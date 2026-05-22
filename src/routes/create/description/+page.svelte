@@ -40,11 +40,14 @@ Output ONLY the text of the description, nothing else.`;
 
 			if (selectedProvider === 'gemini') {
 				const modelName = config.model || 'gemini-1.5-flash';
-				const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${config.key}`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-				});
+				const res = await fetch(
+					`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${config.key}`,
+					{
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+					}
+				);
 				const data = await res.json();
 				if (data.error) throw new Error(data.error.message);
 				description = data.candidates[0].content.parts[0].text.trim();
@@ -80,7 +83,7 @@ Output ONLY the text of the description, nothing else.`;
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
-						...(config.key ? { 'Authorization': `Bearer ${config.key}` } : {})
+						...(config.key ? { Authorization: `Bearer ${config.key}` } : {})
 					},
 					body: JSON.stringify({
 						model,
@@ -108,58 +111,109 @@ Output ONLY the text of the description, nothing else.`;
 
 <div class="mx-auto max-w-4xl px-6 py-12">
 	<div class="grid items-start gap-12 lg:grid-cols-[1fr_2fr]">
-		
 		<div class="flex flex-col gap-4 pt-2">
 			<h1 style="color: var(--text-primary);" class="text-3xl font-bold tracking-tight">
 				Skill Description
 			</h1>
 			<p style="color: var(--text-secondary);" class="text-base">
-				Describe what your skill <span style="color: var(--accent); font-family: var(--font-mono)">{skillName}</span> does.
+				Describe what your skill <span style="color: var(--accent); font-family: var(--font-mono)"
+					>{skillName}</span
+				> does.
 			</p>
-			
-			<div class="mt-8 flex flex-col gap-5 border-l-2 border-(--accent) bg-(--surface-sunken) p-6 shadow-sm">
-				<h3 style="color: var(--accent); font-family: var(--font-display);" class="text-sm font-bold uppercase tracking-widest flex items-center gap-3">
+
+			<div
+				class="mt-8 flex flex-col gap-5 border-l-2 border-(--accent) bg-(--surface-sunken) p-6 shadow-sm"
+			>
+				<h3
+					style="color: var(--accent); font-family: var(--font-display);"
+					class="flex items-center gap-3 text-sm font-bold tracking-widest uppercase"
+				>
 					<i class="bi bi-lightbulb"></i>
 					Helpful Tips
 				</h3>
 				<div class="flex flex-col gap-5" style="font-family: var(--font-mono);">
 					<div class="flex flex-col gap-1.5">
-						<span style="color: var(--text-primary);" class="text-xs font-semibold uppercase tracking-widest">01 // When to use it</span>
-						<span style="color: var(--text-secondary);" class="text-[12px] leading-relaxed opacity-80">Tell the AI exactly when it should use this skill, not just what the skill does.</span>
+						<span
+							style="color: var(--text-primary);"
+							class="text-xs font-semibold tracking-widest uppercase">01 // When to use it</span
+						>
+						<span
+							style="color: var(--text-secondary);"
+							class="text-[12px] leading-relaxed opacity-80"
+							>Tell the AI exactly when it should use this skill, not just what the skill does.</span
+						>
 					</div>
 					<div class="flex flex-col gap-1.5">
-						<span style="color: var(--text-primary);" class="text-xs font-semibold uppercase tracking-widest">02 // How to start</span>
-						<span style="color: var(--text-secondary);" class="text-[12px] leading-relaxed opacity-80">Always start your sentence with "Use this skill when..."</span>
+						<span
+							style="color: var(--text-primary);"
+							class="text-xs font-semibold tracking-widest uppercase">02 // How to start</span
+						>
+						<span
+							style="color: var(--text-secondary);"
+							class="text-[12px] leading-relaxed opacity-80"
+							>Always start your sentence with "Use this skill when..."</span
+						>
 					</div>
 					<div class="flex flex-col gap-1.5">
-						<span style="color: var(--text-primary);" class="text-xs font-semibold uppercase tracking-widest">03 // Give clear examples</span>
-						<span style="color: var(--text-secondary);" class="text-[12px] leading-relaxed opacity-80">Mention specific words or situations so the AI knows exactly what to look for.</span>
+						<span
+							style="color: var(--text-primary);"
+							class="text-xs font-semibold tracking-widest uppercase"
+							>03 // Give clear examples</span
+						>
+						<span
+							style="color: var(--text-secondary);"
+							class="text-[12px] leading-relaxed opacity-80"
+							>Mention specific words or situations so the AI knows exactly what to look for.</span
+						>
 					</div>
 					<div class="flex flex-col gap-1.5">
-						<span style="color: var(--text-primary);" class="text-xs font-semibold uppercase tracking-widest">04 // Keep it short</span>
-						<span style="color: var(--text-secondary);" class="text-[12px] leading-relaxed opacity-80">Be direct and to the point. Don't write a long paragraph.</span>
+						<span
+							style="color: var(--text-primary);"
+							class="text-xs font-semibold tracking-widest uppercase">04 // Keep it short</span
+						>
+						<span
+							style="color: var(--text-secondary);"
+							class="text-[12px] leading-relaxed opacity-80"
+							>Be direct and to the point. Don't write a long paragraph.</span
+						>
 					</div>
 				</div>
 			</div>
 		</div>
 
 		<div class="flex w-full flex-col gap-8">
-			
 			{#if errorMsg}
-				<div style="border-left: 2px solid var(--secondary); background: var(--secondary-subtle); color: var(--secondary); font-family: var(--font-mono)" class="p-4 text-sm shadow-sm rounded">
+				<div
+					style="border-left: 2px solid var(--secondary); background: var(--secondary-subtle); color: var(--secondary); font-family: var(--font-mono)"
+					class="rounded p-4 text-sm shadow-sm"
+				>
 					[Error] {errorMsg}
 				</div>
 			{/if}
 
 			<div class="flex flex-col gap-6">
 				{#if availableProviders.length > 0}
-					<div style="background: var(--surface-sunken); border: 1px solid var(--border-strong)" class="flex flex-col gap-4 rounded p-5 shadow-sm">
+					<div
+						style="background: var(--surface-sunken); border: 1px solid var(--border-strong)"
+						class="flex flex-col gap-4 rounded p-5 shadow-sm"
+					>
 						<div>
-							<h3 style="color: var(--text-primary);" class="text-sm font-semibold uppercase tracking-wider">Don't want to write it yourself?</h3>
-							<p style="color: var(--text-secondary);" class="mt-1 text-sm">Let our AI write a great description for you.</p>
+							<h3
+								style="color: var(--text-primary);"
+								class="text-sm font-semibold tracking-wider uppercase"
+							>
+								Don't want to write it yourself?
+							</h3>
+							<p style="color: var(--text-secondary);" class="mt-1 text-sm">
+								Let our AI write a great description for you.
+							</p>
 						</div>
-						<div class="flex flex-col sm:flex-row items-center gap-3">
-							<select bind:value={selectedProvider} style="color: var(--text-primary); border: 1px solid var(--border-strong);" class="w-full sm:w-auto appearance-none rounded bg-transparent px-3 py-2 text-sm focus:outline-none">
+						<div class="flex flex-col items-center gap-3 sm:flex-row">
+							<select
+								bind:value={selectedProvider}
+								style="color: var(--text-primary); border: 1px solid var(--border-strong);"
+								class="w-full appearance-none rounded bg-transparent px-3 py-2 text-sm focus:outline-none sm:w-auto"
+							>
 								{#each availableProviders as provider}
 									<option value={provider}>{provider}</option>
 								{/each}
@@ -169,7 +223,7 @@ Output ONLY the text of the description, nothing else.`;
 								onclick={handleGenerate}
 								disabled={isGenerating}
 								style="border: 1px solid var(--accent); color: var(--accent);"
-								class="flex w-full sm:w-auto items-center justify-center gap-2 rounded px-4 py-2 text-sm font-medium uppercase tracking-wider transition-colors hover:bg-(--accent-glow) disabled:cursor-not-allowed disabled:opacity-50"
+								class="flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm font-medium tracking-wider uppercase transition-colors hover:bg-(--accent-glow) disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
 							>
 								{#if isGenerating}
 									<span class="animate-pulse">Writing...</span>
@@ -182,13 +236,20 @@ Output ONLY the text of the description, nothing else.`;
 
 					<div class="flex items-center gap-4">
 						<div class="h-px w-full" style="background: var(--border-default)"></div>
-						<span style="color: var(--text-tertiary);" class="text-xs font-medium uppercase tracking-widest">OR</span>
+						<span
+							style="color: var(--text-tertiary);"
+							class="text-xs font-medium tracking-widest uppercase">OR</span
+						>
 						<div class="h-px w-full" style="background: var(--border-default)"></div>
 					</div>
 				{/if}
 
 				<div class="flex flex-col gap-3">
-					<label for="description" style="color: var(--text-primary);" class="text-sm font-semibold uppercase tracking-wider">
+					<label
+						for="description"
+						style="color: var(--text-primary);"
+						class="text-sm font-semibold tracking-wider uppercase"
+					>
 						{availableProviders.length > 0 ? 'Write it yourself' : 'Description'}
 					</label>
 
@@ -198,12 +259,16 @@ Output ONLY the text of the description, nothing else.`;
 						placeholder="Use this skill when..."
 						rows="8"
 						style="background: var(--surface-sunken); color: var(--text-primary); border: 1px solid var(--border-strong);"
-						class="w-full resize-y rounded p-4 text-base transition-colors focus:border-(--accent) focus:outline-none focus:ring-1 focus:ring-(--focus-ring) placeholder:text-(--text-tertiary)"
+						class="w-full resize-y rounded p-4 text-base transition-colors placeholder:text-(--text-tertiary) focus:border-(--accent) focus:ring-1 focus:ring-(--focus-ring) focus:outline-none"
 					></textarea>
 
-					<div class="flex items-center justify-between text-xs font-mono uppercase tracking-wider">
+					<div class="flex items-center justify-between font-mono text-xs tracking-wider uppercase">
 						<span style="color: var(--text-tertiary)">Up to 1024 characters</span>
-						<span style="color: {description.length > 1024 ? 'var(--secondary)' : 'var(--text-secondary)'}">
+						<span
+							style="color: {description.length > 1024
+								? 'var(--secondary)'
+								: 'var(--text-secondary)'}"
+						>
 							{description.length} / 1024
 						</span>
 					</div>
@@ -223,13 +288,16 @@ Output ONLY the text of the description, nothing else.`;
 				<button
 					type="button"
 					disabled={!isValid}
+					onclick={() =>
+						goto(
+							`/create/optional?name=${skillName}&description=${encodeURIComponent(description)}`
+						)}
 					class="rounded bg-(--accent) px-6 py-3 text-sm font-semibold transition-colors hover:bg-(--accent-hover) disabled:cursor-not-allowed disabled:opacity-50"
 					style="color: var(--accent-fg);"
 				>
-					Save Skill
+					Next Step
 				</button>
 			</div>
-			
 		</div>
 	</div>
 </div>

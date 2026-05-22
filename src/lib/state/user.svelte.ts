@@ -11,7 +11,8 @@ class UserState {
 			if (storedKeys) {
 				try {
 					const parsed = JSON.parse(storedKeys);
-					const migratedKeys: Record<string, { key: string; endpoint: string; model?: string }> = {};
+					const migratedKeys: Record<string, { key: string; endpoint: string; model?: string }> =
+						{};
 					for (const [provider, value] of Object.entries(parsed)) {
 						if (typeof value === 'string') {
 							migratedKeys[provider] = { key: value, endpoint: '' };

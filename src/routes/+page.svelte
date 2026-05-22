@@ -109,16 +109,15 @@
 				Generate skills<br />for your<br /><span class="hero-accent">AI agents</span>
 			</h1>
 			<p class="hero-sub">
-				A free, open-source app to build structured AI agent skills. Everything runs safely in your browser.
+				A free, open-source app to build structured AI agent skills. Everything runs safely in your
+				browser.
 			</p>
 			<div class="hero-actions">
 				<a href="/create" class="btn btn-primary" id="cta-create">
 					<i class="bi bi-terminal" aria-hidden="true"></i>
 					Start Building
 				</a>
-				<a href="/browse" class="btn btn-outline" id="cta-browse">
-					Explore Skills
-				</a>
+				<a href="/browse" class="btn btn-outline" id="cta-browse"> Explore Skills </a>
 			</div>
 		</div>
 		<div class="hero-terminal">
@@ -266,8 +265,13 @@
 	}
 
 	@keyframes pulse-dot {
-		0%, 100% { opacity: 1; }
-		50% { opacity: 0.4; }
+		0%,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.4;
+		}
 	}
 
 	.badge-label {
@@ -344,7 +348,9 @@
 
 	.btn-primary:hover {
 		background: var(--accent-hover);
-		box-shadow: 0 0 24px var(--accent-glow), 0 0 48px var(--accent-glow);
+		box-shadow:
+			0 0 24px var(--accent-glow),
+			0 0 48px var(--accent-glow);
 		color: var(--accent-fg);
 	}
 

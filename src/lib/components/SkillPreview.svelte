@@ -19,7 +19,7 @@
 		{ content: '  - Correctness over cleverness', type: 'value' },
 		{ content: '  - Performance bottlenecks', type: 'value' },
 		{ content: '  - Security vulnerabilities', type: 'value' },
-		{ content: '  - Naming clarity', type: 'value' },
+		{ content: '  - Naming clarity', type: 'value' }
 	];
 </script>
 
@@ -33,8 +33,23 @@
 		<span class="terminal-title">SKILL.md — code-reviewer</span>
 		<span class="terminal-status" aria-hidden="true">● LIVE</span>
 	</div>
-	<pre class="terminal-body"><code>{#each LINES as line, i (i)}<span class="line"><span class="line-num" aria-hidden="true">{String(i + 1).padStart(2, ' ')}</span>{#if line.type === 'divider'}<span class="t-divider">{line.content}</span>{:else if line.type === 'key'}<span class="t-key">{line.content.split(':')[0]}:</span><span class="t-val">{line.content.slice(line.content.indexOf(':') + 1)}</span>{:else if line.type === 'comment'}<span class="t-comment">{line.content}</span>{:else if line.type === 'value'}<span class="t-list">{line.content}</span>{:else if line.type === 'blank'}<span class="t-blank">{'\u200B'}</span>{:else}<span class="t-text">{line.content}</span>{/if}</span>
-{/each}<span class="line"><span class="line-num" aria-hidden="true">{String(LINES.length + 1).padStart(2, ' ')}</span><span class="cursor" aria-hidden="true">▌</span></span></code></pre>
+	<pre class="terminal-body"><code
+			>{#each LINES as line, i (i)}<span class="line"
+					><span class="line-num" aria-hidden="true">{String(i + 1).padStart(2, ' ')}</span
+					>{#if line.type === 'divider'}<span class="t-divider">{line.content}</span
+						>{:else if line.type === 'key'}<span class="t-key">{line.content.split(':')[0]}:</span
+						><span class="t-val">{line.content.slice(line.content.indexOf(':') + 1)}</span
+						>{:else if line.type === 'comment'}<span class="t-comment">{line.content}</span
+						>{:else if line.type === 'value'}<span class="t-list">{line.content}</span
+						>{:else if line.type === 'blank'}<span class="t-blank">{'\u200B'}</span>{:else}<span
+							class="t-text">{line.content}</span
+						>{/if}</span
+				>
+			{/each}<span class="line"
+				><span class="line-num" aria-hidden="true">{String(LINES.length + 1).padStart(2, ' ')}</span
+				><span class="cursor" aria-hidden="true">▌</span></span
+			></code
+		></pre>
 </div>
 
 <style>
@@ -70,9 +85,15 @@
 		border-radius: 50%;
 	}
 
-	.dot--red { background: oklch(60% 0.2 25); }
-	.dot--yellow { background: oklch(78% 0.16 85); }
-	.dot--green { background: oklch(70% 0.16 145); }
+	.dot--red {
+		background: oklch(60% 0.2 25);
+	}
+	.dot--yellow {
+		background: oklch(78% 0.16 85);
+	}
+	.dot--green {
+		background: oklch(70% 0.16 145);
+	}
 
 	.terminal-title {
 		flex: 1;
@@ -119,12 +140,25 @@
 		opacity: 0.5;
 	}
 
-	.t-divider { color: var(--terminal-comment); }
-	.t-key { color: var(--terminal-keyword); }
-	.t-val { color: var(--terminal-text); }
-	.t-comment { color: var(--terminal-comment); font-style: italic; }
-	.t-list { color: var(--terminal-string); }
-	.t-text { color: var(--text-secondary); }
+	.t-divider {
+		color: var(--terminal-comment);
+	}
+	.t-key {
+		color: var(--terminal-keyword);
+	}
+	.t-val {
+		color: var(--terminal-text);
+	}
+	.t-comment {
+		color: var(--terminal-comment);
+		font-style: italic;
+	}
+	.t-list {
+		color: var(--terminal-string);
+	}
+	.t-text {
+		color: var(--text-secondary);
+	}
 
 	.cursor {
 		color: var(--accent);
@@ -132,8 +166,13 @@
 	}
 
 	@keyframes blink {
-		0%, 100% { opacity: 1; }
-		50% { opacity: 0; }
+		0%,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0;
+		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {

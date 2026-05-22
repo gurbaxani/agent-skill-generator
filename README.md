@@ -11,6 +11,7 @@ Agent Skill Generator is a modern web application built with SvelteKit that allo
 ## Tech Stack
 
 This project is built using:
+
 - [Svelte 5](https://svelte.dev/) - UI Framework (using Runes)
 - [SvelteKit](https://kit.svelte.dev/) - Application Framework
 - [Tailwind CSS 4](https://tailwindcss.com/) - Utility-first styling
@@ -27,6 +28,7 @@ This project is built using:
 ### Installation
 
 1. Clone the repository and navigate to the project directory:
+
    ```sh
    cd agent-skill-generator
    ```
@@ -74,7 +76,6 @@ npm run preview
 ## Code Quality & Standards
 
 This project uses:
+
 - Strict Type Safety: No `:any` types allowed.
 - Svelte 5 Runes: Exclusively uses `$state`, `$derived`, `$props` for reactivity.
-
-
