@@ -5,9 +5,9 @@
 
 /* ─── Tailwind v4 Theme ─── */
 :root {
-  --font-display: 'Outfit', system-ui, sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --font-mono: 'Fira Code', 'Cascadia Code', monospace;
+  --font-display: 'Chakra Petch', 'Consolas', monospace;
+  --font-body: 'Rajdhani', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
@@ -181,11 +181,11 @@
 
 html {
   font-family: var(--font-body);
+  font-weight: 500;
+  letter-spacing: 0.02em;
   font-size: var(--text-base);
   line-height: var(--leading-base);
   font-kerning: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   background-color: var(--surface-base);
   color: var(--text-primary);

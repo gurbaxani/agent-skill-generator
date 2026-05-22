@@ -298,7 +298,7 @@
 		line-height: var(--leading-base);
 		color: var(--text-secondary);
 		max-width: 42ch;
-		font-weight: 400;
+		font-weight: 500;
 	}
 
 	.hero-actions {
