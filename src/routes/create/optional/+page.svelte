@@ -154,7 +154,20 @@ Output ONLY the JSON, nothing else.`;
 	}
 
 	function handleSave() {
-		// This will be implemented later to finalize the skill creation
+		const params = new URLSearchParams();
+		params.set('name', skillName);
+		params.set('description', description);
+		if (license) params.set('license', license);
+		if (compatibility) params.set('compatibility', compatibility);
+		if (allowedTools) params.set('allowed-tools', allowedTools);
+		if (metadata.length > 0) {
+			const metaObj: Record<string, string> = {};
+			for (const m of metadata) {
+				if (m.key) metaObj[m.key] = m.value;
+			}
+			params.set('metadata', JSON.stringify(metaObj));
+		}
+		goto(`/create/skill?${params.toString()}`);
 	}
 </script>
 
