@@ -120,7 +120,7 @@ Output ONLY the text of the description, nothing else.`;
 			</p>
 			
 			<div class="mt-8 flex flex-col gap-5 border-l-2 border-(--accent) bg-(--surface-sunken) p-6 shadow-sm">
-				<h3 style="color: var(--accent); font-family: var(--font-display);" class="text-sm font-bold uppercase tracking-[0.1em] flex items-center gap-3">
+				<h3 style="color: var(--accent); font-family: var(--font-display);" class="text-sm font-bold uppercase tracking-widest flex items-center gap-3">
 					<i class="bi bi-lightbulb"></i>
 					Helpful Tips
 				</h3>
