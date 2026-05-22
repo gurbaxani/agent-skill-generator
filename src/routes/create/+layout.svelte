@@ -4,7 +4,8 @@
 	const STEPS = [
 		{ index: 1, label: 'Required', segment: '/create/required', exact: false },
 		{ index: 2, label: 'Optional', segment: '/create/optional', exact: false },
-		{ index: 3, label: 'Body', segment: '/create/skill', exact: false }
+		{ index: 3, label: 'Body', segment: '/create/skill', exact: false },
+		{ index: 4, label: 'Directories', segment: '/create/directories', exact: false }
 	] as const;
 
 	let currentStep = $derived.by(() => {
@@ -12,6 +13,7 @@
 		if (path.startsWith('/create/required')) return 1;
 		if (path.startsWith('/create/optional')) return 2;
 		if (path.startsWith('/create/skill')) return 3;
+		if (path.startsWith('/create/directories')) return 4;
 		return 1;
 	});
 

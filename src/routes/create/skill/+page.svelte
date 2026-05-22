@@ -190,6 +190,11 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 		downloaded = true;
 		setTimeout(() => (downloaded = false), 2000);
 	}
+	function handleNext() {
+		const params = new URLSearchParams($page.url.searchParams);
+		params.set('body', body);
+		goto(`/create/directories?${params.toString()}`);
+	}
 </script>
 
 <div class="mx-auto max-w-4xl px-6 py-12">
@@ -449,6 +454,18 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 						{:else}
 							<i class="bi bi-download" aria-hidden="true"></i> Download SKILL.md
 						{/if}
+					</button>
+
+					<!-- Next step -->
+					<button
+						type="button"
+						id="btn-next-directories"
+						onclick={handleNext}
+						disabled={!isValid}
+						class="flex items-center gap-2 px-6 py-3 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--surface-sunken) hover:border-(--accent) hover:text-(--accent) disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none"
+						style="color: var(--text-secondary); border: 1px solid var(--border-strong); border-radius: 2px; font-family: var(--font-display);"
+					>
+						Directories <i class="bi bi-arrow-right" aria-hidden="true"></i>
 					</button>
 				</div>
 			</div>

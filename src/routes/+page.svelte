@@ -121,7 +121,9 @@
 			</div>
 		</div>
 		<div class="hero-terminal">
-			<SkillPreview />
+			<div class="hero-terminal-preview">
+				<SkillPreview />
+			</div>
 		</div>
 	</div>
 	<div class="hero-stats" aria-label="Key facts">
@@ -428,6 +430,14 @@
 	.hero-terminal {
 		display: flex;
 		justify-content: flex-end;
+	}
+
+	.hero-terminal-preview :global(.terminal-body) {
+		line-height: .5;
+	}
+
+	.hero-terminal-preview :global(.line) {
+		min-height: .75em;
 	}
 
 	/* ─── Section Labels ─── */
