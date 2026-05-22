@@ -192,6 +192,13 @@
 							</button>
 						</div>
 					{/each}
+					
+					<div class="action-footer">
+						<a href="/create" class="cyber-btn solid">
+							Continue to Create Skill
+							<i class="bi bi-arrow-right" aria-hidden="true"></i>
+						</a>
+					</div>
 				{/if}
 			</div>
 		</section>
@@ -426,6 +433,36 @@
 		cursor: not-allowed;
 		border-color: var(--border-strong);
 		color: var(--text-tertiary);
+	}
+
+	.cyber-btn.secondary {
+		border-color: var(--secondary);
+		color: var(--secondary);
+	}
+
+	.cyber-btn.secondary:hover:not(:disabled) {
+		background: var(--secondary-subtle);
+		box-shadow: 0 0 15px var(--secondary-subtle);
+	}
+
+	.cyber-btn.solid {
+		background: var(--accent);
+		color: var(--surface-base);
+		border-color: var(--accent);
+		box-shadow: 0 0 10px var(--accent-glow);
+	}
+
+	.cyber-btn.solid:hover:not(:disabled) {
+		background: var(--accent-hover);
+		box-shadow: 0 0 20px var(--accent-glow);
+	}
+
+	.action-footer {
+		display: flex;
+		justify-content: flex-end;
+		margin-top: var(--space-md);
+		padding-top: var(--space-md);
+		border-top: 1px dashed var(--border-default);
 	}
 
 	.keys-list {
