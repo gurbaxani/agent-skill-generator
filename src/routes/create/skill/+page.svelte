@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { userState } from '$lib/state/user.svelte';
+	import { marked } from 'marked';
 
 	// ── Params from previous steps ──────────────────────────────────────────
 	let skillName = $derived($page.url.searchParams.get('name') || '');
@@ -65,6 +66,19 @@
 	});
 
 	let isValid = $derived(body.trim().length > 0);
+
+	// ── Markdown preview ─────────────────────────────────────────────────────
+	/** Frontmatter lines extracted from the assembled file (between the --- delimiters) */
+	let frontmatterLines = $derived.by(() => {
+		const lines = skillFile.split('\n');
+		const start = lines.indexOf('---');
+		const end = lines.indexOf('---', start + 1);
+		if (start === -1 || end === -1) return [];
+		return lines.slice(start + 1, end);
+	});
+
+	/** Rendered HTML of the body markdown */
+	let renderedBody = $derived(marked.parse(body.trim() || '_No content written yet._') as string);
 
 	// ── AI generation ────────────────────────────────────────────────────────
 	async function handleGenerate() {
@@ -352,7 +366,7 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 					</div>
 				{:else}
 					<!-- Full assembled SKILL.md preview -->
-					<div class="flex flex-col gap-2">
+					<div class="flex flex-col gap-2" id="skill-preview">
 						<div class="flex items-center justify-between">
 							<span
 								style="color: var(--text-primary); font-family: var(--font-display);"
@@ -367,11 +381,28 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 								{skillFile.split('\n').length} lines
 							</span>
 						</div>
-						<pre
-							id="skill-preview"
-							style="background: var(--surface-sunken); border: 1px solid var(--border-strong); border-radius: 2px; color: var(--text-secondary); font-family: var(--font-mono); line-height: 1.65; max-height: 480px; overflow-y: auto;"
-							class="w-full p-4 text-sm whitespace-pre-wrap break-words"
-						>{skillFile}</pre>
+
+						<!-- Frontmatter block -->
+						<div class="preview-frontmatter">
+							<span class="fm-fence">---</span>
+							{#each frontmatterLines as fmLine (fmLine)}
+								{@const colonIdx = fmLine.indexOf(':')}
+								{#if colonIdx > -1}
+									<div class="fm-row">
+										<span class="fm-key">{fmLine.slice(0, colonIdx)}:</span><span class="fm-val">{fmLine.slice(colonIdx + 1)}</span>
+									</div>
+								{:else}
+									<div class="fm-row"><span class="fm-indent">{fmLine}</span></div>
+								{/if}
+							{/each}
+							<span class="fm-fence">---</span>
+						</div>
+
+						<!-- Rendered markdown body -->
+						<div class="preview-prose">
+							<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+							{@html renderedBody}
+						</div>
 					</div>
 				{/if}
 			</div>
@@ -424,3 +455,162 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 		</div>
 	</div>
 </div>
+
+<style>
+	/* ── Frontmatter block ───────────────────────────────────────────────── */
+	.preview-frontmatter {
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		line-height: 1.8;
+		padding: 0.75rem 1rem;
+		background: var(--surface-sunken);
+		border: 1px solid var(--border-strong);
+		border-radius: 2px;
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+		overflow-x: hidden;
+		word-break: break-word;
+		overflow-wrap: break-word;
+	}
+
+	.fm-fence {
+		color: var(--terminal-comment, oklch(60% 0.05 270));
+		font-style: italic;
+	}
+
+	.fm-row {
+		display: flex;
+		gap: 0;
+		flex-wrap: wrap;
+	}
+
+	.fm-key {
+		color: var(--terminal-keyword, oklch(70% 0.18 270));
+		min-width: 0;
+	}
+
+	.fm-val {
+		color: var(--terminal-text, var(--text-secondary));
+		white-space: pre-wrap;
+	}
+
+	.fm-indent {
+		color: var(--terminal-string, var(--text-secondary));
+		padding-left: 1.25rem;
+	}
+
+	/* ── Markdown prose body ─────────────────────────────────────────────── */
+	.preview-prose {
+		padding: 1.25rem 1.25rem 1.5rem;
+		background: var(--surface-sunken);
+		border: 1px solid var(--border-strong);
+		border-radius: 2px;
+		color: var(--text-secondary);
+		font-family: var(--font-body);
+		font-size: 0.875rem;
+		line-height: 1.75;
+		max-height: 480px;
+		overflow-x: hidden;
+		overflow-y: auto;
+		word-break: break-word;
+		overflow-wrap: break-word;
+	}
+
+	/* Headings */
+	.preview-prose :global(h1),
+	.preview-prose :global(h2),
+	.preview-prose :global(h3),
+	.preview-prose :global(h4) {
+		font-family: var(--font-display);
+		color: var(--text-primary);
+		font-weight: 700;
+		letter-spacing: 0.02em;
+		margin-top: 1.5em;
+		margin-bottom: 0.4em;
+	}
+
+	.preview-prose :global(h1) { font-size: 1.25rem; }
+	.preview-prose :global(h2) { font-size: 1.05rem; border-bottom: 1px solid var(--border-default); padding-bottom: 0.25em; }
+	.preview-prose :global(h3) { font-size: 0.9rem; color: var(--accent); }
+	.preview-prose :global(h4) { font-size: 0.825rem; text-transform: uppercase; }
+
+	/* Paragraphs */
+	.preview-prose :global(p) {
+		margin-top: 0;
+		margin-bottom: 0.85em;
+	}
+
+	/* Inline code */
+	.preview-prose :global(code) {
+		font-family: var(--font-mono);
+		font-size: 0.8em;
+		background: var(--surface-raised, oklch(20% 0.02 270 / 0.6));
+		color: var(--accent);
+		padding: 0.15em 0.4em;
+		border-radius: 3px;
+	}
+
+	/* Code blocks */
+	.preview-prose :global(pre) {
+		font-family: var(--font-mono);
+		font-size: 0.78rem;
+		background: oklch(12% 0.02 270 / 0.8);
+		border: 1px solid var(--border-strong);
+		border-radius: 2px;
+		padding: 0.9rem 1rem;
+		overflow-x: auto;
+		white-space: pre-wrap;
+		word-break: break-word;
+		margin: 0.85em 0;
+	}
+
+	.preview-prose :global(pre code) {
+		background: none;
+		padding: 0;
+		color: var(--text-secondary);
+		font-size: inherit;
+	}
+
+	/* Lists */
+	.preview-prose :global(ul),
+	.preview-prose :global(ol) {
+		padding-left: 1.4em;
+		margin-bottom: 0.85em;
+	}
+
+	.preview-prose :global(li) {
+		margin-bottom: 0.3em;
+	}
+
+	.preview-prose :global(li::marker) {
+		color: var(--accent);
+	}
+
+	/* Blockquote */
+	.preview-prose :global(blockquote) {
+		border-left: 3px solid var(--accent);
+		margin: 0.85em 0;
+		padding: 0.4em 1em;
+		color: var(--text-tertiary);
+		font-style: italic;
+		background: oklch(20% 0.02 270 / 0.3);
+	}
+
+	/* Horizontal rule */
+	.preview-prose :global(hr) {
+		border: none;
+		border-top: 1px solid var(--border-strong);
+		margin: 1.25em 0;
+	}
+
+	/* Strong / em */
+	.preview-prose :global(strong) {
+		color: var(--text-primary);
+		font-weight: 700;
+	}
+
+	.preview-prose :global(em) {
+		color: var(--text-tertiary);
+	}
+</style>
