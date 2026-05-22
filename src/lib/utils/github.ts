@@ -90,7 +90,7 @@ export function getGithubPrUrl(registrySkill: RegistrySkill): string {
 	const value = JSON.stringify(registrySkill, null, 2);
 	const message = `Add community skill: ${registrySkill.name}`;
 
-	const baseUrl = `https://github.com/gurbaxani/agent-skill-generator/new/main`;
+	const baseUrl = `https://github.com/gurbaxani/agent-skill-generator/new/trunk`;
 	const params = new URLSearchParams();
 	params.append('filename', filename);
 	params.append('value', value);

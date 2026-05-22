@@ -492,24 +492,43 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 	}
 
 	// ── GitHub Submission ────────────────────────────────────────────────────
-	import { serializeSkillToRegistry, getGithubPrUrl } from '$lib/utils/github';
+	import { serializeSkillToRegistry } from '$lib/utils/github';
 
 	let isSubmitModalOpen = $state(false);
 	let githubUsername = $state('');
 	let isSubmitting = $state(false);
+	let submitErrorMsg = $state('');
+	let prSubmitSuccessUrl = $state('');
 
 	async function handleSubmitToGithub() {
 		if (!githubUsername.trim()) return;
 		isSubmitting = true;
-		errorMsg = '';
+		submitErrorMsg = '';
 		try {
 			const registrySkill = await serializeSkillToRegistry(skillDraft, githubUsername);
-			const prUrl = getGithubPrUrl(registrySkill);
-			window.open(prUrl, '_blank', 'noopener,noreferrer');
+			
+			const response = await fetch('/api/submit-pr', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					skill: registrySkill,
+					authorUsername: githubUsername
+				})
+			});
+
+			const result = await response.json();
+
+			if (!response.ok) {
+				throw new Error(result.error || `HTTP error ${response.status}`);
+			}
+
+			prSubmitSuccessUrl = result.prUrl;
 			isSubmitModalOpen = false;
 		} catch (err) {
 			console.error(err);
-			errorMsg = err instanceof Error ? err.message : 'Failed to generate GitHub submission URL.';
+			submitErrorMsg = err instanceof Error ? err.message : 'Failed to submit Pull Request.';
 		} finally {
 			isSubmitting = false;
 		}
@@ -1446,9 +1465,8 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 						<span class="text-(--text-primary) font-semibold uppercase text-[10px] tracking-wider">How it works:</span>
 						<ol class="list-decimal list-inside flex flex-col gap-1.5 opacity-90">
 							<li>Enter your GitHub username to receive author attribution.</li>
-							<li>Clicking "Continue to GitHub" will redirect you to pre-populate a new file commit.</li>
-							<li>Commit the new file in your GitHub account (this will prompt you to fork & propose changes).</li>
-							<li>Open a Pull Request to merge your skill into the registry.</li>
+							<li>Clicking "Submit to GitHub" will trigger a Cloudflare Worker request.</li>
+							<li>The backend automatically creates a branch, commits the file, and opens a Pull Request on your behalf.</li>
 						</ol>
 					</div>
 
@@ -1468,6 +1486,15 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 							/>
 						</div>
 					</div>
+
+					{#if submitErrorMsg}
+						<div
+							style="border: 1px solid var(--secondary); background: var(--secondary-subtle); color: var(--secondary); font-family: var(--font-mono); border-radius: 2px;"
+							class="p-3 text-xs leading-relaxed"
+						>
+							[Error] {submitErrorMsg}
+						</div>
+					{/if}
 				</div>
 
 				<div class="modal-footer border-t border-(--border-default) pt-4 flex justify-end gap-3">
@@ -1487,13 +1514,40 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 						class="flex items-center gap-1.5 px-4 py-2 text-[11px] font-bold tracking-wider uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_10px_var(--accent-glow)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
 					>
 						{#if isSubmitting}
-							<span class="animate-pulse">Loading...</span>
+							<span class="animate-pulse">Submitting...</span>
 						{:else}
 							<i class="bi bi-github"></i>
-							Continue to GitHub
+							Submit to GitHub
 						{/if}
 					</button>
 				</div>
+			</div>
+		</div>
+	{/if}
+
+	<!-- Success Toast Overlay -->
+	{#if prSubmitSuccessUrl}
+		<div class="toast-overlay" role="alert">
+			<div class="toast-content cyber-panel glow-accent flex flex-col gap-3 p-4" style="background: var(--surface-raised); border: 1px solid var(--border-accent); border-radius: 2px; max-width: 320px;">
+				<div class="flex items-center justify-between border-b border-(--border-default) pb-2">
+					<span class="font-mono text-[10px] font-bold uppercase tracking-wider text-(--accent)">Submission Successful</span>
+					<button type="button" onclick={() => (prSubmitSuccessUrl = '')} class="text-(--text-tertiary) hover:text-(--text-primary) focus:outline-none" aria-label="Close success toast">
+						<i class="bi bi-x-lg"></i>
+					</button>
+				</div>
+				<p class="font-mono text-xs text-(--text-secondary) leading-relaxed">
+					Your pull request has been automatically created in the registry repository!
+				</p>
+				<a
+					href={prSubmitSuccessUrl}
+					target="_blank"
+					rel="noopener noreferrer"
+					style="background: var(--accent); color: var(--accent-fg); font-family: var(--font-display);"
+					class="flex items-center justify-center gap-1.5 rounded-[2px] py-2 text-xs font-bold tracking-wider uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_10px_var(--accent-glow)]"
+				>
+					<i class="bi bi-box-arrow-up-right"></i>
+					View Pull Request
+				</a>
 			</div>
 		</div>
 	{/if}
@@ -1847,5 +1901,28 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 		flex-direction: column;
 		gap: 16px;
 		box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+	}
+
+	/* Toast overlay styling */
+	.toast-overlay {
+		position: fixed;
+		top: var(--space-xl);
+		right: var(--space-xl);
+		z-index: 9999;
+		animation: slide-in 0.25s var(--ease-out-quart) both;
+	}
+	.toast-content {
+		padding: var(--space-md) var(--space-lg);
+	}
+
+	@keyframes slide-in {
+		from {
+			opacity: 0;
+			transform: translateY(-20px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 </style>
