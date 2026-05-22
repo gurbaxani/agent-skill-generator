@@ -130,11 +130,17 @@ Output ONLY the JSON, nothing else.`;
 			if (parsed.references?.enabled) {
 				skillDraft.enableReferences = true;
 				if (parsed.references.files.length > 0) {
-					skillDraft.refFiles = parsed.references.files.map((f, i) => ({
-						name: f.name,
-						description: f.description,
-						id: skillDraft.nextRefId + i
-					}));
+					skillDraft.refFiles = parsed.references.files.map((f, i) => {
+						let name = f.name.trim();
+						if (name && !name.toLowerCase().endsWith('.md')) {
+							name += '.md';
+						}
+						return {
+							name,
+							description: f.description,
+							id: skillDraft.nextRefId + i
+						};
+					});
 					skillDraft.nextRefId += parsed.references.files.length;
 				}
 			} else {
@@ -178,15 +184,194 @@ Output ONLY the JSON, nothing else.`;
 		}
 	}
 
-	// ── references/ config ────────────────────────────────────────
+	// ── files upload and management ──────────────────────────────
+	let refDragActive = $state(false);
+	let refOpenEditorId = $state<number | null>(null);
+
+	let scriptDragActive = $state(false);
+	let scriptOpenEditorId = $state<number | null>(null);
+
+	let assetDragActive = $state(false);
+	let assetOpenEditorId = $state<number | null>(null);
+
+	function handleRefDrag(e: DragEvent) {
+		e.preventDefault();
+		e.stopPropagation();
+		if (e.type === 'dragenter' || e.type === 'dragover') {
+			refDragActive = true;
+		} else if (e.type === 'dragleave') {
+			refDragActive = false;
+		}
+	}
+
+	function handleRefDrop(e: DragEvent) {
+		e.preventDefault();
+		e.stopPropagation();
+		refDragActive = false;
+		if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+			handleRefFilesUploaded(e.dataTransfer.files);
+		}
+	}
+
+	function handleRefFilesUploaded(files: FileList | File[]) {
+		const mdFiles = Array.from(files).filter((file) =>
+			file.name.toLowerCase().endsWith('.md')
+		);
+		if (mdFiles.length === 0) {
+			errorMsg = 'Please upload Markdown (.md) files only.';
+			return;
+		}
+		errorMsg = '';
+		const newRefFiles = mdFiles.map((file) => {
+			return {
+				name: file.name,
+				description: `Uploaded file: ${file.name}`,
+				id: skillDraft.nextRefId++,
+				file: file,
+				size: file.size
+			};
+		});
+		skillDraft.refFiles = [...skillDraft.refFiles, ...newRefFiles];
+	}
+
 	function addRefFile() {
+		const newId = skillDraft.nextRefId++;
 		skillDraft.refFiles = [
 			...skillDraft.refFiles,
-			{ name: '', description: '', id: skillDraft.nextRefId++ }
+			{ name: '', description: '', content: '', id: newId }
 		];
+		refOpenEditorId = newId;
 	}
+
 	function removeRefFile(id: number) {
 		skillDraft.refFiles = skillDraft.refFiles.filter((f) => f.id !== id);
+		if (refOpenEditorId === id) refOpenEditorId = null;
+	}
+
+	// scripts upload
+	function handleScriptDrag(e: DragEvent) {
+		e.preventDefault();
+		e.stopPropagation();
+		if (e.type === 'dragenter' || e.type === 'dragover') {
+			scriptDragActive = true;
+		} else if (e.type === 'dragleave') {
+			scriptDragActive = false;
+		}
+	}
+
+	function handleScriptDrop(e: DragEvent) {
+		e.preventDefault();
+		e.stopPropagation();
+		scriptDragActive = false;
+		if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+			handleScriptFilesUploaded(e.dataTransfer.files);
+		}
+	}
+
+	function handleScriptFilesUploaded(files: FileList | File[]) {
+		const validFiles = Array.from(files);
+		if (validFiles.length === 0) return;
+		errorMsg = '';
+		const newScriptFiles = validFiles.map((file) => {
+			return {
+				name: file.name,
+				id: skillDraft.nextScriptId++,
+				file: file,
+				size: file.size
+			};
+		});
+		skillDraft.scriptFiles = [...skillDraft.scriptFiles, ...newScriptFiles];
+	}
+
+	function addScriptFile() {
+		const newId = skillDraft.nextScriptId++;
+		skillDraft.scriptFiles = [
+			...skillDraft.scriptFiles,
+			{ name: '', content: '', id: newId }
+		];
+		scriptOpenEditorId = newId;
+	}
+
+	function removeScriptFile(id: number) {
+		skillDraft.scriptFiles = skillDraft.scriptFiles.filter((f) => f.id !== id);
+		if (scriptOpenEditorId === id) scriptOpenEditorId = null;
+	}
+
+	// assets upload
+	function handleAssetDrag(e: DragEvent) {
+		e.preventDefault();
+		e.stopPropagation();
+		if (e.type === 'dragenter' || e.type === 'dragover') {
+			assetDragActive = true;
+		} else if (e.type === 'dragleave') {
+			assetDragActive = false;
+		}
+	}
+
+	function handleAssetDrop(e: DragEvent) {
+		e.preventDefault();
+		e.stopPropagation();
+		assetDragActive = false;
+		if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+			handleAssetFilesUploaded(e.dataTransfer.files);
+		}
+	}
+
+	function getAssetKindFromExtension(name: string): AssetKind {
+		const ext = name.split('.').pop()?.toLowerCase();
+		if (['jpg', 'jpeg', 'png', 'svg', 'gif', 'webp'].includes(ext || '')) return 'images';
+		if (['md', 'html', 'jinja', 'tpl', 'template', 'txt'].includes(ext || '')) return 'templates';
+		return 'data';
+	}
+
+	function handleAssetFilesUploaded(files: FileList | File[]) {
+		const validFiles = Array.from(files);
+		if (validFiles.length === 0) return;
+		errorMsg = '';
+		const newAssetFiles = validFiles.map((file) => {
+			return {
+				name: file.name,
+				id: skillDraft.nextAssetId++,
+				kind: getAssetKindFromExtension(file.name),
+				file: file,
+				size: file.size
+			};
+		});
+		skillDraft.assetFiles = [...skillDraft.assetFiles, ...newAssetFiles];
+	}
+
+	function addAssetFile() {
+		const newId = skillDraft.nextAssetId++;
+		skillDraft.assetFiles = [
+			...skillDraft.assetFiles,
+			{ name: '', kind: 'data', content: '', id: newId }
+		];
+		assetOpenEditorId = newId;
+	}
+
+	// remove asset file
+	function removeAssetFile(id: number) {
+		skillDraft.assetFiles = skillDraft.assetFiles.filter((f) => f.id !== id);
+		if (assetOpenEditorId === id) assetOpenEditorId = null;
+	}
+
+	function formatBytes(bytes?: number): string {
+		if (bytes === undefined) return '';
+		if (bytes === 0) return '0 Bytes';
+		const k = 1024;
+		const sizes = ['Bytes', 'KB', 'MB'];
+		const i = Math.floor(Math.log(bytes) / Math.log(k));
+		return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+	}
+
+	function getFileIcon(name: string): string {
+		const ext = name.split('.').pop()?.toLowerCase();
+		if (ext === 'md') return 'bi-markdown-fill text-[#4a90e2]';
+		if (ext === 'txt') return 'bi-file-earmark-text text-[#8e8e93]';
+		if (ext === 'pdf') return 'bi-file-pdf-fill text-[#ff3b30]';
+		if (['jpg', 'jpeg', 'png', 'svg', 'gif', 'webp'].includes(ext || '')) return 'bi-file-image-fill text-[#34c759]';
+		if (['py', 'sh', 'js', 'json', 'ts'].includes(ext || '')) return 'bi-file-code-fill text-[#ff9500]';
+		return 'bi-file-earmark-fill text-(--text-tertiary)';
 	}
 
 	// ── assets/ config ────────────────────────────────────────────
@@ -409,14 +594,134 @@ Output ONLY the JSON, nothing else.`;
 								</button>
 							{/each}
 						</div>
-						{#if skillDraft.scriptLanguages.length === 0}
+						{#if skillDraft.scriptLanguages.length === 0 && (!skillDraft.scriptFiles || skillDraft.scriptFiles.length === 0)}
 							<p
 								style="color: var(--text-tertiary); font-family: var(--font-mono);"
 								class="text-[11px]"
 							>
-								⚠ Select at least one language.
+								⚠ Select at least one language runtime or upload/create script files.
 							</p>
 						{/if}
+
+						<div class="h-px my-1" style="background: var(--border-default);"></div>
+						<p
+							style="color: var(--text-secondary); font-family: var(--font-body);"
+							class="text-xs font-semibold leading-relaxed mt-1"
+						>
+							Upload script files or write custom scripts:
+						</p>
+
+						<!-- Drag and Drop Dropzone for Scripts -->
+						<div
+							role="presentation"
+							class="dropzone flex flex-col items-center justify-center py-8 px-4 transition-all"
+							class:dropzone-active={scriptDragActive}
+							ondragenter={handleScriptDrag}
+							ondragover={handleScriptDrag}
+							ondragleave={handleScriptDrag}
+							ondrop={handleScriptDrop}
+							style="border: 2px dashed {scriptDragActive ? 'var(--accent)' : 'var(--border-strong)'}; border-radius: 2px; background: {scriptDragActive ? 'var(--accent-glow)' : 'var(--surface-base)'}; cursor: pointer;"
+							onclick={() => document.getElementById('script-file-upload-input')?.click()}
+						>
+							<i class="bi bi-cloud-upload text-3xl mb-2 text-(--text-tertiary) transition-colors" class:text-(--accent)={scriptDragActive}></i>
+							<p style="color: var(--text-secondary); font-family: var(--font-body);" class="text-xs text-center">
+								Drag & drop script files here, or <span style="color: var(--accent);" class="underline font-semibold hover:text-(--accent-hover)">browse</span>
+							</p>
+							<p style="color: var(--text-tertiary); font-family: var(--font-mono);" class="text-[10px] mt-1 opacity-70">
+								Supports Python, Bash, JavaScript, and custom executables
+							</p>
+							<input
+								type="file"
+								id="script-file-upload-input"
+								multiple
+								class="hidden"
+								onchange={(e) => {
+									if (e.currentTarget.files && e.currentTarget.files.length > 0) {
+										handleScriptFilesUploaded(e.currentTarget.files);
+									}
+								}}
+							/>
+						</div>
+
+						<!-- Script Files List -->
+						{#if skillDraft.scriptFiles && skillDraft.scriptFiles.length > 0}
+							<div class="flex flex-col gap-3">
+								{#each skillDraft.scriptFiles as file (file.id)}
+									<div class="flex flex-col gap-2 p-3 border border-(--border-strong) rounded-[2px]" style="background: var(--surface-base);">
+										<div class="flex items-center justify-between gap-3">
+											<div class="flex flex-1 items-center gap-2">
+												<i class="bi {getFileIcon(file.name)} shrink-0 text-sm"></i>
+												<input
+													type="text"
+													bind:value={file.name}
+													placeholder="script.py"
+													style="background: transparent; color: var(--text-primary); border: none; border-bottom: 1px solid transparent; font-family: var(--font-mono);"
+													class="flex-1 py-1 text-xs focus:border-(--accent) focus:outline-none placeholder:text-(--text-tertiary)"
+												/>
+											</div>
+											<div class="flex items-center gap-2">
+												{#if file.file}
+													<span style="color: var(--text-tertiary); font-family: var(--font-mono);" class="text-[11px] whitespace-nowrap">
+														{formatBytes(file.size)}
+													</span>
+												{:else}
+													<span style="border: 1px solid var(--accent); color: var(--accent); font-family: var(--font-mono);" class="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded-[2px]">
+														Text
+													</span>
+													<button
+														type="button"
+														onclick={() => scriptOpenEditorId = scriptOpenEditorId === file.id ? null : file.id}
+														style="color: var(--text-secondary); border: 1px solid var(--border-strong);"
+														class="flex items-center gap-1 rounded-[2px] px-2 py-1 text-[10px] font-medium tracking-wide uppercase transition-colors hover:border-(--accent) hover:text-(--accent) focus:outline-none"
+													>
+														<i class="bi bi-pencil-square"></i>
+														{scriptOpenEditorId === file.id ? 'Close' : 'Edit'}
+													</button>
+												{/if}
+												<button
+													type="button"
+													onclick={() => removeScriptFile(file.id)}
+													class="flex items-center justify-center rounded-[2px] p-1.5 text-(--text-tertiary) transition-colors hover:bg-(--surface-sunken) hover:text-(--secondary) focus:outline-none"
+													title="Remove"
+												>
+													<i class="bi bi-trash3 text-xs"></i>
+												</button>
+											</div>
+										</div>
+
+										<!-- If content editor is open (for non-uploaded script files) -->
+										{#if !file.file && scriptOpenEditorId === file.id}
+											<div class="mt-2 flex flex-col gap-1.5 border-t border-(--border-default) pt-2">
+												<label
+													for="script-editor-{file.id}"
+													style="color: var(--text-secondary); font-family: var(--font-display);"
+													class="text-[10px] font-bold tracking-wider uppercase"
+												>
+													Script Content:
+												</label>
+												<textarea
+													id="script-editor-{file.id}"
+													bind:value={file.content}
+													placeholder="Write custom script content here..."
+													rows="8"
+													style="background: var(--surface-sunken); border: 1px solid var(--border-strong); border-radius: 2px; color: var(--text-primary); font-family: var(--font-mono); line-height: 1.5;"
+													class="w-full p-2.5 text-xs focus:border-(--accent) focus:outline-none focus:ring-1 focus:ring-(--accent)"
+												></textarea>
+											</div>
+										{/if}
+									</div>
+								{/each}
+							</div>
+						{/if}
+
+						<button
+							type="button"
+							onclick={addScriptFile}
+							style="border: 1px dashed var(--border-strong); color: var(--text-secondary); font-family: var(--font-display); border-radius: 2px;"
+							class="flex w-full items-center justify-center gap-2 py-2.5 text-xs font-bold tracking-widest uppercase transition-all hover:border-(--accent) hover:bg-(--surface-base) hover:text-(--accent) focus:outline-none"
+						>
+							<i class="bi bi-plus-lg"></i> Add Blank Script File
+						</button>
 					</div>
 				{/if}
 			</div>
@@ -463,40 +768,113 @@ Output ONLY the JSON, nothing else.`;
 							style="color: var(--text-secondary); font-family: var(--font-body);"
 							class="text-xs leading-relaxed"
 						>
-							List the reference files you plan to include. Keep files focused — agents load these
-							individually.
+							Upload documents referenced in your skill, or write reference pages directly. Keep files focused for context efficiency.
 						</p>
 
+						<!-- Drag and Drop Dropzone -->
+						<div
+							role="presentation"
+							class="dropzone flex flex-col items-center justify-center py-8 px-4 transition-all"
+							class:dropzone-active={refDragActive}
+							ondragenter={handleRefDrag}
+							ondragover={handleRefDrag}
+							ondragleave={handleRefDrag}
+							ondrop={handleRefDrop}
+							style="border: 2px dashed {refDragActive ? 'var(--accent)' : 'var(--border-strong)'}; border-radius: 2px; background: {refDragActive ? 'var(--accent-glow)' : 'var(--surface-base)'}; cursor: pointer;"
+							onclick={() => document.getElementById('file-upload-input')?.click()}
+						>
+							<i class="bi bi-cloud-upload text-3xl mb-2 text-(--text-tertiary) transition-colors" class:text-(--accent)={refDragActive}></i>
+							<p style="color: var(--text-secondary); font-family: var(--font-body);" class="text-xs text-center">
+								Drag & drop files here, or <span style="color: var(--accent);" class="underline font-semibold hover:text-(--accent-hover)">browse</span>
+							</p>
+							<p style="color: var(--text-tertiary); font-family: var(--font-mono);" class="text-[10px] mt-1 opacity-70">
+								Supports Markdown (.md) files only
+							</p>
+							<input
+								type="file"
+								id="file-upload-input"
+								accept=".md"
+								multiple
+								class="hidden"
+								onchange={(e) => {
+									if (e.currentTarget.files && e.currentTarget.files.length > 0) {
+										handleRefFilesUploaded(e.currentTarget.files);
+									}
+								}}
+							/>
+						</div>
+
+						<!-- Reference Files List -->
 						{#if skillDraft.refFiles.length > 0}
 							<div class="flex flex-col gap-3">
 								{#each skillDraft.refFiles as file (file.id)}
-									<div class="flex items-center gap-2">
-										<i
-											class="bi bi-file-earmark-text shrink-0 text-sm"
-											style="color: var(--text-tertiary);"
-										></i>
-										<input
-											type="text"
-											bind:value={file.name}
-											placeholder="filename.md"
-											style="background: var(--surface-base); color: var(--text-primary); border: 1px solid var(--border-strong); border-radius: 2px; font-family: var(--font-mono);"
-											class="w-2/5 p-2 text-xs transition-all placeholder:text-(--text-tertiary) focus:border-(--accent) focus:shadow-[0_0_8px_var(--accent-glow)] focus:ring-1 focus:ring-(--accent) focus:outline-none"
-										/>
-										<input
-											type="text"
-											bind:value={file.description}
-											placeholder="Brief description"
-											style="background: var(--surface-base); color: var(--text-primary); border: 1px solid var(--border-strong); border-radius: 2px; font-family: var(--font-body);"
-											class="flex-1 p-2 text-xs transition-all placeholder:text-(--text-tertiary) focus:border-(--accent) focus:shadow-[0_0_8px_var(--accent-glow)] focus:ring-1 focus:ring-(--accent) focus:outline-none"
-										/>
-										<button
-											type="button"
-											onclick={() => removeRefFile(file.id)}
-											class="flex items-center justify-center rounded-[2px] p-2 text-(--text-tertiary) transition-colors hover:bg-(--surface-base) hover:text-(--secondary) focus:outline-none"
-											title="Remove"
-										>
-											<i class="bi bi-x-lg text-xs"></i>
-										</button>
+									<div class="flex flex-col gap-2 p-3 border border-(--border-strong) rounded-[2px]" style="background: var(--surface-base);">
+										<div class="flex items-center justify-between gap-3">
+											<div class="flex flex-1 items-center gap-2">
+												<i class="bi {getFileIcon(file.name)} shrink-0 text-sm"></i>
+												<input
+													type="text"
+													bind:value={file.name}
+													onblur={() => {
+														if (file.name.trim() && !file.name.toLowerCase().endsWith('.md')) {
+															file.name = file.name.trim() + '.md';
+														}
+													}}
+													placeholder="filename.md"
+													style="background: transparent; color: var(--text-primary); border: none; border-bottom: 1px solid transparent; font-family: var(--font-mono);"
+													class="flex-1 py-1 text-xs focus:border-(--accent) focus:outline-none placeholder:text-(--text-tertiary)"
+												/>
+											</div>
+											<div class="flex items-center gap-2">
+												{#if file.file}
+													<span style="color: var(--text-tertiary); font-family: var(--font-mono);" class="text-[11px] whitespace-nowrap">
+														{formatBytes(file.size)}
+													</span>
+												{:else}
+													<span style="border: 1px solid var(--accent); color: var(--accent); font-family: var(--font-mono);" class="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded-[2px]">
+														Text
+													</span>
+													<button
+														type="button"
+														onclick={() => refOpenEditorId = refOpenEditorId === file.id ? null : file.id}
+														style="color: var(--text-secondary); border: 1px solid var(--border-strong);"
+														class="flex items-center gap-1 rounded-[2px] px-2 py-1 text-[10px] font-medium tracking-wide uppercase transition-colors hover:border-(--accent) hover:text-(--accent) focus:outline-none"
+													>
+														<i class="bi bi-pencil-square"></i>
+														{refOpenEditorId === file.id ? 'Close' : 'Edit'}
+													</button>
+												{/if}
+												<button
+													type="button"
+													onclick={() => removeRefFile(file.id)}
+													class="flex items-center justify-center rounded-[2px] p-1.5 text-(--text-tertiary) transition-colors hover:bg-(--surface-sunken) hover:text-(--secondary) focus:outline-none"
+													title="Remove"
+												>
+													<i class="bi bi-trash3 text-xs"></i>
+												</button>
+											</div>
+										</div>
+
+										<!-- If content editor is open (for non-uploaded files) -->
+										{#if !file.file && refOpenEditorId === file.id}
+											<div class="mt-2 flex flex-col gap-1.5 border-t border-(--border-default) pt-2">
+												<label
+													for="editor-{file.id}"
+													style="color: var(--text-secondary); font-family: var(--font-display);"
+													class="text-[10px] font-bold tracking-wider uppercase"
+												>
+													File Content:
+												</label>
+												<textarea
+													id="editor-{file.id}"
+													bind:value={file.content}
+													placeholder="Write Markdown or text content for this reference file..."
+													rows="5"
+													style="background: var(--surface-sunken); border: 1px solid var(--border-strong); border-radius: 2px; color: var(--text-primary); font-family: var(--font-mono); line-height: 1.5;"
+													class="w-full p-2.5 text-xs focus:border-(--accent) focus:outline-none focus:ring-1 focus:ring-(--accent)"
+												></textarea>
+											</div>
+										{/if}
 									</div>
 								{/each}
 							</div>
@@ -508,7 +886,7 @@ Output ONLY the JSON, nothing else.`;
 							style="border: 1px dashed var(--border-strong); color: var(--text-secondary); font-family: var(--font-display); border-radius: 2px;"
 							class="flex w-full items-center justify-center gap-2 py-2.5 text-xs font-bold tracking-widest uppercase transition-all hover:border-(--accent) hover:bg-(--surface-base) hover:text-(--accent) focus:outline-none"
 						>
-							<i class="bi bi-plus-lg"></i> Add Reference File
+							<i class="bi bi-plus-lg"></i> Add Blank Markdown File
 						</button>
 
 						<!-- Hint about common files -->
@@ -518,10 +896,17 @@ Output ONLY the JSON, nothing else.`;
 									type="button"
 									onclick={() => {
 										if (!skillDraft.refFiles.some((f) => f.name === suggestion)) {
+											const newId = skillDraft.nextRefId++;
 											skillDraft.refFiles = [
 												...skillDraft.refFiles,
-												{ name: suggestion, description: '', id: skillDraft.nextRefId++ }
+												{
+													name: suggestion,
+													description: `Reference doc: ${suggestion}`,
+													content: `# ${suggestion}\n\n`,
+													id: newId
+												}
 											];
+											refOpenEditorId = newId;
 										}
 									}}
 									class="suggestion-pill"
@@ -578,7 +963,7 @@ Output ONLY the JSON, nothing else.`;
 							style="color: var(--text-secondary); font-family: var(--font-body);"
 							class="text-xs leading-relaxed"
 						>
-							Choose the types of static assets you'll include.
+							Select the subdirectories you want to enable, or upload/create files.
 						</p>
 						<div class="flex flex-col gap-3">
 							{#each allAssetKinds as kind (kind.value)}
@@ -612,6 +997,137 @@ Output ONLY the JSON, nothing else.`;
 								</button>
 							{/each}
 						</div>
+
+						<div class="h-px my-1" style="background: var(--border-default);"></div>
+						<p
+							style="color: var(--text-secondary); font-family: var(--font-body);"
+							class="text-xs font-semibold leading-relaxed mt-1"
+						>
+							Upload asset files or create blank assets:
+						</p>
+
+						<!-- Drag and Drop Dropzone for Assets -->
+						<div
+							role="presentation"
+							class="dropzone flex flex-col items-center justify-center py-8 px-4 transition-all"
+							class:dropzone-active={assetDragActive}
+							ondragenter={handleAssetDrag}
+							ondragover={handleAssetDrag}
+							ondragleave={handleAssetDrag}
+							ondrop={handleAssetDrop}
+							style="border: 2px dashed {assetDragActive ? 'var(--accent)' : 'var(--border-strong)'}; border-radius: 2px; background: {assetDragActive ? 'var(--accent-glow)' : 'var(--surface-base)'}; cursor: pointer;"
+							onclick={() => document.getElementById('asset-file-upload-input')?.click()}
+						>
+							<i class="bi bi-cloud-upload text-3xl mb-2 text-(--text-tertiary) transition-colors" class:text-(--accent)={assetDragActive}></i>
+							<p style="color: var(--text-secondary); font-family: var(--font-body);" class="text-xs text-center">
+								Drag & drop asset files here, or <span style="color: var(--accent);" class="underline font-semibold hover:text-(--accent-hover)">browse</span>
+							</p>
+							<p style="color: var(--text-tertiary); font-family: var(--font-mono);" class="text-[10px] mt-1 opacity-70">
+								Automatically categorized by file type (Templates, Images, Data)
+							</p>
+							<input
+								type="file"
+								id="asset-file-upload-input"
+								multiple
+								class="hidden"
+								onchange={(e) => {
+									if (e.currentTarget.files && e.currentTarget.files.length > 0) {
+										handleAssetFilesUploaded(e.currentTarget.files);
+									}
+								}}
+							/>
+						</div>
+
+						<!-- Asset Files List -->
+						{#if skillDraft.assetFiles && skillDraft.assetFiles.length > 0}
+							<div class="flex flex-col gap-3">
+								{#each skillDraft.assetFiles as file (file.id)}
+									<div class="flex flex-col gap-2 p-3 border border-(--border-strong) rounded-[2px]" style="background: var(--surface-base);">
+										<div class="flex items-center justify-between gap-3">
+											<div class="flex flex-1 items-center gap-2">
+												<i class="bi {getFileIcon(file.name)} shrink-0 text-sm"></i>
+												<input
+													type="text"
+													bind:value={file.name}
+													placeholder="data.csv"
+													style="background: transparent; color: var(--text-primary); border: none; border-bottom: 1px solid transparent; font-family: var(--font-mono);"
+													class="flex-1 py-1 text-xs focus:border-(--accent) focus:outline-none placeholder:text-(--text-tertiary)"
+												/>
+											</div>
+											<div class="flex items-center gap-2">
+												<!-- Category Selector Dropdown -->
+												<select
+													bind:value={file.kind}
+													style="color: var(--text-primary); border: 1px solid var(--border-strong); border-radius: 2px; font-family: var(--font-mono);"
+													class="bg-transparent px-2 py-1 text-xs focus:outline-none"
+												>
+													<option value="templates">Templates</option>
+													<option value="images">Images</option>
+													<option value="data">Data</option>
+												</select>
+
+												{#if file.file}
+													<span style="color: var(--text-tertiary); font-family: var(--font-mono);" class="text-[11px] whitespace-nowrap">
+														{formatBytes(file.size)}
+													</span>
+												{:else}
+													<span style="border: 1px solid var(--accent); color: var(--accent); font-family: var(--font-mono);" class="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded-[2px]">
+														Text
+													</span>
+													<button
+														type="button"
+														onclick={() => assetOpenEditorId = assetOpenEditorId === file.id ? null : file.id}
+														style="color: var(--text-secondary); border: 1px solid var(--border-strong);"
+														class="flex items-center gap-1 rounded-[2px] px-2 py-1 text-[10px] font-medium tracking-wide uppercase transition-colors hover:border-(--accent) hover:text-(--accent) focus:outline-none"
+													>
+														<i class="bi bi-pencil-square"></i>
+														{assetOpenEditorId === file.id ? 'Close' : 'Edit'}
+													</button>
+												{/if}
+												<button
+													type="button"
+													onclick={() => removeAssetFile(file.id)}
+													class="flex items-center justify-center rounded-[2px] p-1.5 text-(--text-tertiary) transition-colors hover:bg-(--surface-sunken) hover:text-(--secondary) focus:outline-none"
+													title="Remove"
+												>
+													<i class="bi bi-trash3 text-xs"></i>
+												</button>
+											</div>
+										</div>
+
+										<!-- If content editor is open (for non-uploaded asset files) -->
+										{#if !file.file && assetOpenEditorId === file.id}
+											<div class="mt-2 flex flex-col gap-1.5 border-t border-(--border-default) pt-2">
+												<label
+													for="asset-editor-{file.id}"
+													style="color: var(--text-secondary); font-family: var(--font-display);"
+													class="text-[10px] font-bold tracking-wider uppercase"
+												>
+													Asset Content:
+												</label>
+												<textarea
+													id="asset-editor-{file.id}"
+													bind:value={file.content}
+													placeholder="Write custom asset template content here..."
+													rows="6"
+													style="background: var(--surface-sunken); border: 1px solid var(--border-strong); border-radius: 2px; color: var(--text-primary); font-family: var(--font-mono); line-height: 1.5;"
+													class="w-full p-2.5 text-xs focus:border-(--accent) focus:outline-none focus:ring-1 focus:ring-(--accent)"
+												></textarea>
+											</div>
+										{/if}
+									</div>
+								{/each}
+							</div>
+						{/if}
+
+						<button
+							type="button"
+							onclick={addAssetFile}
+							style="border: 1px dashed var(--border-strong); color: var(--text-secondary); font-family: var(--font-display); border-radius: 2px;"
+							class="flex w-full items-center justify-center gap-2 py-2.5 text-xs font-bold tracking-widest uppercase transition-all hover:border-(--accent) hover:bg-(--surface-base) hover:text-(--accent) focus:outline-none"
+						>
+							<i class="bi bi-plus-lg"></i> Add Blank Asset File
+						</button>
 					</div>
 				{/if}
 			</div>
@@ -783,5 +1299,22 @@ Output ONLY the JSON, nothing else.`;
 	.check-box-active {
 		background: var(--accent);
 		border-color: var(--accent);
+	}
+
+	/* Dropzone styles */
+	.dropzone {
+		transition: all 0.2s ease-in-out;
+	}
+	.dropzone:hover {
+		border-color: var(--accent) !important;
+		background: var(--accent-glow) !important;
+	}
+	.dropzone:hover i {
+		color: var(--accent) !important;
+	}
+	.dropzone-active {
+		border-color: var(--accent) !important;
+		background: var(--accent-glow) !important;
+		box-shadow: 0 0 15px var(--accent-glow);
 	}
 </style>

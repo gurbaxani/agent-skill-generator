@@ -8,6 +8,26 @@ export interface RefFile {
 	name: string;
 	description: string;
 	id: number;
+	file?: File;
+	content?: string;
+	size?: number;
+}
+
+export interface ScriptFile {
+	name: string;
+	id: number;
+	file?: File;
+	content?: string;
+	size?: number;
+}
+
+export interface AssetFile {
+	name: string;
+	id: number;
+	kind: AssetKind;
+	file?: File;
+	content?: string;
+	size?: number;
 }
 
 export type ScriptLanguage = 'python' | 'bash' | 'javascript' | 'other';
@@ -28,6 +48,8 @@ export class SkillDraftState {
 
 	enableScripts = $state(false);
 	scriptLanguages = $state<ScriptLanguage[]>(['python', 'bash']);
+	scriptFiles = $state<ScriptFile[]>([]);
+	nextScriptId = 1;
 
 	enableReferences = $state(false);
 	refFiles = $state<RefFile[]>([
@@ -37,6 +59,8 @@ export class SkillDraftState {
 
 	enableAssets = $state(false);
 	assetKinds = $state<AssetKind[]>([]);
+	assetFiles = $state<AssetFile[]>([]);
+	nextAssetId = 1;
 
 	// Validation helpers
 	get validName(): string {
@@ -81,11 +105,15 @@ export class SkillDraftState {
 		this.body = '';
 		this.enableScripts = false;
 		this.scriptLanguages = ['python', 'bash'];
+		this.scriptFiles = [];
+		this.nextScriptId = 1;
 		this.enableReferences = false;
 		this.refFiles = [{ name: 'REFERENCE.md', description: 'Detailed technical reference', id: 1 }];
 		this.nextRefId = 2;
 		this.enableAssets = false;
 		this.assetKinds = [];
+		this.assetFiles = [];
+		this.nextAssetId = 1;
 	}
 
 	get assembledMarkdown(): string {

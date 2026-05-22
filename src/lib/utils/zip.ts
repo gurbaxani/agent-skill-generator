@@ -25,28 +25,42 @@ export async function downloadSkillZip(draft: SkillDraftState): Promise<void> {
 	if (draft.enableScripts) {
 		const scriptsFolder = skillFolder.folder('scripts');
 		if (scriptsFolder) {
+			const activeFiles = draft.scriptFiles ? draft.scriptFiles.filter((f) => f.name.trim().length > 0) : [];
+			if (activeFiles.length > 0) {
+				for (const file of activeFiles) {
+					const fileName = file.name.trim();
+					if (file.file) {
+						scriptsFolder.file(fileName, file.file);
+					} else if (file.content !== undefined) {
+						scriptsFolder.file(fileName, file.content);
+					} else {
+						scriptsFolder.file(fileName, `\n`);
+					}
+				}
+			}
 			if (draft.scriptLanguages && draft.scriptLanguages.length > 0) {
 				for (const lang of draft.scriptLanguages) {
-					if (lang === 'python') {
+					if (lang === 'python' && !activeFiles.some((f) => f.name.trim() === 'main.py')) {
 						scriptsFolder.file(
 							'main.py',
 							`#!/usr/bin/env python3\n"""\nPython script for skill: ${draft.name}\n"""\n\ndef main():\n    print("Hello from ${draft.name} script!")\n\nif __name__ == "__main__":\n    main()\n`
 						);
-					} else if (lang === 'bash') {
+					} else if (lang === 'bash' && !activeFiles.some((f) => f.name.trim() === 'run.sh')) {
 						scriptsFolder.file(
 							'run.sh',
 							`#!/bin/bash\n# Bash script for skill: ${draft.name}\n\nset -euo pipefail\n\necho "Running ${draft.name} script..."\n`
 						);
-					} else if (lang === 'javascript') {
+					} else if (lang === 'javascript' && !activeFiles.some((f) => f.name.trim() === 'index.js')) {
 						scriptsFolder.file(
 							'index.js',
 							`#!/usr/bin/env node\n/**\n * JavaScript script for skill: ${draft.name}\n */\n\nconsole.log("Running ${draft.name} script...");\n`
 						);
-					} else {
+					} else if (lang === 'other' && !activeFiles.some((f) => f.name.trim() === 'script.txt')) {
 						scriptsFolder.file('script.txt', `Placeholder for custom script runtime.\n`);
 					}
 				}
-			} else {
+			}
+			if (activeFiles.length === 0 && (!draft.scriptLanguages || draft.scriptLanguages.length === 0)) {
 				scriptsFolder.file(
 					'README.md',
 					`# Scripts\n\nPlace your executable scripts in this directory.\n`
@@ -62,11 +76,20 @@ export async function downloadSkillZip(draft: SkillDraftState): Promise<void> {
 			const activeFiles = draft.refFiles.filter((f) => f.name.trim().length > 0);
 			if (activeFiles.length > 0) {
 				for (const file of activeFiles) {
-					const fileName = file.name.trim();
-					referencesFolder.file(
-						fileName,
-						`# ${fileName}\n\n${file.description.trim() || 'Reference documentation placeholder.'}\n`
-					);
+					let fileName = file.name.trim();
+					if (!fileName.toLowerCase().endsWith('.md')) {
+						fileName += '.md';
+					}
+					if (file.file) {
+						referencesFolder.file(fileName, file.file);
+					} else if (file.content !== undefined) {
+						referencesFolder.file(fileName, file.content);
+					} else {
+						referencesFolder.file(
+							fileName,
+							`# ${fileName}\n\n${file.description.trim() || 'Reference documentation placeholder.'}\n`
+						);
+					}
 				}
 			} else {
 				referencesFolder.file(
@@ -81,14 +104,33 @@ export async function downloadSkillZip(draft: SkillDraftState): Promise<void> {
 	if (draft.enableAssets) {
 		const assetsFolder = skillFolder.folder('assets');
 		if (assetsFolder) {
+			const activeFiles = draft.assetFiles ? draft.assetFiles.filter((f) => f.name.trim().length > 0) : [];
+			const writtenKinds = new Set<string>();
+
+			if (activeFiles.length > 0) {
+				for (const file of activeFiles) {
+					const fileName = file.name.trim();
+					const kind = file.kind || 'data';
+					writtenKinds.add(kind);
+					const kindFolder = assetsFolder.folder(kind) || assetsFolder;
+					if (file.file) {
+						kindFolder.file(fileName, file.file);
+					} else if (file.content !== undefined) {
+						kindFolder.file(fileName, file.content);
+					} else {
+						kindFolder.file(fileName, `\n`);
+					}
+				}
+			}
+
 			if (draft.assetKinds && draft.assetKinds.length > 0) {
 				for (const kind of draft.assetKinds) {
 					const kindFolder = assetsFolder.folder(kind);
-					if (kindFolder) {
+					if (kindFolder && !writtenKinds.has(kind)) {
 						kindFolder.file('.gitkeep', '');
 					}
 				}
-			} else {
+			} else if (activeFiles.length === 0) {
 				assetsFolder.file(
 					'README.md',
 					`# Assets\n\nPlace static resources (templates, images, data files) in this directory.\n`
