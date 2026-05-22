@@ -1,42 +1,80 @@
-# sv
+# Agent Skill Generator (ASG)
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Agent Skill Generator is a modern web application built with SvelteKit that allows you to create, browse, and manage skills for AI agents.
 
-## Creating a project
+## Features
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **Create Skills:** Interface to define and generate new agent skills.
+- **Browse Skills:** View and discover existing skills.
+- **Manage Keys:** API key management.
 
-```sh
-# create a new project
-npx sv create my-app
-```
+## Tech Stack
 
-To recreate this project with the same configuration:
+This project is built using:
+- [Svelte 5](https://svelte.dev/) - UI Framework (using Runes)
+- [SvelteKit](https://kit.svelte.dev/) - Application Framework
+- [Tailwind CSS 4](https://tailwindcss.com/) - Utility-first styling
+- [TypeScript](https://www.typescriptlang.org/) - Type safety
+- [Vite](https://vitejs.dev/) - Build tool
 
-```sh
-# recreate this project
-pnpm dlx sv@0.15.3 create --template minimal --types ts --add prettier tailwindcss="plugins:none" sveltekit-adapter="adapter:static" mdsvex --install pnpm asg
-```
+## Getting Started
 
-## Developing
+### Prerequisites
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+- Node.js (v18+)
+- pnpm, npm, or yarn
+
+### Installation
+
+1. Clone the repository and navigate to the project directory:
+   ```sh
+   cd asg
+   ```
+
+2. Install dependencies:
+   ```sh
+   npm install
+   # or
+   pnpm install
+   ```
+
+### Development
+
+Start the development server:
 
 ```sh
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+# or
+pnpm run dev
 ```
 
-## Building
+The app will be available at `http://localhost:5173/`.
 
-To create a production version of your app:
+### Building for Production
+
+To create a production build:
 
 ```sh
 npm run build
+# or
+pnpm run build
 ```
 
-You can preview the production build with `npm run preview`.
+You can preview the built app with:
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+```sh
+npm run preview
+```
+
+## Project Structure
+
+- `src/routes/` - SvelteKit pages and API routes (browse, contact, create, keys)
+- `src/lib/` - Reusable components and utilities
+
+## Code Quality & Standards
+
+This project uses:
+- Strict Type Safety: No `:any` types allowed.
+- Svelte 5 Runes: Exclusively uses `$state`, `$derived`, `$props` for reactivity.
+- Biome for linting.
+
