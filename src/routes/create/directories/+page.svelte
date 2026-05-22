@@ -212,17 +212,47 @@ Output ONLY the JSON, nothing else.`;
 	}
 
 	// ── Navigation ────────────────────────────────────────────────
-	function handleNext() {
-		const params = new URLSearchParams($page.url.searchParams);
-		if (enableScripts) params.set('scripts', scriptLanguages.join(','));
-		if (enableReferences) {
-			const names = refFiles.map((f) => f.name).filter(Boolean).join(',');
-			if (names) params.set('references', names);
+	let body = $derived($page.url.searchParams.get('body') || '');
+	let downloaded = $state(false);
+
+	function handleFinish() {
+		const params = $page.url.searchParams;
+		const name = params.get('name') || 'skill';
+		const description = params.get('description') || '';
+		const license = params.get('license') || '';
+		const compatibility = params.get('compatibility') || '';
+		const allowedTools = params.get('allowed-tools') || '';
+		const metadataRaw = params.get('metadata') || '{}';
+		let metadataParsed: Record<string, string> = {};
+		try { metadataParsed = JSON.parse(metadataRaw) as Record<string, string>; } catch { /* empty */ }
+
+		const lines: string[] = ['---'];
+		lines.push(`name: ${name}`);
+		if (description) lines.push(`description: "${description.replace(/"/g, '\\"')}"`);
+		if (license) lines.push(`license: ${license}`);
+		if (compatibility) lines.push(`compatibility: "${compatibility.replace(/"/g, '\\"')}"`);
+		if (allowedTools) lines.push(`allowed-tools: ${allowedTools}`);
+		if (Object.keys(metadataParsed).length > 0) {
+			lines.push('metadata:');
+			for (const [k, v] of Object.entries(metadataParsed)) {
+				lines.push(`  ${k}: ${v}`);
+			}
 		}
-		if (enableAssets && assetKinds.length > 0) {
-			params.set('assets', assetKinds.join(','));
+		lines.push('---');
+		if (body.trim()) {
+			lines.push('');
+			lines.push(body.trim());
 		}
-		goto(`/create/skill?${params.toString()}`);
+
+		const blob = new Blob([lines.join('\n')], { type: 'text/markdown' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = 'SKILL.md';
+		a.click();
+		URL.revokeObjectURL(url);
+		downloaded = true;
+		setTimeout(() => (downloaded = false), 2500);
 	}
 </script>
 
@@ -567,11 +597,16 @@ Output ONLY the JSON, nothing else.`;
 				</button>
 				<button
 					type="button"
-					onclick={handleNext}
+					id="btn-finish"
+					onclick={handleFinish}
 					class="flex items-center gap-2 bg-(--accent) px-6 py-3.5 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_15px_var(--accent-glow)] focus:outline-none"
 					style="color: var(--accent-fg); border-radius: 2px; font-family: var(--font-display);"
 				>
-					Generate <i class="bi bi-arrow-right" aria-hidden="true"></i>
+					{#if downloaded}
+						<i class="bi bi-check-lg" aria-hidden="true"></i> Downloaded!
+					{:else}
+						<i class="bi bi-download" aria-hidden="true"></i> Download SKILL.md
+					{/if}
 				</button>
 			</div>
 		</div>
