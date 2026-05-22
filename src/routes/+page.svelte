@@ -70,21 +70,21 @@
 	const VALUE_PROPS: ReadonlyArray<ValueProp> = [
 		{
 			icon: 'bi-shield-lock',
-			label: '01',
-			heading: 'No accounts. No cloud.',
-			body: 'Your skills stay on your machine. API keys never leave your browser.'
+			label: '01 //',
+			heading: '100% Private',
+			body: 'Your generated skills stay on your computer. Your API keys never leave your browser.'
 		},
 		{
-			icon: 'bi-key',
-			label: '02',
-			heading: 'Any AI provider.',
-			body: 'OpenAI, Anthropic, Google, Ollama — plug in whatever key you have.'
+			icon: 'bi-magic',
+			label: '02 //',
+			heading: 'AI assistance',
+			body: 'Let ChatGPT, Claude, Gemini, or Ollama help you write the perfect skill description.'
 		},
 		{
-			icon: 'bi-arrow-repeat',
-			label: '03',
-			heading: 'Fork anything.',
-			body: 'Every community skill is a starting point. Remix, combine, ship.'
+			icon: 'bi-file-earmark-check',
+			label: '03 //',
+			heading: 'You own your skills',
+			body: 'Decide how you want to share. Open-source your skills for the community, or keep them private under your own license.'
 		}
 	];
 </script>
@@ -106,19 +106,18 @@
 				<span class="badge-label">Open Source · MIT Licensed</span>
 			</div>
 			<h1 id="hero-heading" class="hero-heading">
-				Build skills<br />for your<br /><span class="hero-accent">AI agents</span>
+				Generate skills<br />for your<br /><span class="hero-accent">AI agents</span>
 			</h1>
 			<p class="hero-sub">
-				Author, browse, and remix structured agent skills.
-				Runs entirely in your browser. Bring your own API key.
+				A free, open-source app to build structured AI agent skills. Everything runs safely in your browser.
 			</p>
 			<div class="hero-actions">
 				<a href="/create" class="btn btn-primary" id="cta-create">
 					<i class="bi bi-terminal" aria-hidden="true"></i>
-					Create Skill
+					Start Building
 				</a>
 				<a href="/browse" class="btn btn-outline" id="cta-browse">
-					Browse Registry
+					Explore Skills
 				</a>
 			</div>
 		</div>
@@ -129,17 +128,17 @@
 	<div class="hero-stats" aria-label="Key facts">
 		<div class="stat">
 			<span class="stat-value">0</span>
-			<span class="stat-label">Accounts Needed</span>
+			<span class="stat-label">Sign-ups</span>
 		</div>
 		<div class="stat-divider" aria-hidden="true"></div>
 		<div class="stat">
 			<span class="stat-value">100%</span>
-			<span class="stat-label">Local Processing</span>
+			<span class="stat-label">Open Source</span>
 		</div>
 		<div class="stat-divider" aria-hidden="true"></div>
 		<div class="stat">
-			<span class="stat-value">MIT</span>
-			<span class="stat-label">Licensed</span>
+			<span class="stat-value">Local</span>
+			<span class="stat-label">Processing</span>
 		</div>
 		<div class="stat-divider" aria-hidden="true"></div>
 		<div class="stat">
@@ -153,7 +152,7 @@
 <section class="features" id="values" aria-labelledby="values-heading">
 	<h2 id="values-heading" class="section-label">
 		<span class="label-line" aria-hidden="true"></span>
-		How it works
+		Why use this?
 		<span class="label-line" aria-hidden="true"></span>
 	</h2>
 	<div class="feature-grid">
@@ -175,11 +174,11 @@
 	<div class="catalog-header">
 		<h2 id="catalog-heading" class="section-label">
 			<span class="label-line" aria-hidden="true"></span>
-			Skill Registry
+			Community Skills
 			<span class="label-line" aria-hidden="true"></span>
 		</h2>
 		<a href="/browse" class="registry-link">
-			Browse all
+			See all
 			<i class="bi bi-arrow-right" aria-hidden="true"></i>
 		</a>
 	</div>
