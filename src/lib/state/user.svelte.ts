@@ -4,6 +4,7 @@ class UserState {
 	// Centralized reactive state using Svelte 5 Runes
 	keys = $state<Record<string, { key: string; endpoint: string; model?: string }>>({});
 	skipKeyRequirement = $state(false);
+	expertMode = $state(false);
 
 	constructor() {
 		if (browser) {
@@ -26,6 +27,7 @@ class UserState {
 				}
 			}
 			this.skipKeyRequirement = localStorage.getItem('asg-skip-keys') === 'true';
+			this.expertMode = localStorage.getItem('asg-expert-mode') === 'true';
 		}
 	}
 
@@ -38,6 +40,13 @@ class UserState {
 		this.skipKeyRequirement = value;
 		if (browser) {
 			localStorage.setItem('asg-skip-keys', String(value));
+		}
+	}
+
+	setExpertMode(value: boolean): void {
+		this.expertMode = value;
+		if (browser) {
+			localStorage.setItem('asg-expert-mode', String(value));
 		}
 	}
 

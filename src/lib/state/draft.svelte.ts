@@ -1,0 +1,123 @@
+export interface MetaEntry {
+	key: string;
+	value: string;
+	id: number;
+}
+
+export interface RefFile {
+	name: string;
+	description: string;
+	id: number;
+}
+
+export type ScriptLanguage = 'python' | 'bash' | 'javascript' | 'other';
+export type AssetKind = 'templates' | 'images' | 'data';
+
+export class SkillDraftState {
+	name = $state('');
+	description = $state('');
+	license = $state('');
+	compatibility = $state('');
+	metadata = $state<MetaEntry[]>([
+		{ key: 'author', value: '', id: 1 },
+		{ key: 'version', value: '1.0', id: 2 }
+	]);
+	nextMetaId = 3;
+	allowedTools = $state('');
+	body = $state('');
+
+	enableScripts = $state(false);
+	scriptLanguages = $state<ScriptLanguage[]>(['python', 'bash']);
+
+	enableReferences = $state(false);
+	refFiles = $state<RefFile[]>([
+		{ name: 'REFERENCE.md', description: 'Detailed technical reference', id: 1 }
+	]);
+	nextRefId = 2;
+
+	enableAssets = $state(false);
+	assetKinds = $state<AssetKind[]>([]);
+
+	// Validation helpers
+	get validName(): string {
+		return this.name
+			.toLowerCase()
+			.replace(/[^a-z0-9\s-]/g, '')
+			.replace(/\s+/g, '-')
+			.replace(/-+/g, '-')
+			.replace(/^-+/, '')
+			.slice(0, 63);
+	}
+
+	get isValidRequired(): boolean {
+		return this.validName.length > 0 && this.description.length > 0 && this.description.length <= 1024;
+	}
+
+	get isValidOptional(): boolean {
+		return this.compatibility.length <= 500;
+	}
+
+	get isValidBody(): boolean {
+		return this.body.trim().length > 0;
+	}
+
+	get isValid(): boolean {
+		return this.isValidRequired && this.isValidOptional && this.isValidBody;
+	}
+
+	reset(): void {
+		this.name = '';
+		this.description = '';
+		this.license = '';
+		this.compatibility = '';
+		this.metadata = [
+			{ key: 'author', value: '', id: 1 },
+			{ key: 'version', value: '1.0', id: 2 }
+		];
+		this.nextMetaId = 3;
+		this.allowedTools = '';
+		this.body = '';
+		this.enableScripts = false;
+		this.scriptLanguages = ['python', 'bash'];
+		this.enableReferences = false;
+		this.refFiles = [{ name: 'REFERENCE.md', description: 'Detailed technical reference', id: 1 }];
+		this.nextRefId = 2;
+		this.enableAssets = false;
+		this.assetKinds = [];
+	}
+
+	get assembledMarkdown(): string {
+		const lines: string[] = ['---'];
+		lines.push(`name: ${this.validName}`);
+		if (this.description) {
+			lines.push(`description: "${this.description.replace(/"/g, '\\"')}"`);
+		}
+		if (this.license) {
+			lines.push(`license: ${this.license}`);
+		}
+		if (this.compatibility) {
+			lines.push(`compatibility: "${this.compatibility.replace(/"/g, '\\"')}"`);
+		}
+		if (this.allowedTools) {
+			lines.push(`allowed-tools: ${this.allowedTools}`);
+		}
+		const metaObj: Record<string, string> = {};
+		for (const m of this.metadata) {
+			if (m.key) metaObj[m.key] = m.value;
+		}
+		if (Object.keys(metaObj).length > 0) {
+			lines.push('metadata:');
+			for (const [k, v] of Object.entries(metaObj)) {
+				lines.push(`  ${k}: ${v}`);
+			}
+		}
+		lines.push('---');
+		if (this.body.trim()) {
+			lines.push('');
+			lines.push(this.body.trim());
+		}
+		return lines.join('\n');
+	}
+}
+
+export const skillDraft = new SkillDraftState();

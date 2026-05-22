@@ -1,11 +1,8 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { userState } from '$lib/state/user.svelte';
-
-	let skillName = $derived($page.url.searchParams.get('name') || '');
-	let description = $derived($page.url.searchParams.get('description') || '');
+	import { skillDraft, type ScriptLanguage, type AssetKind } from '$lib/state/draft.svelte';
 
 	let isGenerating = $state(false);
 	let errorMsg = $state('');
@@ -13,7 +10,7 @@
 	let selectedProvider = $state('');
 
 	onMount(() => {
-		if (!skillName) {
+		if (!skillDraft.name) {
 			goto('/create/required');
 		}
 		if (availableProviders.length > 0) {
@@ -35,7 +32,7 @@
 		errorMsg = '';
 		try {
 			const prompt = `You are an expert at structuring AI agent skills.
-A skill named "${skillName}" has this description: "${description || 'Not provided'}".
+A skill named "${skillDraft.validName}" has this description: "${skillDraft.description || 'Not provided'}".
 
 Decide which optional directories this skill should include and what content they need.
 Output ONLY a valid JSON object with this exact shape (omit any directory the skill doesn't need):
@@ -121,29 +118,35 @@ Output ONLY the JSON, nothing else.`;
 			const parsed: GenerateResult = JSON.parse(cleaned);
 
 			if (parsed.scripts?.enabled) {
-				enableScripts = true;
+				skillDraft.enableScripts = true;
 				const validLangs = parsed.scripts.languages.filter((l): l is ScriptLanguage =>
 					['python', 'bash', 'javascript', 'other'].includes(l)
 				);
-				if (validLangs.length > 0) scriptLanguages = validLangs;
+				if (validLangs.length > 0) skillDraft.scriptLanguages = validLangs;
+			} else {
+				skillDraft.enableScripts = false;
 			}
 			if (parsed.references?.enabled) {
-				enableReferences = true;
+				skillDraft.enableReferences = true;
 				if (parsed.references.files.length > 0) {
-					refFiles = parsed.references.files.map((f, i) => ({
+					skillDraft.refFiles = parsed.references.files.map((f, i) => ({
 						name: f.name,
 						description: f.description,
-						id: nextRefId + i
+						id: skillDraft.nextRefId + i
 					}));
-					nextRefId += parsed.references.files.length;
+					skillDraft.nextRefId += parsed.references.files.length;
 				}
+			} else {
+				skillDraft.enableReferences = false;
 			}
 			if (parsed.assets?.enabled) {
-				enableAssets = true;
+				skillDraft.enableAssets = true;
 				const validKinds = parsed.assets.kinds.filter((k): k is AssetKind =>
 					['templates', 'images', 'data'].includes(k)
 				);
-				if (validKinds.length > 0) assetKinds = validKinds;
+				if (validKinds.length > 0) skillDraft.assetKinds = validKinds;
+			} else {
+				skillDraft.enableAssets = false;
 			}
 		} catch (err: unknown) {
 			console.error(err);
@@ -157,15 +160,7 @@ Output ONLY the JSON, nothing else.`;
 		}
 	}
 
-	// ── Directory toggles ──────────────────────────────────────────
-	let enableScripts = $state(false);
-	let enableReferences = $state(false);
-	let enableAssets = $state(false);
-
 	// ── scripts/ config ───────────────────────────────────────────
-	type ScriptLanguage = 'python' | 'bash' | 'javascript' | 'other';
-	let scriptLanguages = $state<ScriptLanguage[]>(['python', 'bash']);
-
 	const allLanguages: { value: ScriptLanguage; label: string; icon: string }[] = [
 		{ value: 'python', label: 'Python', icon: 'bi-filetype-py' },
 		{ value: 'bash', label: 'Bash', icon: 'bi-terminal' },
@@ -174,29 +169,22 @@ Output ONLY the JSON, nothing else.`;
 	];
 
 	function toggleLanguage(lang: ScriptLanguage) {
-		if (scriptLanguages.includes(lang)) {
-			scriptLanguages = scriptLanguages.filter((l) => l !== lang);
+		if (skillDraft.scriptLanguages.includes(lang)) {
+			skillDraft.scriptLanguages = skillDraft.scriptLanguages.filter((l) => l !== lang);
 		} else {
-			scriptLanguages = [...scriptLanguages, lang];
+			skillDraft.scriptLanguages = [...skillDraft.scriptLanguages, lang];
 		}
 	}
 
 	// ── references/ config ────────────────────────────────────────
-	type RefFile = { name: string; description: string; id: number };
-	let refFiles = $state<RefFile[]>([{ name: 'REFERENCE.md', description: 'Detailed technical reference', id: 1 }]);
-	let nextRefId = 2;
-
 	function addRefFile() {
-		refFiles = [...refFiles, { name: '', description: '', id: nextRefId++ }];
+		skillDraft.refFiles = [...skillDraft.refFiles, { name: '', description: '', id: skillDraft.nextRefId++ }];
 	}
 	function removeRefFile(id: number) {
-		refFiles = refFiles.filter((f) => f.id !== id);
+		skillDraft.refFiles = skillDraft.refFiles.filter((f) => f.id !== id);
 	}
 
 	// ── assets/ config ────────────────────────────────────────────
-	type AssetKind = 'templates' | 'images' | 'data';
-	let assetKinds = $state<AssetKind[]>([]);
-
 	const allAssetKinds: { value: AssetKind; label: string; icon: string; hint: string }[] = [
 		{ value: 'templates', label: 'Templates', icon: 'bi-file-earmark-text', hint: 'Document & config templates' },
 		{ value: 'images', label: 'Images', icon: 'bi-image', hint: 'Diagrams, screenshots, examples' },
@@ -204,47 +192,18 @@ Output ONLY the JSON, nothing else.`;
 	];
 
 	function toggleAsset(kind: AssetKind) {
-		if (assetKinds.includes(kind)) {
-			assetKinds = assetKinds.filter((k) => k !== kind);
+		if (skillDraft.assetKinds.includes(kind)) {
+			skillDraft.assetKinds = skillDraft.assetKinds.filter((k) => k !== kind);
 		} else {
-			assetKinds = [...assetKinds, kind];
+			skillDraft.assetKinds = [...skillDraft.assetKinds, kind];
 		}
 	}
 
 	// ── Navigation ────────────────────────────────────────────────
-	let body = $derived($page.url.searchParams.get('body') || '');
 	let downloaded = $state(false);
 
 	function handleFinish() {
-		const params = $page.url.searchParams;
-		const name = params.get('name') || 'skill';
-		const description = params.get('description') || '';
-		const license = params.get('license') || '';
-		const compatibility = params.get('compatibility') || '';
-		const allowedTools = params.get('allowed-tools') || '';
-		const metadataRaw = params.get('metadata') || '{}';
-		let metadataParsed: Record<string, string> = {};
-		try { metadataParsed = JSON.parse(metadataRaw) as Record<string, string>; } catch { /* empty */ }
-
-		const lines: string[] = ['---'];
-		lines.push(`name: ${name}`);
-		if (description) lines.push(`description: "${description.replace(/"/g, '\\"')}"`);
-		if (license) lines.push(`license: ${license}`);
-		if (compatibility) lines.push(`compatibility: "${compatibility.replace(/"/g, '\\"')}"`);
-		if (allowedTools) lines.push(`allowed-tools: ${allowedTools}`);
-		if (Object.keys(metadataParsed).length > 0) {
-			lines.push('metadata:');
-			for (const [k, v] of Object.entries(metadataParsed)) {
-				lines.push(`  ${k}: ${v}`);
-			}
-		}
-		lines.push('---');
-		if (body.trim()) {
-			lines.push('');
-			lines.push(body.trim());
-		}
-
-		const blob = new Blob([lines.join('\n')], { type: 'text/markdown' });
+		const blob = new Blob([skillDraft.assembledMarkdown], { type: 'text/markdown' });
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');
 		a.href = url;
@@ -330,7 +289,7 @@ Output ONLY the JSON, nothing else.`;
 							style="color: var(--text-secondary); font-family: var(--font-body);"
 							class="mt-1 text-sm"
 						>
-							Let AI suggest the right directories and content for <span style="color: var(--accent); font-family: var(--font-mono);">{skillName}</span>.
+							Let AI suggest the right directories and content for <span style="color: var(--accent); font-family: var(--font-mono);">{skillDraft.name || 'Skill'}</span>.
 						</p>
 					</div>
 					<div class="flex flex-col items-center gap-3 sm:flex-row">
@@ -372,7 +331,7 @@ Output ONLY the JSON, nothing else.`;
 			<!-- scripts/ -->
 			<div
 				class="dir-card flex flex-col gap-0 transition-all"
-				style="border: 1px solid {enableScripts ? 'var(--accent)' : 'var(--border-strong)'}; border-radius: 2px; background: var(--surface-sunken);"
+				style="border: 1px solid {skillDraft.enableScripts ? 'var(--accent)' : 'var(--border-strong)'}; border-radius: 2px; background: var(--surface-sunken);"
 			>
 				<!-- Header row -->
 				<div class="flex items-center justify-between gap-4 p-5">
@@ -388,10 +347,10 @@ Output ONLY the JSON, nothing else.`;
 					<button
 						type="button"
 						id="toggle-scripts"
-						onclick={() => (enableScripts = !enableScripts)}
+						onclick={() => (skillDraft.enableScripts = !skillDraft.enableScripts)}
 						class="toggle-pill"
-						class:active={enableScripts}
-						aria-pressed={enableScripts}
+						class:active={skillDraft.enableScripts}
+						aria-pressed={skillDraft.enableScripts}
 						aria-label="Enable scripts directory"
 					>
 						<span class="toggle-knob"></span>
@@ -399,7 +358,7 @@ Output ONLY the JSON, nothing else.`;
 				</div>
 
 				<!-- Expanded config -->
-				{#if enableScripts}
+				{#if skillDraft.enableScripts}
 					<div class="flex flex-col gap-4 border-t p-5" style="border-color: var(--border-strong);">
 						<p style="color: var(--text-secondary); font-family: var(--font-body);" class="text-xs leading-relaxed">
 							Select the languages your scripts will use. Agents will know what runtimes are expected.
@@ -411,14 +370,14 @@ Output ONLY the JSON, nothing else.`;
 									id="lang-{lang.value}"
 									onclick={() => toggleLanguage(lang.value)}
 									class="chip"
-									class:chip-active={scriptLanguages.includes(lang.value)}
+									class:chip-active={skillDraft.scriptLanguages.includes(lang.value)}
 								>
 									<i class="bi {lang.icon} text-xs"></i>
 									{lang.label}
 								</button>
 							{/each}
 						</div>
-						{#if scriptLanguages.length === 0}
+						{#if skillDraft.scriptLanguages.length === 0}
 							<p style="color: var(--text-tertiary); font-family: var(--font-mono);" class="text-[11px]">
 								⚠ Select at least one language.
 							</p>
@@ -430,7 +389,7 @@ Output ONLY the JSON, nothing else.`;
 			<!-- references/ -->
 			<div
 				class="dir-card flex flex-col gap-0 transition-all"
-				style="border: 1px solid {enableReferences ? 'var(--accent)' : 'var(--border-strong)'}; border-radius: 2px; background: var(--surface-sunken);"
+				style="border: 1px solid {skillDraft.enableReferences ? 'var(--accent)' : 'var(--border-strong)'}; border-radius: 2px; background: var(--surface-sunken);"
 			>
 				<div class="flex items-center justify-between gap-4 p-5">
 					<div class="flex items-center gap-3">
@@ -445,25 +404,25 @@ Output ONLY the JSON, nothing else.`;
 					<button
 						type="button"
 						id="toggle-references"
-						onclick={() => (enableReferences = !enableReferences)}
+						onclick={() => (skillDraft.enableReferences = !skillDraft.enableReferences)}
 						class="toggle-pill"
-						class:active={enableReferences}
-						aria-pressed={enableReferences}
+						class:active={skillDraft.enableReferences}
+						aria-pressed={skillDraft.enableReferences}
 						aria-label="Enable references directory"
 					>
 						<span class="toggle-knob"></span>
 					</button>
 				</div>
 
-				{#if enableReferences}
+				{#if skillDraft.enableReferences}
 					<div class="flex flex-col gap-4 border-t p-5" style="border-color: var(--border-strong);">
 						<p style="color: var(--text-secondary); font-family: var(--font-body);" class="text-xs leading-relaxed">
 							List the reference files you plan to include. Keep files focused — agents load these individually.
 						</p>
 
-						{#if refFiles.length > 0}
+						{#if skillDraft.refFiles.length > 0}
 							<div class="flex flex-col gap-3">
-								{#each refFiles as file (file.id)}
+								{#each skillDraft.refFiles as file (file.id)}
 									<div class="flex items-center gap-2">
 										<i class="bi bi-file-earmark-text text-sm shrink-0" style="color: var(--text-tertiary);"></i>
 										<input
@@ -508,8 +467,8 @@ Output ONLY the JSON, nothing else.`;
 								<button
 									type="button"
 									onclick={() => {
-										if (!refFiles.some((f) => f.name === suggestion)) {
-											refFiles = [...refFiles, { name: suggestion, description: '', id: nextRefId++ }];
+										if (!skillDraft.refFiles.some((f) => f.name === suggestion)) {
+											skillDraft.refFiles = [...skillDraft.refFiles, { name: suggestion, description: '', id: skillDraft.nextRefId++ }];
 										}
 									}}
 									class="suggestion-pill"
@@ -527,7 +486,7 @@ Output ONLY the JSON, nothing else.`;
 			<!-- assets/ -->
 			<div
 				class="dir-card flex flex-col gap-0 transition-all"
-				style="border: 1px solid {enableAssets ? 'var(--accent)' : 'var(--border-strong)'}; border-radius: 2px; background: var(--surface-sunken);"
+				style="border: 1px solid {skillDraft.enableAssets ? 'var(--accent)' : 'var(--border-strong)'}; border-radius: 2px; background: var(--surface-sunken);"
 			>
 				<div class="flex items-center justify-between gap-4 p-5">
 					<div class="flex items-center gap-3">
@@ -542,17 +501,17 @@ Output ONLY the JSON, nothing else.`;
 					<button
 						type="button"
 						id="toggle-assets"
-						onclick={() => (enableAssets = !enableAssets)}
+						onclick={() => (skillDraft.enableAssets = !skillDraft.enableAssets)}
 						class="toggle-pill"
-						class:active={enableAssets}
-						aria-pressed={enableAssets}
+						class:active={skillDraft.enableAssets}
+						aria-pressed={skillDraft.enableAssets}
 						aria-label="Enable assets directory"
 					>
 						<span class="toggle-knob"></span>
 					</button>
 				</div>
 
-				{#if enableAssets}
+				{#if skillDraft.enableAssets}
 					<div class="flex flex-col gap-4 border-t p-5" style="border-color: var(--border-strong);">
 						<p style="color: var(--text-secondary); font-family: var(--font-body);" class="text-xs leading-relaxed">
 							Choose the types of static assets you'll include.
@@ -564,17 +523,17 @@ Output ONLY the JSON, nothing else.`;
 									id="asset-{kind.value}"
 									onclick={() => toggleAsset(kind.value)}
 									class="asset-row"
-									class:asset-row-active={assetKinds.includes(kind.value)}
+									class:asset-row-active={skillDraft.assetKinds.includes(kind.value)}
 								>
 									<div class="flex items-center gap-3">
-										<i class="bi {kind.icon} text-base" style="color: {assetKinds.includes(kind.value) ? 'var(--accent)' : 'var(--text-tertiary)'};"></i>
+										<i class="bi {kind.icon} text-base" style="color: {skillDraft.assetKinds.includes(kind.value) ? 'var(--accent)' : 'var(--text-tertiary)'};"></i>
 										<div class="flex flex-col items-start gap-0.5">
 											<span class="asset-label">{kind.label}</span>
 											<span class="asset-hint">{kind.hint}</span>
 										</div>
 									</div>
-									<div class="check-box" class:check-box-active={assetKinds.includes(kind.value)}>
-										{#if assetKinds.includes(kind.value)}
+									<div class="check-box" class:check-box-active={skillDraft.assetKinds.includes(kind.value)}>
+										{#if skillDraft.assetKinds.includes(kind.value)}
 											<i class="bi bi-check2 text-xs"></i>
 										{/if}
 									</div>
@@ -636,7 +595,7 @@ Output ONLY the JSON, nothing else.`;
 		width: 18px;
 		height: 18px;
 		border-radius: 50%;
-		background: white;
+		background: var(--text-primary);
 		transition: transform 0.2s var(--ease-out-quart, ease);
 	}
 	.toggle-pill.active .toggle-knob {

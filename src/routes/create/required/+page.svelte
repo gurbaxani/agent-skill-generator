@@ -2,22 +2,8 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { userState } from '$lib/state/user.svelte';
+	import { skillDraft } from '$lib/state/draft.svelte';
 
-	// ── Name ──────────────────────────────────────────────────────
-	let rawName = $state('');
-
-	let validName = $derived(
-		rawName
-			.toLowerCase()
-			.replace(/[^a-z0-9\s-]/g, '')
-			.replace(/\s+/g, '-')
-			.replace(/-+/g, '-')
-			.replace(/^-+/, '')
-			.slice(0, 63)
-	);
-
-	// ── Description ───────────────────────────────────────────────
-	let description = $state('');
 	let isGenerating = $state(false);
 	let errorMsg = $state('');
 
@@ -31,13 +17,13 @@
 	});
 
 	async function handleGenerate() {
-		if (!selectedProvider || !validName) return;
+		if (!selectedProvider || !skillDraft.validName) return;
 		const config = userState.keys[selectedProvider];
 		isGenerating = true;
 		errorMsg = '';
 		try {
 			const prompt = `You are an expert at writing descriptions for AI Agent Skills.
-Please write a short description (under 1024 characters) for a skill about: ${validName}
+Please write a short description (under 1024 characters) for a skill about: ${skillDraft.validName}
 
 The description MUST follow these rules:
 1. Prioritize describing WHEN to use the skill over what it does.
@@ -103,7 +89,7 @@ Output ONLY the text of the description, nothing else.`;
 				responseText = data.choices[0].message.content.trim();
 			}
 
-			description = responseText;
+			skillDraft.description = responseText;
 		} catch (err: unknown) {
 			console.error(err);
 			if (err instanceof Error) {
@@ -116,12 +102,10 @@ Output ONLY the text of the description, nothing else.`;
 		}
 	}
 
-	let isValid = $derived(
-		validName.length > 0 && description.length > 0 && description.length <= 1024
-	);
+	let isValid = $derived(skillDraft.isValidRequired);
 
 	function handleNext() {
-		goto(`/create/optional?name=${validName}&description=${encodeURIComponent(description)}`);
+		goto('/create/optional');
 	}
 </script>
 
@@ -190,7 +174,7 @@ Output ONLY the text of the description, nothing else.`;
 				<input
 					id="skillName"
 					type="text"
-					bind:value={rawName}
+					bind:value={skillDraft.name}
 					placeholder="e.g. code-reviewer"
 					style="background: var(--surface-sunken); color: var(--text-primary); border: 1px solid var(--border-strong); border-radius: 2px; font-family: var(--font-body);"
 					class="w-full p-3 text-base transition-all placeholder:text-(--text-tertiary) focus:border-(--accent) focus:shadow-[0_0_8px_var(--accent-glow)] focus:ring-1 focus:ring-(--accent) focus:outline-none"
@@ -218,8 +202,8 @@ Output ONLY the text of the description, nothing else.`;
 						style="color: var(--accent); font-family: var(--font-mono)"
 						class="min-h-5 text-sm break-all"
 					>
-						{#if validName}
-							{validName}
+						{#if skillDraft.validName}
+							{skillDraft.validName}
 						{:else}
 							<span style="opacity: 0.4">your-skill-name</span>
 						{/if}
@@ -270,7 +254,7 @@ Output ONLY the text of the description, nothing else.`;
 						<button
 							type="button"
 							onclick={handleGenerate}
-							disabled={isGenerating || !validName}
+							disabled={isGenerating || !skillDraft.validName}
 							style="border: 1px solid var(--accent); color: var(--accent); font-family: var(--font-display); border-radius: 2px;"
 							class="flex w-full items-center justify-center gap-2 px-4 py-2 text-sm font-medium tracking-wider uppercase transition-colors hover:bg-(--accent-glow) disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
 						>
@@ -305,7 +289,7 @@ Output ONLY the text of the description, nothing else.`;
 
 				<textarea
 					id="description"
-					bind:value={description}
+					bind:value={skillDraft.description}
 					placeholder="Use this skill when..."
 					rows="8"
 					style="background: var(--surface-sunken); color: var(--text-primary); border: 1px solid var(--border-strong); border-radius: 2px; font-family: var(--font-body);"
@@ -315,10 +299,10 @@ Output ONLY the text of the description, nothing else.`;
 				<div class="flex items-center justify-between" style="font-family: var(--font-mono);">
 					<span style="color: var(--text-tertiary);" class="text-xs tracking-wider uppercase">Up to 1 024 characters</span>
 					<span
-						style="color: {description.length > 1024 ? 'var(--secondary)' : 'var(--text-tertiary)'};"
+						style="color: {skillDraft.description.length > 1024 ? 'var(--secondary)' : 'var(--text-tertiary)'};"
 						class="text-xs tracking-wider uppercase"
 					>
-						{description.length} / 1024
+						{skillDraft.description.length} / 1024
 					</span>
 				</div>
 			</div>

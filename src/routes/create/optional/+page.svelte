@@ -1,23 +1,9 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { userState } from '$lib/state/user.svelte';
+	import { skillDraft, type MetaEntry } from '$lib/state/draft.svelte';
 
-	let skillName = $derived($page.url.searchParams.get('name') || '');
-	let description = $derived($page.url.searchParams.get('description') || '');
-
-	let license = $state('');
-	let compatibility = $state('');
-
-	type MetaEntry = { key: string; value: string; id: number };
-	let metadata = $state<MetaEntry[]>([
-		{ key: 'author', value: '', id: 1 },
-		{ key: 'version', value: '1.0', id: 2 }
-	]);
-	let nextMetaId = 3;
-
-	let allowedTools = $state('');
 	let showExperimentalMsg = $state(false);
 
 	let isGenerating = $state(false);
@@ -26,7 +12,7 @@
 	let selectedProvider = $state('');
 
 	onMount(() => {
-		if (!skillName) {
+		if (!skillDraft.name) {
 			goto('/create/required');
 		}
 		if (availableProviders.length > 0) {
@@ -35,14 +21,14 @@
 	});
 
 	function addMeta() {
-		metadata = [...metadata, { key: '', value: '', id: nextMetaId++ }];
+		skillDraft.metadata = [...skillDraft.metadata, { key: '', value: '', id: skillDraft.nextMetaId++ }];
 	}
 
 	function removeMeta(id: number) {
-		metadata = metadata.filter((m) => m.id !== id);
+		skillDraft.metadata = skillDraft.metadata.filter((m) => m.id !== id);
 	}
 
-	let isValid = $derived(compatibility.length <= 500);
+	let isValid = $derived(skillDraft.isValidOptional);
 
 	async function handleGenerate() {
 		if (!selectedProvider) return;
@@ -51,7 +37,7 @@
 		errorMsg = '';
 		try {
 			const prompt = `You are an expert at writing configuration options for AI Agent Skills.
-Please suggest optional metadata for a skill named "${skillName}" with the description: "${description}".
+Please suggest optional metadata for a skill named "${skillDraft.validName}" with the description: "${skillDraft.description}".
 
 Your output MUST be a valid JSON object matching this schema:
 {
@@ -129,18 +115,18 @@ Output ONLY the JSON, nothing else.`;
 				.trim();
 			const parsed = JSON.parse(cleaned);
 
-			if (parsed.license) license = parsed.license;
-			if (parsed.compatibility) compatibility = parsed.compatibility.slice(0, 500);
+			if (parsed.license) skillDraft.license = parsed.license;
+			if (parsed.compatibility) skillDraft.compatibility = parsed.compatibility.slice(0, 500);
 			if (parsed.metadata) {
 				const entries: MetaEntry[] = [];
 				let id = 1;
 				for (const [k, v] of Object.entries(parsed.metadata)) {
 					entries.push({ key: k, value: String(v), id: id++ });
 				}
-				metadata = entries;
-				nextMetaId = id;
+				skillDraft.metadata = entries;
+				skillDraft.nextMetaId = id;
 			}
-			if (parsed['allowed-tools']) allowedTools = parsed['allowed-tools'];
+			if (parsed['allowed-tools']) skillDraft.allowedTools = parsed['allowed-tools'];
 		} catch (err: unknown) {
 			console.error(err);
 			if (err instanceof Error) {
@@ -154,20 +140,7 @@ Output ONLY the JSON, nothing else.`;
 	}
 
 	function handleSave() {
-		const params = new URLSearchParams();
-		params.set('name', skillName);
-		params.set('description', description);
-		if (license) params.set('license', license);
-		if (compatibility) params.set('compatibility', compatibility);
-		if (allowedTools) params.set('allowed-tools', allowedTools);
-		if (metadata.length > 0) {
-			const metaObj: Record<string, string> = {};
-			for (const m of metadata) {
-				if (m.key) metaObj[m.key] = m.value;
-			}
-			params.set('metadata', JSON.stringify(metaObj));
-		}
-		goto(`/create/skill?${params.toString()}`);
+		goto('/create/skill');
 	}
 </script>
 
@@ -184,7 +157,7 @@ Output ONLY the JSON, nothing else.`;
 				style="color: var(--text-secondary); font-family: var(--font-body);"
 				class="text-base leading-relaxed"
 			>
-				Enrich <span style="color: var(--accent); font-family: var(--font-mono)">{skillName}</span> with extra metadata. All fields are optional.
+				Enrich <span style="color: var(--accent); font-family: var(--font-mono)">{skillDraft.name || 'Skill'}</span> with extra metadata. All fields are optional.
 			</p>
 
 			<div
@@ -292,7 +265,7 @@ Output ONLY the JSON, nothing else.`;
 					<input
 						id="license"
 						type="text"
-						bind:value={license}
+						bind:value={skillDraft.license}
 						placeholder="e.g. Apache-2.0"
 						style="background: var(--surface-sunken); color: var(--text-primary); border: 1px solid var(--border-strong); border-radius: 2px; font-family: var(--font-mono);"
 						class="w-full p-3 text-sm transition-all placeholder:text-(--text-tertiary) focus:border-(--accent) focus:shadow-[0_0_8px_var(--accent-glow)] focus:ring-1 focus:ring-(--accent) focus:outline-none"
@@ -310,17 +283,17 @@ Output ONLY the JSON, nothing else.`;
 							Compatibility
 						</label>
 						<span
-							style="color: {compatibility.length > 500
+							style="color: {skillDraft.compatibility.length > 500
 								? 'var(--secondary)'
 								: 'var(--text-tertiary)'}; font-family: var(--font-mono)"
 							class="text-xs tracking-wider uppercase"
 						>
-							{compatibility.length} / 500
+							{skillDraft.compatibility.length} / 500
 						</span>
 					</div>
 					<textarea
 						id="compatibility"
-						bind:value={compatibility}
+						bind:value={skillDraft.compatibility}
 						placeholder="Environment requirements..."
 						rows="3"
 						style="background: var(--surface-sunken); color: var(--text-primary); border: 1px solid var(--border-strong); border-radius: 2px; font-family: var(--font-body);"
@@ -337,9 +310,9 @@ Output ONLY the JSON, nothing else.`;
 					>
 						Metadata
 					</label>
-					{#if metadata.length > 0}
+					{#if skillDraft.metadata.length > 0}
 						<div class="flex flex-col gap-3">
-							{#each metadata as item (item.id)}
+							{#each skillDraft.metadata as item (item.id)}
 								<div class="flex items-center gap-3">
 									<input
 										type="text"
@@ -411,7 +384,7 @@ Output ONLY the JSON, nothing else.`;
 					<input
 						id="allowed-tools"
 						type="text"
-						bind:value={allowedTools}
+						bind:value={skillDraft.allowedTools}
 						placeholder="Space-separated list of tools"
 						style="background: var(--surface-sunken); color: var(--text-primary); border: 1px solid var(--border-strong); border-radius: 2px; font-family: var(--font-mono);"
 						class="w-full p-3 text-sm transition-all placeholder:text-(--text-tertiary) focus:border-(--accent) focus:shadow-[0_0_8px_var(--accent-glow)] focus:ring-1 focus:ring-(--accent) focus:outline-none"

@@ -1,27 +1,11 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { userState } from '$lib/state/user.svelte';
+	import { skillDraft } from '$lib/state/draft.svelte';
 	import { marked } from 'marked';
 
-	// ── Params from previous steps ──────────────────────────────────────────
-	let skillName = $derived($page.url.searchParams.get('name') || '');
-	let description = $derived($page.url.searchParams.get('description') || '');
-	let license = $derived($page.url.searchParams.get('license') || '');
-	let compatibility = $derived($page.url.searchParams.get('compatibility') || '');
-	let allowedTools = $derived($page.url.searchParams.get('allowed-tools') || '');
-	let metadataRaw = $derived($page.url.searchParams.get('metadata') || '{}');
-	let metadataParsed = $derived.by<Record<string, string>>(() => {
-		try {
-			return JSON.parse(metadataRaw) as Record<string, string>;
-		} catch {
-			return {};
-		}
-	});
-
 	// ── Body state ───────────────────────────────────────────────────────────
-	let body = $state('');
 	let isGenerating = $state(false);
 	let errorMsg = $state('');
 	let copied = $state(false);
@@ -33,8 +17,8 @@
 	let selectedProvider = $state('');
 
 	onMount(() => {
-		if (!skillName) {
-			goto('/create');
+		if (!skillDraft.name) {
+			goto('/create/required');
 			return;
 		}
 		if (availableProviders.length > 0) {
@@ -43,29 +27,9 @@
 	});
 
 	// ── Assembled SKILL.md ───────────────────────────────────────────────────
-	let skillFile = $derived.by(() => {
-		const lines: string[] = ['---'];
-		lines.push(`name: ${skillName}`);
-		if (description) lines.push(`description: "${description.replace(/"/g, '\\"')}"`);
-		if (license) lines.push(`license: ${license}`);
-		if (compatibility) lines.push(`compatibility: "${compatibility.replace(/"/g, '\\"')}"`);
-		if (allowedTools) lines.push(`allowed-tools: ${allowedTools}`);
-		const meta = metadataParsed;
-		if (Object.keys(meta).length > 0) {
-			lines.push('metadata:');
-			for (const [k, v] of Object.entries(meta)) {
-				lines.push(`  ${k}: ${v}`);
-			}
-		}
-		lines.push('---');
-		if (body.trim()) {
-			lines.push('');
-			lines.push(body.trim());
-		}
-		return lines.join('\n');
-	});
+	let skillFile = $derived(skillDraft.assembledMarkdown);
 
-	let isValid = $derived(body.trim().length > 0);
+	let isValid = $derived(skillDraft.isValidBody);
 
 	// ── Markdown preview ─────────────────────────────────────────────────────
 	/** Frontmatter lines extracted from the assembled file (between the --- delimiters) */
@@ -78,7 +42,7 @@
 	});
 
 	/** Rendered HTML of the body markdown */
-	let renderedBody = $derived(marked.parse(body.trim() || '_No content written yet._') as string);
+	let renderedBody = $derived(marked.parse(skillDraft.body.trim() || '_No content written yet._') as string);
 
 	// ── AI generation ────────────────────────────────────────────────────────
 	async function handleGenerate() {
@@ -88,8 +52,8 @@
 		errorMsg = '';
 		try {
 			const prompt = `You are an expert at writing AI Agent Skill instruction documents.
-Write the markdown body content for a SKILL.md file for a skill named "${skillName}".
-Description: "${description}"
+Write the markdown body content for a SKILL.md file for a skill named "${skillDraft.validName}".
+Description: "${skillDraft.description}"
 
 The body is the skill's instructions — what the agent should do when this skill is active.
 It follows the YAML frontmatter and has no format restrictions.
@@ -159,7 +123,7 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 				responseText = data.choices[0].message.content.trim();
 			}
 
-			body = responseText;
+			skillDraft.body = responseText;
 		} catch (err: unknown) {
 			console.error(err);
 			if (err instanceof Error) {
@@ -191,9 +155,7 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 		setTimeout(() => (downloaded = false), 2000);
 	}
 	function handleNext() {
-		const params = new URLSearchParams($page.url.searchParams);
-		params.set('body', body);
-		goto(`/create/directories?${params.toString()}`);
+		goto('/create/directories');
 	}
 </script>
 
@@ -209,7 +171,7 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 			</h1>
 			<p style="color: var(--text-secondary); font-family: var(--font-body);" class="text-base leading-relaxed">
 				Write the instructions for <span style="color: var(--accent); font-family: var(--font-mono)"
-					>{skillName}</span
+					>{skillDraft.name}</span
 				>. This becomes the markdown body of your <span style="font-family: var(--font-mono); color: var(--text-primary)">SKILL.md</span>.
 			</p>
 
@@ -348,7 +310,7 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 						</label>
 						<textarea
 							id="skill-body"
-							bind:value={body}
+							bind:value={skillDraft.body}
 							placeholder={`## Step-by-step Instructions\n\n1. Read the user's request carefully.\n2. …\n\n## Examples\n\n**Input:** …\n**Output:** …\n\n## Common Edge Cases\n\n- If the user doesn't specify a language, default to English.`}
 							rows="18"
 							style="background: var(--surface-sunken); color: var(--text-primary); border: 1px solid var(--border-strong); border-radius: 2px; font-family: var(--font-mono); line-height: 1.65;"
@@ -362,10 +324,10 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 								Markdown supported
 							</span>
 							<span
-								style="color: {body.length > 0 ? 'var(--text-secondary)' : 'var(--text-tertiary)'}; font-family: var(--font-mono);"
+								style="color: {skillDraft.body.length > 0 ? 'var(--text-secondary)' : 'var(--text-tertiary)'}; font-family: var(--font-mono);"
 								class="text-xs tracking-wider uppercase"
 							>
-								{body.length.toLocaleString()} chars
+								{skillDraft.body.length.toLocaleString()} chars
 							</span>
 						</div>
 					</div>
@@ -492,7 +454,7 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 	}
 
 	.fm-fence {
-		color: var(--terminal-comment, oklch(60% 0.05 270));
+		color: var(--terminal-comment);
 		font-style: italic;
 	}
 
@@ -503,7 +465,7 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 	}
 
 	.fm-key {
-		color: var(--terminal-keyword, oklch(70% 0.18 270));
+		color: var(--terminal-keyword);
 		min-width: 0;
 	}
 
@@ -562,7 +524,7 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 	.preview-prose :global(code) {
 		font-family: var(--font-mono);
 		font-size: 0.8em;
-		background: var(--surface-raised, oklch(20% 0.02 270 / 0.6));
+		background: var(--surface-raised);
 		color: var(--accent);
 		padding: 0.15em 0.4em;
 		border-radius: 3px;
@@ -572,7 +534,7 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 	.preview-prose :global(pre) {
 		font-family: var(--font-mono);
 		font-size: 0.78rem;
-		background: oklch(12% 0.02 270 / 0.8);
+		background: var(--terminal-bg);
 		border: 1px solid var(--border-strong);
 		border-radius: 2px;
 		padding: 0.9rem 1rem;
@@ -611,7 +573,7 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 		padding: 0.4em 1em;
 		color: var(--text-tertiary);
 		font-style: italic;
-		background: oklch(20% 0.02 270 / 0.3);
+		background: var(--surface-raised);
 	}
 
 	/* Horizontal rule */
