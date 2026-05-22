@@ -41,7 +41,8 @@ The description MUST follow these rules:
 Output ONLY the text of the description, nothing else.`;
 
 			if (selectedProvider === 'gemini') {
-				const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${config.key}`, {
+				const modelName = config.model || 'gemini-1.5-flash';
+				const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${config.key}`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -59,7 +60,7 @@ Output ONLY the text of the description, nothing else.`;
 						'anthropic-dangerous-direct-browser-access': 'true'
 					},
 					body: JSON.stringify({
-						model: 'claude-3-haiku-20240307',
+						model: config.model || 'claude-3-haiku-20240307',
 						max_tokens: 1024,
 						messages: [{ role: 'user', content: prompt }]
 					})
@@ -70,9 +71,12 @@ Output ONLY the text of the description, nothing else.`;
 			} else {
 				// OpenAI, OpenRouter, Ollama, Custom
 				const endpoint = config.endpoint || 'https://api.openai.com/v1';
-				let model = 'gpt-4o-mini';
-				if (selectedProvider === 'openrouter') model = 'meta-llama/llama-3-8b-instruct:free';
-				if (selectedProvider === 'ollama') model = 'llama3';
+				let model = config.model;
+				if (!model) {
+					model = 'gpt-4o-mini';
+					if (selectedProvider === 'openrouter') model = 'meta-llama/llama-3-8b-instruct:free';
+					if (selectedProvider === 'ollama') model = 'llama3';
+				}
 
 				const res = await fetch(`${endpoint}/chat/completions`, {
 					method: 'POST',

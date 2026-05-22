@@ -6,6 +6,7 @@
 	let selectedProvider = $state('openai');
 	let apiKeyValue = $state('');
 	let endpointValue = $state('');
+	let modelValue = $state('gpt-4o');
 	
 	type ProviderConfig = {
 		id: string;
@@ -13,17 +14,18 @@
 		hasEndpoint: boolean;
 		keyRequired: boolean;
 		defaultEndpoint?: string;
+		defaultModel?: string;
 		icon?: string;
 		svg?: SimpleIcon;
 		keyUrl?: string;
 	};
 
 	const providers: ProviderConfig[] = [
-		{ id: 'openai', name: 'OpenAI', icon: 'bi-openai', hasEndpoint: true, defaultEndpoint: 'https://api.openai.com/v1', keyRequired: true, keyUrl: 'https://platform.openai.com/api-keys' },
-		{ id: 'anthropic', name: 'Anthropic', svg: siAnthropic, hasEndpoint: false, keyRequired: true, keyUrl: 'https://console.anthropic.com/settings/keys' },
-		{ id: 'gemini', name: 'Google Gemini', svg: siGooglegemini, hasEndpoint: false, keyRequired: true, keyUrl: 'https://aistudio.google.com/app/apikey' },
+		{ id: 'openai', name: 'OpenAI', icon: 'bi-openai', hasEndpoint: true, defaultEndpoint: 'https://api.openai.com/v1', keyRequired: true, keyUrl: 'https://platform.openai.com/api-keys', defaultModel: 'gpt-4o' },
+		{ id: 'anthropic', name: 'Anthropic', svg: siAnthropic, hasEndpoint: false, keyRequired: true, keyUrl: 'https://console.anthropic.com/settings/keys', defaultModel: 'claude-3-5-sonnet-latest' },
+		{ id: 'gemini', name: 'Google Gemini', svg: siGooglegemini, hasEndpoint: false, keyRequired: true, keyUrl: 'https://aistudio.google.com/app/apikey', defaultModel: 'gemini-1.5-pro' },
 		{ id: 'openrouter', name: 'OpenRouter', svg: siOpenrouter, hasEndpoint: true, defaultEndpoint: 'https://openrouter.ai/keys', keyRequired: true, keyUrl: 'https://openrouter.ai/keys' },
-		{ id: 'ollama', name: 'Ollama', svg: siOllama, hasEndpoint: true, defaultEndpoint: 'http://localhost:11434/v1', keyRequired: false, keyUrl: 'https://ollama.com/' },
+		{ id: 'ollama', name: 'Ollama', svg: siOllama, hasEndpoint: true, defaultEndpoint: 'http://localhost:11434/v1', keyRequired: false, keyUrl: 'https://ollama.com/', defaultModel: 'llama3' },
 		{ id: 'custom', name: 'Custom Server', icon: 'bi-hdd-network', hasEndpoint: true, defaultEndpoint: 'http://localhost:11434/v1', keyRequired: false }
 	];
 
@@ -31,21 +33,24 @@
 
 	function handleProviderChange(id: string) {
 		selectedProvider = id;
-		if (currentProvider.hasEndpoint && currentProvider.defaultEndpoint) {
-			endpointValue = currentProvider.defaultEndpoint;
+		const nextProvider = providers.find(p => p.id === id) || providers[0];
+		if (nextProvider.hasEndpoint && nextProvider.defaultEndpoint) {
+			endpointValue = nextProvider.defaultEndpoint;
 		} else {
 			endpointValue = '';
 		}
+		modelValue = nextProvider.defaultModel || '';
 	}
 
 	function handleSave(e: Event) {
 		e.preventDefault();
 		if (apiKeyValue.trim() || !currentProvider.keyRequired) {
-			userState.saveKey(selectedProvider, apiKeyValue.trim(), endpointValue.trim());
+			userState.saveKey(selectedProvider, apiKeyValue.trim(), endpointValue.trim(), modelValue.trim());
 			apiKeyValue = ''; // Reset after saving
 			if (currentProvider.hasEndpoint) {
 				endpointValue = currentProvider.defaultEndpoint || '';
 			}
+			modelValue = currentProvider.defaultModel || '';
 		}
 	}
 
@@ -54,149 +59,169 @@
 	}
 </script>
 
-<div class="keys-container">
-	<header class="page-header">
-		<h1 class="page-title">
-			<span class="index">01</span> // Configuration
-		</h1>
-		<p class="page-subtitle">Configure provider credentials. Keys are stored locally in your browser.</p>
-	</header>
+<div class="mx-auto max-w-6xl px-6 py-12 lg:px-12">
+	<div class="mb-10 flex flex-col gap-2">
+		<h1 style="color: var(--text-primary);" class="text-3xl font-bold tracking-tight">Configuration</h1>
+		<p style="color: var(--text-secondary);" class="text-base">Configure provider credentials. Keys are stored locally in your browser.</p>
+	</div>
 
-	<div class="split-layout">
+	<div class="grid items-start gap-12 lg:grid-cols-2">
 		<!-- Add Key Section -->
-		<section class="panel add-panel">
-			<h2 class="panel-title">Add Provider Key</h2>
-			<form onsubmit={handleSave} class="key-form">
-				<div class="form-group">
-					<span class="form-label">Provider</span>
-					<div class="provider-grid">
+		<section style="background: var(--surface-raised); border: 1px solid var(--border-default);" class="flex flex-col gap-6 rounded-lg p-6">
+			<h2 style="color: var(--text-primary); border-bottom: 1px solid var(--border-default);" class="pb-3 text-xl font-semibold">
+				Add Provider Key
+			</h2>
+			
+			<form onsubmit={handleSave} class="flex flex-col gap-6">
+				<div class="flex flex-col gap-2">
+					<span style="color: var(--text-primary);" class="text-sm font-medium">Provider</span>
+					<div class="grid grid-cols-3 gap-3">
 						{#each providers as provider (provider.id)}
 							<button 
 								type="button" 
-								class="provider-card {selectedProvider === provider.id ? 'selected' : ''}" 
+								class="flex flex-col items-center justify-center gap-2 rounded-lg border p-3 transition-colors {selectedProvider === provider.id ? 'border-(--accent) bg-(--accent-glow) text-(--accent)' : 'border-(--border-strong) bg-(--surface-sunken) text-(--text-secondary) hover:text-(--text-primary)'}" 
+								style={selectedProvider === provider.id ? 'border: 1px solid var(--accent); color: var(--accent); background: var(--accent-subtle);' : 'border: 1px solid var(--border-strong);'}
 								onclick={() => handleProviderChange(provider.id)}
 							>
 								{#if provider.svg}
-									<svg viewBox="0 0 24 24" class="provider-card-svg" aria-hidden="true" fill="currentColor">
+									<svg viewBox="0 0 24 24" class="h-6 w-6" aria-hidden="true" fill="currentColor">
 										<path d={provider.svg.path} />
 									</svg>
 								{:else}
-									<i class="bi {provider.icon} provider-card-icon" aria-hidden="true"></i>
+									<i class="bi {provider.icon} text-2xl" aria-hidden="true"></i>
 								{/if}
-								<span class="provider-card-name">{provider.name}</span>
+								<span class="text-xs font-medium">{provider.name}</span>
 							</button>
 						{/each}
 					</div>
 				</div>
 
 				{#if currentProvider.hasEndpoint}
-					<div class="form-group">
-						<label for="endpoint">Base URL / Endpoint</label>
+					<div class="flex flex-col gap-2">
+						<label for="endpoint" style="color: var(--text-primary);" class="text-sm font-medium">Base URL / Endpoint</label>
 						<input
 							type="text"
 							id="endpoint"
 							bind:value={endpointValue}
 							placeholder={currentProvider.defaultEndpoint}
-							class="cyber-input"
+							style="background: var(--surface-sunken); color: var(--text-primary); border: 1px solid var(--border-strong);"
+							class="w-full rounded-md p-3 text-sm focus:border-(--accent) focus:outline-none focus:ring-1 focus:ring-(--focus-ring) placeholder:text-(--text-tertiary)"
 							autocomplete="off"
 						/>
 					</div>
 				{/if}
 
-				{#if currentProvider.keyRequired}
-					<div class="form-group">
-						<div class="label-row">
-							<label for="api-key">API Key</label>
-							{#if currentProvider.keyUrl}
-								<a href={currentProvider.keyUrl} target="_blank" rel="noopener noreferrer" class="get-key-link">
-									Get API Key <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
-								</a>
-							{/if}
-						</div>
-						<input
-							type="password"
-							id="api-key"
-							bind:value={apiKeyValue}
-							placeholder="sk-..."
-							class="cyber-input"
-							autocomplete="off"
-						/>
-					</div>
-				{:else}
-					<div class="form-group">
-						<div class="label-row">
-							<label for="api-key">API Key (Optional)</label>
-							{#if currentProvider.keyUrl}
-								<a href={currentProvider.keyUrl} target="_blank" rel="noopener noreferrer" class="get-key-link">
-									Learn More <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
-								</a>
-							{/if}
-						</div>
-						<input
-							type="password"
-							id="api-key"
-							bind:value={apiKeyValue}
-							placeholder="Leave empty if not required"
-							class="cyber-input"
-							autocomplete="off"
-						/>
-					</div>
-				{/if}
+				<div class="flex flex-col gap-2">
+					<label for="model" style="color: var(--text-primary);" class="text-sm font-medium">Model</label>
+					<input
+						type="text"
+						id="model"
+						bind:value={modelValue}
+						placeholder={currentProvider.defaultModel || 'Enter model name'}
+						style="background: var(--surface-sunken); color: var(--text-primary); border: 1px solid var(--border-strong);"
+						class="w-full rounded-md p-3 text-sm focus:border-(--accent) focus:outline-none focus:ring-1 focus:ring-(--focus-ring) placeholder:text-(--text-tertiary)"
+						autocomplete="off"
+					/>
+				</div>
 
-				<button type="submit" class="cyber-btn primary" disabled={currentProvider.keyRequired && !apiKeyValue.trim()}>
-					<i class="bi bi-plus-lg" aria-hidden="true"></i>
+				<div class="flex flex-col gap-2">
+					<div class="flex items-center justify-between">
+						<label for="api-key" style="color: var(--text-primary);" class="text-sm font-medium">
+							API Key {!currentProvider.keyRequired ? '(Optional)' : ''}
+						</label>
+						{#if currentProvider.keyUrl}
+							<a href={currentProvider.keyUrl} target="_blank" rel="noopener noreferrer" style="color: var(--accent);" class="text-xs hover:underline">
+								Get Key <i class="bi bi-box-arrow-up-right ml-1"></i>
+							</a>
+						{/if}
+					</div>
+					<input
+						type="password"
+						id="api-key"
+						bind:value={apiKeyValue}
+						placeholder={currentProvider.keyRequired ? 'sk-...' : 'Leave empty if not required'}
+						style="background: var(--surface-sunken); color: var(--text-primary); border: 1px solid var(--border-strong);"
+						class="w-full rounded-md p-3 text-sm focus:border-(--accent) focus:outline-none focus:ring-1 focus:ring-(--focus-ring) placeholder:text-(--text-tertiary)"
+						autocomplete="off"
+					/>
+				</div>
+
+				<button 
+					type="submit" 
+					disabled={currentProvider.keyRequired && !apiKeyValue.trim()}
+					class="mt-2 flex w-full items-center justify-center gap-2 rounded-md bg-(--accent) px-4 py-3 text-sm font-semibold text-(--surface-base) transition-colors hover:bg-(--accent-hover) disabled:cursor-not-allowed disabled:opacity-50"
+				>
+					<i class="bi bi-plus-lg"></i>
 					Install Key
 				</button>
 			</form>
 		</section>
 
 		<!-- Active Keys Section -->
-		<section class="panel active-panel">
-			<h2 class="panel-title">Active Credentials</h2>
+		<section style="background: var(--surface-raised); border: 1px solid var(--border-default);" class="flex flex-col gap-6 rounded-lg p-6">
+			<h2 style="color: var(--text-primary); border-bottom: 1px solid var(--border-default);" class="pb-3 text-xl font-semibold">
+				Active Credentials
+			</h2>
 			
-			<div class="keys-list">
+			<div class="flex flex-col gap-4">
 				{#if !userState.hasKeys()}
-					<div class="empty-state">
-						<i class="bi bi-terminal" aria-hidden="true"></i>
+					<div style="background: var(--surface-sunken); border: 1px dashed var(--border-default); color: var(--text-secondary);" class="flex flex-col items-center justify-center gap-4 rounded-lg p-12 text-center text-sm">
+						<i class="bi bi-terminal text-4xl text-(--border-strong)"></i>
 						<p>No keys installed. System running in disconnected mode.</p>
 					</div>
 				{:else}
 					{#each Object.entries(userState.keys) as [providerId, config] (providerId)}
 						{@const provider = providers.find(p => p.id === providerId) || { id: providerId, name: providerId, icon: 'bi-key', hasEndpoint: false, keyRequired: true } as ProviderConfig}
-						<div class="key-card">
-							<div class="key-info">
+						<div style="background: var(--surface-base); border: 1px solid var(--border-default);" class="flex items-center justify-between rounded-md p-4">
+							<div class="flex items-center gap-4">
 								{#if provider.svg}
-									<svg viewBox="0 0 24 24" class="provider-icon-svg" aria-hidden="true" fill="currentColor">
+									<svg viewBox="0 0 24 24" style="color: var(--secondary);" class="h-6 w-6" aria-hidden="true" fill="currentColor">
 										<path d={provider.svg.path} />
 									</svg>
 								{:else}
-									<i class="bi {provider.icon} provider-icon" aria-hidden="true"></i>
+									<i class="bi {provider.icon} text-2xl text-(--secondary)" aria-hidden="true"></i>
 								{/if}
-								<div class="key-details">
-									<span class="provider-name">{provider.name}</span>
-									{#if config.endpoint}
-										<span class="provider-endpoint">{config.endpoint}</span>
-									{/if}
+								
+								<div class="flex flex-col gap-1">
+									<span style="color: var(--text-primary);" class="font-semibold text-sm">{provider.name}</span>
+									<div class="flex items-center gap-2 text-xs">
+										{#if config.model}
+											<span style="background: var(--surface-sunken); border: 1px solid var(--border-default); color: var(--text-secondary);" class="rounded px-2 py-0.5">
+												{config.model}
+											</span>
+										{/if}
+										{#if config.endpoint}
+											<span style="color: var(--text-tertiary);" class="max-w-[150px] truncate">{config.endpoint}</span>
+										{/if}
+									</div>
 								</div>
-								<div class="spacer"></div>
-								<span class="key-mask">
+							</div>
+							
+							<div class="flex items-center gap-4">
+								<span style="color: var(--text-tertiary);" class="text-sm font-mono">
 									{#if config.key}
-										••••••••{config.key.slice(-4)}
+										••••{config.key.slice(-4)}
 									{:else}
-										<span class="no-key">NO KEY</span>
+										<span class="opacity-50">NO KEY</span>
 									{/if}
 								</span>
+								
+								<button 
+									type="button" 
+									onclick={() => handleRemove(providerId)} 
+									aria-label="Remove {provider.name} key"
+									class="flex h-8 w-8 items-center justify-center rounded-md text-(--text-tertiary) transition-colors hover:bg-(--secondary-subtle) hover:text-(--secondary)"
+								>
+									<i class="bi bi-x-lg"></i>
+								</button>
 							</div>
-							<button type="button" class="icon-btn remove-btn" onclick={() => handleRemove(providerId)} aria-label="Remove {provider.name} key">
-								<i class="bi bi-x-lg" aria-hidden="true"></i>
-							</button>
 						</div>
 					{/each}
 					
-					<div class="action-footer">
-						<a href="/create" class="cyber-btn solid">
+					<div class="mt-4 flex justify-end pt-4 border-t border-(--border-default)">
+						<a href="/create" class="flex items-center gap-2 rounded-md bg-(--accent) px-6 py-3 text-sm font-semibold text-(--surface-base) transition-colors hover:bg-(--accent-hover)">
 							Continue to Create Skill
-							<i class="bi bi-arrow-right" aria-hidden="true"></i>
+							<i class="bi bi-arrow-right"></i>
 						</a>
 					</div>
 				{/if}
@@ -204,378 +229,3 @@
 		</section>
 	</div>
 </div>
-
-<style>
-	.keys-container {
-		max-width: 1000px;
-		margin: 0 auto;
-		padding: var(--space-xl) var(--space-lg);
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-2xl);
-	}
-
-	.page-header {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-sm);
-	}
-
-	.page-title {
-		display: flex;
-		align-items: center;
-		gap: var(--space-sm);
-		color: var(--text-primary);
-		font-size: var(--text-2xl);
-	}
-
-	.index {
-		color: var(--accent);
-		font-family: var(--font-mono);
-		font-weight: 400;
-		font-size: var(--text-lg);
-	}
-
-	.page-subtitle {
-		color: var(--text-secondary);
-		font-family: var(--font-mono);
-		font-size: var(--text-sm);
-	}
-
-	.split-layout {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-		gap: var(--space-xl);
-		align-items: start;
-	}
-
-	.panel {
-		background: var(--surface-raised);
-		border: 1px solid var(--border-default);
-		border-radius: var(--radius);
-		padding: var(--space-lg);
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-lg);
-		position: relative;
-	}
-
-	.panel::before,
-	.panel::after {
-		content: '';
-		position: absolute;
-		width: 12px;
-		height: 12px;
-		border: 1px solid var(--accent-subtle);
-		pointer-events: none;
-	}
-
-	.panel::before {
-		top: -1px;
-		left: -1px;
-		border-right: none;
-		border-bottom: none;
-	}
-
-	.panel::after {
-		bottom: -1px;
-		right: -1px;
-		border-left: none;
-		border-top: none;
-	}
-
-	.panel-title {
-		font-size: var(--text-lg);
-		color: var(--text-primary);
-		border-bottom: 1px solid var(--border-default);
-		padding-bottom: var(--space-sm);
-	}
-
-	.key-form {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-md);
-	}
-
-	.form-group {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-xs);
-	}
-
-	.form-group .form-label,
-	.form-group label {
-		font-family: var(--font-mono);
-		font-size: var(--text-xs);
-		color: var(--text-tertiary);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
-
-	.label-row {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-
-	.get-key-link {
-		font-family: var(--font-mono);
-		font-size: var(--text-xs);
-		color: var(--accent);
-		text-decoration: none;
-		text-transform: uppercase;
-		display: inline-flex;
-		align-items: center;
-		gap: 4px;
-		transition: color var(--duration-fast) var(--ease-out-quart);
-	}
-
-	.get-key-link:hover {
-		color: var(--accent-hover);
-		text-decoration: underline;
-	}
-
-	.provider-grid {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: var(--space-sm);
-	}
-
-	.provider-card {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		gap: var(--space-xs);
-		background: var(--surface-sunken);
-		border: 1px solid var(--border-strong);
-		border-radius: var(--radius);
-		padding: var(--space-md) var(--space-xs);
-		cursor: pointer;
-		transition: all var(--duration-fast) var(--ease-out-quart);
-		color: var(--text-tertiary);
-	}
-
-	.provider-card:hover {
-		border-color: var(--text-secondary);
-		color: var(--text-primary);
-	}
-
-	.provider-card.selected {
-		border-color: var(--accent);
-		background: var(--accent-glow);
-		color: var(--accent);
-		box-shadow: 0 0 10px var(--accent-glow);
-	}
-
-	.provider-card-icon,
-	.provider-card-svg {
-		font-size: var(--text-xl);
-		width: var(--text-xl);
-		height: var(--text-xl);
-		line-height: 1;
-	}
-
-	.provider-card-name {
-		font-family: var(--font-mono);
-		font-size: var(--text-xs);
-		text-align: center;
-		letter-spacing: 0.02em;
-	}
-
-	.cyber-input {
-		background: var(--surface-sunken);
-		border: 1px solid var(--border-strong);
-		color: var(--text-primary);
-		font-family: var(--font-mono);
-		font-size: var(--text-sm);
-		padding: 10px 12px;
-		border-radius: var(--radius);
-		transition: border-color var(--duration-fast) var(--ease-out-quart),
-					box-shadow var(--duration-fast) var(--ease-out-quart);
-		width: 100%;
-		appearance: none;
-	}
-
-	.cyber-input:focus {
-		outline: none;
-		border-color: var(--accent);
-		box-shadow: 0 0 0 1px var(--accent-glow);
-	}
-
-	.cyber-btn {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		gap: var(--space-sm);
-		background: transparent;
-		color: var(--accent);
-		border: 1px solid var(--accent);
-		font-family: var(--font-display);
-		font-weight: 600;
-		font-size: var(--text-sm);
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		padding: 12px var(--space-lg);
-		border-radius: var(--radius);
-		cursor: pointer;
-		transition: all var(--duration-fast) var(--ease-out-quart);
-		margin-top: var(--space-sm);
-	}
-
-	.cyber-btn:hover:not(:disabled) {
-		background: var(--accent-glow);
-		box-shadow: 0 0 15px var(--accent-glow);
-	}
-
-	.cyber-btn:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-		border-color: var(--border-strong);
-		color: var(--text-tertiary);
-	}
-
-	.cyber-btn.secondary {
-		border-color: var(--secondary);
-		color: var(--secondary);
-	}
-
-	.cyber-btn.secondary:hover:not(:disabled) {
-		background: var(--secondary-subtle);
-		box-shadow: 0 0 15px var(--secondary-subtle);
-	}
-
-	.cyber-btn.solid {
-		background: var(--accent);
-		color: var(--surface-base);
-		border-color: var(--accent);
-		box-shadow: 0 0 10px var(--accent-glow);
-	}
-
-	.cyber-btn.solid:hover:not(:disabled) {
-		background: var(--accent-hover);
-		box-shadow: 0 0 20px var(--accent-glow);
-	}
-
-	.action-footer {
-		display: flex;
-		justify-content: flex-end;
-		margin-top: var(--space-md);
-		padding-top: var(--space-md);
-		border-top: 1px dashed var(--border-default);
-	}
-
-	.keys-list {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-sm);
-	}
-
-	.empty-state {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		text-align: center;
-		gap: var(--space-md);
-		padding: var(--space-2xl) var(--space-lg);
-		color: var(--text-tertiary);
-		font-family: var(--font-mono);
-		font-size: var(--text-sm);
-		border: 1px dashed var(--border-default);
-		border-radius: var(--radius);
-		background: var(--surface-sunken);
-	}
-
-	.empty-state i {
-		font-size: var(--text-2xl);
-		color: var(--border-strong);
-	}
-
-	.key-card {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: var(--space-sm) var(--space-md);
-		background: var(--surface-base);
-		border: 1px solid var(--border-default);
-		border-radius: var(--radius);
-		transition: border-color var(--duration-fast) var(--ease-out-quart);
-	}
-
-	.key-card:hover {
-		border-color: var(--border-strong);
-	}
-
-	.key-info {
-		display: flex;
-		align-items: center;
-		gap: var(--space-sm);
-		flex: 1;
-		font-family: var(--font-mono);
-		font-size: var(--text-sm);
-	}
-
-	.provider-icon,
-	.provider-icon-svg {
-		color: var(--secondary);
-		font-size: var(--text-lg);
-		width: var(--text-lg);
-		height: var(--text-lg);
-	}
-
-	.key-details {
-		display: flex;
-		flex-direction: column;
-	}
-
-	.provider-name {
-		color: var(--text-primary);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
-
-	.provider-endpoint {
-		color: var(--text-tertiary);
-		font-size: var(--text-xs);
-		max-width: 150px;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	.spacer {
-		flex: 1;
-		border-bottom: 1px dotted var(--border-strong);
-		margin: 0 var(--space-md);
-		opacity: 0.5;
-	}
-
-	.key-mask {
-		color: var(--text-secondary);
-	}
-
-	.no-key {
-		color: var(--text-tertiary);
-		font-size: var(--text-xs);
-	}
-
-	.icon-btn {
-		background: transparent;
-		border: none;
-		color: var(--text-tertiary);
-		cursor: pointer;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 28px;
-		height: 28px;
-		border-radius: var(--radius);
-		transition: all var(--duration-fast) var(--ease-out-quart);
-	}
-
-	.icon-btn:hover {
-		color: var(--secondary);
-		background: var(--secondary-subtle);
-	}
-</style>

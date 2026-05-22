@@ -5,9 +5,9 @@
 
 /* ─── Tailwind v4 Theme ─── */
 :root {
-  --font-display: 'Chakra Petch', 'Consolas', monospace;
-  --font-body: 'Rajdhani', 'Segoe UI', system-ui, sans-serif;
-  --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+  --font-display: 'Outfit', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'Fira Code', 'Cascadia Code', monospace;
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
@@ -58,9 +58,9 @@
   --surface-sunken: oklch(7% 0.018 285);
 
   /* Text — cool near-white */
-  --text-primary: oklch(92% 0.006 285);
-  --text-secondary: oklch(65% 0.012 285);
-  --text-tertiary: oklch(45% 0.015 285);
+  --text-primary: oklch(96% 0.005 285);
+  --text-secondary: oklch(80% 0.01 285);
+  --text-tertiary: oklch(65% 0.015 285);
 
   /* Accent — electric amber (phosphor display) */
   --accent: oklch(82% 0.175 80);

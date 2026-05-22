@@ -1,14 +1,15 @@
 <script lang="ts">
-	import '@fontsource/chakra-petch/300.css';
-	import '@fontsource/chakra-petch/400.css';
-	import '@fontsource/chakra-petch/500.css';
-	import '@fontsource/chakra-petch/600.css';
-	import '@fontsource/chakra-petch/700.css';
-	import '@fontsource/rajdhani/300.css';
-	import '@fontsource/rajdhani/400.css';
-	import '@fontsource/rajdhani/500.css';
-	import '@fontsource/rajdhani/600.css';
-	import '@fontsource/rajdhani/700.css';
+	import '@fontsource/inter/300.css';
+	import '@fontsource/inter/400.css';
+	import '@fontsource/inter/500.css';
+	import '@fontsource/inter/600.css';
+	import '@fontsource/inter/700.css';
+	import '@fontsource/outfit/400.css';
+	import '@fontsource/outfit/500.css';
+	import '@fontsource/outfit/600.css';
+	import '@fontsource/outfit/700.css';
+	import '@fontsource/fira-code/400.css';
+	import '@fontsource/fira-code/500.css';
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';

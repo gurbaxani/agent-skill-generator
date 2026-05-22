@@ -2,7 +2,7 @@ import { browser } from '$app/environment';
 
 class UserState {
 	// Centralized reactive state using Svelte 5 Runes
-	keys = $state<Record<string, { key: string; endpoint: string }>>({});
+	keys = $state<Record<string, { key: string; endpoint: string; model?: string }>>({});
 
 	constructor() {
 		if (browser) {
@@ -10,12 +10,12 @@ class UserState {
 			if (storedKeys) {
 				try {
 					const parsed = JSON.parse(storedKeys);
-					const migratedKeys: Record<string, { key: string; endpoint: string }> = {};
+					const migratedKeys: Record<string, { key: string; endpoint: string; model?: string }> = {};
 					for (const [provider, value] of Object.entries(parsed)) {
 						if (typeof value === 'string') {
 							migratedKeys[provider] = { key: value, endpoint: '' };
 						} else {
-							migratedKeys[provider] = value as { key: string; endpoint: string };
+							migratedKeys[provider] = value as { key: string; endpoint: string; model?: string };
 						}
 					}
 					this.keys = migratedKeys;
@@ -31,8 +31,8 @@ class UserState {
 		return Object.keys(this.keys).length > 0;
 	}
 
-	saveKey(provider: string, key: string, endpoint: string = ''): void {
-		this.keys[provider] = { key, endpoint };
+	saveKey(provider: string, key: string, endpoint: string = '', model?: string): void {
+		this.keys[provider] = { key, endpoint, model };
 		if (browser) {
 			localStorage.setItem('asg-api-keys', JSON.stringify(this.keys));
 		}
