@@ -132,13 +132,13 @@
 		</div>
 		<div class="stat-divider" aria-hidden="true"></div>
 		<div class="stat">
-			<span class="stat-value">100%</span>
+			<span class="stat-value">MIT</span>
 			<span class="stat-label">Open Source</span>
 		</div>
 		<div class="stat-divider" aria-hidden="true"></div>
 		<div class="stat">
-			<span class="stat-value">Local</span>
-			<span class="stat-label">Processing</span>
+			<span class="stat-value">100%</span>
+			<span class="stat-label">Spec Coverage</span>
 		</div>
 		<div class="stat-divider" aria-hidden="true"></div>
 		<div class="stat">
