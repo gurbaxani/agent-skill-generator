@@ -4,7 +4,7 @@
 	import { userState } from '$lib/state/user.svelte';
 
 	onMount(() => {
-		if (!userState.hasKeys()) {
+		if (!userState.hasKeys() && !userState.skipKeyRequirement) {
 			goto('/keys');
 		}
 	});

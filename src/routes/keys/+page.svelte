@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { userState } from '$lib/state/user.svelte';
 	import { siAnthropic, siGooglegemini, siOllama, siOpenrouter } from 'simple-icons';
 	import type { SimpleIcon } from 'simple-icons';
@@ -7,6 +8,7 @@
 	let apiKeyValue = $state('');
 	let endpointValue = $state('');
 	let modelValue = $state('gpt-4o');
+	let showConfirmSkip = $state(false);
 	
 	type ProviderConfig = {
 		id: string;
@@ -83,13 +85,15 @@
 								style={selectedProvider === provider.id ? 'border: 1px solid var(--accent); color: var(--accent); background: var(--accent-subtle);' : 'border: 1px solid var(--border-strong);'}
 								onclick={() => handleProviderChange(provider.id)}
 							>
-								{#if provider.svg}
-									<svg viewBox="0 0 24 24" class="h-6 w-6" aria-hidden="true" fill="currentColor">
-										<path d={provider.svg.path} />
-									</svg>
-								{:else}
-									<i class="bi {provider.icon} text-2xl" aria-hidden="true"></i>
-								{/if}
+								<div class="flex h-8 w-8 shrink-0 items-center justify-center">
+									{#if provider.svg}
+										<svg viewBox="0 0 24 24" class="h-5 w-5" aria-hidden="true" fill="currentColor">
+											<path d={provider.svg.path} />
+										</svg>
+									{:else}
+										<i class="bi {provider.icon} text-xl" aria-hidden="true"></i>
+									{/if}
+								</div>
 								<span class="text-xs font-medium">{provider.name}</span>
 							</button>
 						{/each}
@@ -149,10 +153,11 @@
 				<button 
 					type="submit" 
 					disabled={currentProvider.keyRequired && !apiKeyValue.trim()}
-					class="mt-2 flex w-full items-center justify-center gap-2 rounded-md bg-(--accent) px-4 py-3 text-sm font-semibold text-(--surface-base) transition-colors hover:bg-(--accent-hover) disabled:cursor-not-allowed disabled:opacity-50"
+					class="mt-2 flex w-full items-center justify-center gap-2 rounded-md bg-(--accent) px-4 py-3 text-sm font-semibold transition-colors hover:bg-(--accent-hover) disabled:cursor-not-allowed disabled:opacity-50"
+					style="color: var(--accent-fg);"
 				>
 					<i class="bi bi-plus-lg"></i>
-					Install Key
+					Save Key
 				</button>
 			</form>
 		</section>
@@ -160,27 +165,63 @@
 		<!-- Active Keys Section -->
 		<section style="background: var(--surface-raised); border: 1px solid var(--border-default);" class="flex flex-col gap-6 rounded-lg p-6">
 			<h2 style="color: var(--text-primary); border-bottom: 1px solid var(--border-default);" class="pb-3 text-xl font-semibold">
-				Active Credentials
+				Active Keys
 			</h2>
 			
 			<div class="flex flex-col gap-4">
 				{#if !userState.hasKeys()}
 					<div style="background: var(--surface-sunken); border: 1px dashed var(--border-default); color: var(--text-secondary);" class="flex flex-col items-center justify-center gap-4 rounded-lg p-12 text-center text-sm">
-						<i class="bi bi-terminal text-4xl text-(--border-strong)"></i>
-						<p>No keys installed. System running in disconnected mode.</p>
+						<i class="bi bi-key text-4xl text-(--border-strong)"></i>
+						<p>No keys added yet.</p>
+						
+						{#if showConfirmSkip}
+							<div class="mt-2 flex flex-col items-center gap-3 rounded border border-(--border-accent) bg-(--surface-base) p-4 shadow-lg">
+								<p style="color: var(--text-primary);" class="text-xs font-medium">Are you sure? You will need to write everything manually.</p>
+								<div class="flex gap-3">
+									<button 
+										type="button" 
+										class="rounded border border-(--border-strong) bg-transparent px-3 py-1.5 text-xs transition-colors hover:border-(--text-primary) hover:text-(--text-primary)"
+										onclick={() => showConfirmSkip = false}
+									>
+										Cancel
+									</button>
+									<button 
+										type="button" 
+										class="rounded bg-(--accent) px-3 py-1.5 text-xs font-bold transition-colors hover:bg-(--accent-hover)"
+										style="color: var(--accent-fg);"
+										onclick={() => {
+											userState.setSkipKeyRequirement(true);
+											goto('/create');
+										}}
+									>
+										Yes, Continue
+									</button>
+								</div>
+							</div>
+						{:else}
+							<button 
+								type="button" 
+								class="mt-2 rounded border border-(--border-strong) bg-transparent px-4 py-2 text-xs font-semibold uppercase tracking-wider text-(--text-secondary) transition-colors hover:border-(--text-primary) hover:text-(--text-primary)"
+								onclick={() => showConfirmSkip = true}
+							>
+								Continue without generative AI features
+							</button>
+						{/if}
 					</div>
 				{:else}
 					{#each Object.entries(userState.keys) as [providerId, config] (providerId)}
 						{@const provider = providers.find(p => p.id === providerId) || { id: providerId, name: providerId, icon: 'bi-key', hasEndpoint: false, keyRequired: true } as ProviderConfig}
 						<div style="background: var(--surface-base); border: 1px solid var(--border-default);" class="flex items-center justify-between rounded-md p-4">
 							<div class="flex items-center gap-4">
-								{#if provider.svg}
-									<svg viewBox="0 0 24 24" style="color: var(--secondary);" class="h-6 w-6" aria-hidden="true" fill="currentColor">
-										<path d={provider.svg.path} />
-									</svg>
-								{:else}
-									<i class="bi {provider.icon} text-2xl text-(--secondary)" aria-hidden="true"></i>
-								{/if}
+								<div class="flex h-8 w-8 shrink-0 items-center justify-center">
+									{#if provider.svg}
+										<svg viewBox="0 0 24 24" style="color: var(--secondary);" class="h-5 w-5" aria-hidden="true" fill="currentColor">
+											<path d={provider.svg.path} />
+										</svg>
+									{:else}
+										<i class="bi {provider.icon} text-xl text-(--secondary)" aria-hidden="true"></i>
+									{/if}
+								</div>
 								
 								<div class="flex flex-col gap-1">
 									<span style="color: var(--text-primary);" class="font-semibold text-sm">{provider.name}</span>
@@ -219,7 +260,7 @@
 					{/each}
 					
 					<div class="mt-4 flex justify-end pt-4 border-t border-(--border-default)">
-						<a href="/create" class="flex items-center gap-2 rounded-md bg-(--accent) px-6 py-3 text-sm font-semibold text-(--surface-base) transition-colors hover:bg-(--accent-hover)">
+						<a href="/create" class="flex items-center gap-2 rounded-md bg-(--accent) px-6 py-3 text-sm font-semibold transition-colors hover:bg-(--accent-hover)" style="color: var(--accent-fg);">
 							Continue to Create Skill
 							<i class="bi bi-arrow-right"></i>
 						</a>
