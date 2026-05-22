@@ -105,16 +105,16 @@ Output ONLY the text of the description, nothing else.`;
 </script>
 
 <div class="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-4">
-	<div class="w-full max-w-2xl rounded-2xl border border-[var(--border-default)] bg-[var(--surface-raised)] p-8 shadow-2xl">
+	<div class="w-full max-w-2xl rounded-2xl border border-(--border-default) bg-(--surface-raised) p-8 shadow-2xl">
 		<div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 			<div>
-				<h1 class="mb-2 text-2xl font-bold tracking-tight text-[var(--text-primary)]">Skill Description</h1>
-				<p class="text-sm text-[var(--text-secondary)]">Describe what your skill <span class="font-mono text-[var(--accent)]">{skillName}</span> does.</p>
+				<h1 class="mb-2 text-2xl font-bold tracking-tight text-(--text-primary)">Skill Description</h1>
+				<p class="text-sm text-(--text-secondary)">Describe what your skill <span class="font-mono text-(--accent)">{skillName}</span> does.</p>
 			</div>
 			
 			{#if availableProviders.length > 0}
-				<div class="flex items-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--surface-sunken)] p-2">
-					<select bind:value={selectedProvider} class="bg-transparent text-sm text-[var(--text-primary)] focus:outline-none">
+				<div class="flex items-center gap-2 rounded-lg border border-(--border-default) bg-(--surface-sunken) p-2">
+					<select bind:value={selectedProvider} class="bg-transparent text-sm text-(--text-primary) focus:outline-none">
 						{#each availableProviders as provider}
 							<option value={provider}>{provider}</option>
 						{/each}
@@ -123,7 +123,7 @@ Output ONLY the text of the description, nothing else.`;
 						type="button"
 						onclick={handleGenerate}
 						disabled={isGenerating}
-						class="flex items-center gap-2 rounded bg-[var(--surface-base)] px-3 py-1.5 text-xs font-semibold text-[var(--accent)] transition-colors hover:bg-[var(--border-default)] disabled:opacity-50"
+						class="flex items-center gap-2 rounded bg-(--surface-base) px-3 py-1.5 text-xs font-semibold text-(--accent) transition-colors hover:bg-(--border-default) disabled:opacity-50"
 					>
 						{#if isGenerating}
 							<span class="animate-pulse">Generating...</span>
@@ -137,7 +137,7 @@ Output ONLY the text of the description, nothing else.`;
 		</div>
 
 		{#if errorMsg}
-			<div class="mb-4 rounded-lg border border-[var(--secondary)] bg-[var(--secondary-subtle)] p-3 text-sm text-[var(--secondary)]">
+			<div class="mb-4 rounded-lg border border-(--secondary) bg-(--secondary-subtle) p-3 text-sm text-(--secondary)">
 				{errorMsg}
 			</div>
 		{/if}
@@ -147,11 +147,11 @@ Output ONLY the text of the description, nothing else.`;
 				bind:value={description}
 				placeholder="Use this skill when..."
 				rows="6"
-				class="w-full resize-none rounded-lg border border-[var(--border-strong)] bg-[var(--surface-sunken)] px-4 py-3 text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--focus-ring)]"
+				class="w-full resize-none rounded-lg border border-(--border-strong) bg-(--surface-sunken) px-4 py-3 text-(--text-primary) placeholder-(--text-tertiary) transition-colors focus:border-(--accent) focus:outline-none focus:ring-1 focus:ring-(--focus-ring)"
 			></textarea>
 			<div class="mt-2 flex justify-between text-xs font-medium">
-				<span class="text-[var(--text-tertiary)]">Max 1024 characters</span>
-				<span class={description.length > 1024 ? 'text-[var(--secondary)]' : 'text-[var(--text-secondary)]'}>
+				<span class="text-(--text-tertiary)">Max 1024 characters</span>
+				<span class={description.length > 1024 ? 'text-(--secondary)' : 'text-(--text-secondary)'}>
 					{description.length} / 1024
 				</span>
 			</div>
@@ -160,7 +160,7 @@ Output ONLY the text of the description, nothing else.`;
 		<button
 			type="button"
 			disabled={!isValid}
-			class="w-full rounded-lg bg-[var(--accent)] px-4 py-3 text-sm font-semibold text-[var(--accent-fg)] shadow-sm transition-all hover:bg-[var(--accent-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+			class="w-full rounded-lg bg-(--accent) px-4 py-3 text-sm font-semibold text-(--accent-fg) shadow-sm transition-all hover:bg-(--accent-hover) disabled:cursor-not-allowed disabled:opacity-50"
 		>
 			Save Skill
 		</button>
