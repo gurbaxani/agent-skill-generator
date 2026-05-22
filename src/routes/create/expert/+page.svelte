@@ -490,6 +490,30 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 			skillDraft.reset();
 		}
 	}
+
+	// ── GitHub Submission ────────────────────────────────────────────────────
+	import { serializeSkillToRegistry, getGithubPrUrl } from '$lib/utils/github';
+
+	let isSubmitModalOpen = $state(false);
+	let githubUsername = $state('');
+	let isSubmitting = $state(false);
+
+	async function handleSubmitToGithub() {
+		if (!githubUsername.trim()) return;
+		isSubmitting = true;
+		errorMsg = '';
+		try {
+			const registrySkill = await serializeSkillToRegistry(skillDraft, githubUsername);
+			const prUrl = getGithubPrUrl(registrySkill);
+			window.open(prUrl, '_blank', 'noopener,noreferrer');
+			isSubmitModalOpen = false;
+		} catch (err) {
+			console.error(err);
+			errorMsg = err instanceof Error ? err.message : 'Failed to generate GitHub submission URL.';
+		} finally {
+			isSubmitting = false;
+		}
+	}
 </script>
 
 <svelte:head>
@@ -1341,42 +1365,138 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 				</div>
 
 				<!-- Live Preview Panel Action Footer -->
-				<div class="flex items-center justify-between gap-3">
-					<button
-						type="button"
-						id="expert-btn-copy"
-						onclick={handleCopy}
-						disabled={!isValid}
-						style="border: 1px solid var(--border-strong); color: {copied
-							? 'var(--accent)'
-							: 'var(--text-secondary)'}; {copied ? 'border-color: var(--accent);' : ''}"
-						class="flex flex-1 items-center justify-center gap-2 rounded-[2px] py-3.5 text-xs font-bold tracking-widest uppercase transition-all hover:border-(--accent) hover:text-(--accent) focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
-					>
-						{#if copied}
-							<i class="bi bi-check-lg"></i> Copied Markdown!
-						{:else}
-							<i class="bi bi-clipboard"></i> Copy SKILL.md
-						{/if}
-					</button>
+				<div class="flex flex-col gap-3">
+					<div class="flex items-center justify-between gap-3">
+						<button
+							type="button"
+							id="expert-btn-copy"
+							onclick={handleCopy}
+							disabled={!isValid}
+							style="border: 1px solid var(--border-strong); color: {copied
+								? 'var(--accent)'
+								: 'var(--text-secondary)'}; {copied ? 'border-color: var(--accent);' : ''}"
+							class="flex flex-1 items-center justify-center gap-2 rounded-[2px] py-3.5 text-xs font-bold tracking-widest uppercase transition-all hover:border-(--accent) hover:text-(--accent) focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
+						>
+							{#if copied}
+								<i class="bi bi-check-lg"></i> Copied Markdown!
+							{:else}
+								<i class="bi bi-clipboard"></i> Copy SKILL.md
+							{/if}
+						</button>
+
+						<button
+							type="button"
+							id="expert-btn-download"
+							onclick={handleDownload}
+							disabled={!isValid}
+							style="background: var(--accent); color: var(--accent-fg);"
+							class="flex flex-1 items-center justify-center gap-2 rounded-[2px] py-3.5 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_15px_var(--accent-glow)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+						>
+							{#if downloaded}
+								<i class="bi bi-check-lg"></i> Downloaded!
+							{:else}
+								<i class="bi bi-download" aria-hidden="true"></i> Download ZIP
+							{/if}
+						</button>
+					</div>
 
 					<button
 						type="button"
-						id="expert-btn-download"
-						onclick={handleDownload}
+						id="expert-btn-submit"
+						onclick={() => (isSubmitModalOpen = true)}
 						disabled={!isValid}
-						style="background: var(--accent); color: var(--accent-fg);"
-						class="flex flex-1 items-center justify-center gap-2 rounded-[2px] py-3.5 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_15px_var(--accent-glow)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+						style="border: 1px solid var(--accent); color: var(--accent);"
+						class="flex w-full items-center justify-center gap-2 rounded-[2px] py-3.5 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-glow) focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
 					>
-						{#if downloaded}
-							<i class="bi bi-check-lg"></i> Downloaded!
-						{:else}
-							<i class="bi bi-download"></i> Download ZIP
-						{/if}
+						<i class="bi bi-github" aria-hidden="true"></i> Submit to GitHub Registry
 					</button>
 				</div>
 			</div>
 		</div>
 	</div>
+
+	<!-- GitHub Submission Modal Overlay -->
+	{#if isSubmitModalOpen}
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<div class="modal-backdrop" role="presentation" onclick={() => (isSubmitModalOpen = false)}>
+			<!-- svelte-ignore a11y_click_events_have_key_events -->
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
+			<div class="modal-container cyber-panel glow-accent" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1" onclick={(e) => e.stopPropagation()}>
+				<div class="modal-header flex items-center justify-between border-b border-(--border-default) pb-3">
+					<h3 id="modal-title" class="flex items-center gap-2 font-mono text-sm font-bold tracking-widest text-(--text-primary) uppercase">
+						<i class="bi bi-github text-base text-(--accent)"></i>
+						Submit to GitHub Registry
+					</h3>
+					<button
+						type="button"
+						onclick={() => (isSubmitModalOpen = false)}
+						class="text-(--text-tertiary) hover:text-(--text-primary) focus:outline-none"
+						aria-label="Close modal"
+					>
+						<i class="bi bi-x-lg"></i>
+					</button>
+				</div>
+
+				<div class="modal-body py-4 flex flex-col gap-4 font-mono text-xs text-(--text-secondary) leading-relaxed">
+					<p>
+						You are about to submit <span class="text-(--accent) font-semibold">{skillDraft.validName || 'skill'}.json</span> to the community catalog registry.
+					</p>
+					<div class="bg-(--surface-sunken) p-3 border border-(--border-strong) rounded-[2px] flex flex-col gap-2">
+						<span class="text-(--text-primary) font-semibold uppercase text-[10px] tracking-wider">How it works:</span>
+						<ol class="list-decimal list-inside flex flex-col gap-1.5 opacity-90">
+							<li>Enter your GitHub username to receive author attribution.</li>
+							<li>Clicking "Continue to GitHub" will redirect you to pre-populate a new file commit.</li>
+							<li>Commit the new file in your GitHub account (this will prompt you to fork & propose changes).</li>
+							<li>Open a Pull Request to merge your skill into the registry.</li>
+						</ol>
+					</div>
+
+					<div class="flex flex-col gap-2">
+						<label for="github-username-input" class="font-semibold text-(--text-primary) uppercase text-[10px] tracking-wider">
+							GitHub Username (for credit)
+						</label>
+						<div class="relative">
+							<span class="absolute top-1/2 left-3 -translate-y-1/2 text-(--text-tertiary) font-bold">@</span>
+							<input
+								type="text"
+								id="github-username-input"
+								bind:value={githubUsername}
+								placeholder="username"
+								style="background: var(--surface-sunken); border: 1px solid var(--border-strong); border-radius: 2px; color: var(--text-primary); font-family: var(--font-mono);"
+								class="w-full py-2 pr-3 pl-7 text-xs focus:border-(--accent) focus:ring-1 focus:ring-(--accent) focus:outline-none"
+							/>
+						</div>
+					</div>
+				</div>
+
+				<div class="modal-footer border-t border-(--border-default) pt-4 flex justify-end gap-3">
+					<button
+						type="button"
+						onclick={() => (isSubmitModalOpen = false)}
+						style="color: var(--text-secondary); border: 1px solid var(--border-default); border-radius: 2px;"
+						class="px-4 py-2 text-[11px] font-bold tracking-wider uppercase transition-colors hover:bg-(--surface-sunken) focus:outline-none"
+					>
+						Cancel
+					</button>
+					<button
+						type="button"
+						onclick={handleSubmitToGithub}
+						disabled={isSubmitting || !githubUsername.trim()}
+						style="background: var(--accent); color: var(--accent-fg); border-radius: 2px;"
+						class="flex items-center gap-1.5 px-4 py-2 text-[11px] font-bold tracking-wider uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_10px_var(--accent-glow)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
+					>
+						{#if isSubmitting}
+							<span class="animate-pulse">Loading...</span>
+						{:else}
+							<i class="bi bi-github"></i>
+							Continue to GitHub
+						{/if}
+					</button>
+				</div>
+			</div>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -1699,5 +1819,33 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 		border-color: var(--accent) !important;
 		background: var(--accent-glow) !important;
 		box-shadow: 0 0 15px var(--accent-glow);
+	}
+
+	/* Modal Backdrop & Container */
+	.modal-backdrop {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100vw;
+		height: 100vh;
+		background: rgba(0, 0, 0, 0.8);
+		backdrop-filter: blur(8px);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 9999;
+	}
+
+	.modal-container {
+		width: 90%;
+		max-width: 500px;
+		background: var(--surface-raised);
+		border: 1px solid var(--border-strong);
+		border-radius: 2px;
+		padding: 24px;
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+		box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
 	}
 </style>

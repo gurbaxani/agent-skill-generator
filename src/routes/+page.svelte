@@ -1,64 +1,9 @@
 <script lang="ts">
 	import SkillPreview from '$lib/components/SkillPreview.svelte';
 	import CatalogEntry from '$lib/components/CatalogEntry.svelte';
+	import { getRegistrySkills } from '$lib/registry';
 
-	interface CatalogSkill {
-		name: string;
-		description: string;
-		author: string;
-		tag: string;
-	}
-
-	const CATALOG_SKILLS: ReadonlyArray<CatalogSkill> = [
-		{
-			name: 'code-reviewer',
-			description: 'Reviews pull requests for style, bugs, and performance issues',
-			author: '@mchen',
-			tag: 'dev'
-		},
-		{
-			name: 'api-documenter',
-			description: 'Generates OpenAPI specs from source code and inline comments',
-			author: '@jpark',
-			tag: 'docs'
-		},
-		{
-			name: 'test-writer',
-			description: 'Creates unit and integration tests with edge case coverage',
-			author: '@sluna',
-			tag: 'test'
-		},
-		{
-			name: 'commit-crafter',
-			description: 'Writes conventional commit messages from staged diffs',
-			author: '@aroy',
-			tag: 'git'
-		},
-		{
-			name: 'sql-optimizer',
-			description: 'Analyzes queries and suggests index, join, and schema improvements',
-			author: '@kzhang',
-			tag: 'data'
-		},
-		{
-			name: 'a11y-auditor',
-			description: 'Checks components against WCAG 2.2 and suggests ARIA fixes',
-			author: '@tlee',
-			tag: 'a11y'
-		},
-		{
-			name: 'refactor-guide',
-			description: 'Identifies code smells and proposes incremental refactoring steps',
-			author: '@npatel',
-			tag: 'dev'
-		},
-		{
-			name: 'changelog-gen',
-			description: 'Builds changelogs from commit history using keep-a-changelog format',
-			author: '@mchen',
-			tag: 'ops'
-		}
-	];
+	const CATALOG_SKILLS = getRegistrySkills();
 
 	interface ValueProp {
 		icon: string;
