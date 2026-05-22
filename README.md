@@ -28,7 +28,7 @@ This project is built using:
 
 1. Clone the repository and navigate to the project directory:
    ```sh
-   cd asg
+   cd agent-skill-generator
    ```
 
 2. Install dependencies:
@@ -76,5 +76,5 @@ npm run preview
 This project uses:
 - Strict Type Safety: No `:any` types allowed.
 - Svelte 5 Runes: Exclusively uses `$state`, `$derived`, `$props` for reactivity.
-- Biome for linting.
+
 
