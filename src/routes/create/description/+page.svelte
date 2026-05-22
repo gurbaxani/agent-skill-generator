@@ -104,65 +104,95 @@ Output ONLY the text of the description, nothing else.`;
 	let isValid = $derived(description.length > 0 && description.length <= 1024);
 </script>
 
-<div class="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-4">
-	<div class="w-full max-w-2xl rounded-2xl border border-(--border-default) bg-(--surface-raised) p-8 shadow-2xl">
-		<div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-			<div>
-				<h1 class="mb-2 text-2xl font-bold tracking-tight text-(--text-primary)">Skill Description</h1>
-				<p class="text-sm text-(--text-secondary)">Describe what your skill <span class="font-mono text-(--accent)">{skillName}</span> does.</p>
-			</div>
+<div class="mx-auto max-w-4xl px-6 py-12">
+	<div class="grid items-start gap-12 lg:grid-cols-[1fr_2fr]">
+		
+		<div class="flex flex-col gap-4 pt-2">
+			<h1 style="color: var(--text-primary);" class="text-3xl font-bold tracking-tight">
+				Skill Description
+			</h1>
+			<p style="color: var(--text-secondary);" class="text-base">
+				Describe what your skill <span style="color: var(--accent); font-family: var(--font-mono)">{skillName}</span> does.
+			</p>
+		</div>
+
+		<div class="flex w-full flex-col gap-8">
 			
-			{#if availableProviders.length > 0}
-				<div class="flex items-center gap-2 rounded-lg border border-(--border-default) bg-(--surface-sunken) p-2">
-					<select bind:value={selectedProvider} class="bg-transparent text-sm text-(--text-primary) focus:outline-none">
-						{#each availableProviders as provider}
-							<option value={provider}>{provider}</option>
-						{/each}
-					</select>
-					<button
-						type="button"
-						onclick={handleGenerate}
-						disabled={isGenerating}
-						class="flex items-center gap-2 rounded bg-(--surface-base) px-3 py-1.5 text-xs font-semibold text-(--accent) transition-colors hover:bg-(--border-default) disabled:opacity-50"
-					>
-						{#if isGenerating}
-							<span class="animate-pulse">Generating...</span>
-						{:else}
-							<svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" /></svg>
-							Auto-Generate
-						{/if}
-					</button>
+			{#if errorMsg}
+				<div style="border-left: 2px solid var(--secondary); background: var(--secondary-subtle); color: var(--secondary); font-family: var(--font-mono)" class="p-4 text-sm shadow-sm rounded">
+					[Error] {errorMsg}
 				</div>
 			{/if}
-		</div>
 
-		{#if errorMsg}
-			<div class="mb-4 rounded-lg border border-(--secondary) bg-(--secondary-subtle) p-3 text-sm text-(--secondary)">
-				{errorMsg}
+			<div class="flex flex-col gap-6">
+				{#if availableProviders.length > 0}
+					<div style="background: var(--surface-sunken); border: 1px solid var(--border-default)" class="flex flex-col gap-4 rounded p-5 shadow-sm">
+						<div>
+							<h3 style="color: var(--text-primary);" class="text-sm font-medium">Don't want to write it yourself?</h3>
+							<p style="color: var(--text-secondary);" class="mt-1 text-sm">Have AI generate a perfect description based on your skill name.</p>
+						</div>
+						<div class="flex flex-col sm:flex-row items-center gap-3">
+							<select bind:value={selectedProvider} style="color: var(--text-primary); border: 1px solid var(--border-strong);" class="w-full sm:w-auto appearance-none rounded bg-transparent px-3 py-2 text-sm focus:outline-none">
+								{#each availableProviders as provider}
+									<option value={provider}>{provider}</option>
+								{/each}
+							</select>
+							<button
+								type="button"
+								onclick={handleGenerate}
+								disabled={isGenerating}
+								style="border: 1px solid var(--accent); color: var(--accent);"
+								class="flex w-full sm:w-auto items-center justify-center gap-2 rounded px-4 py-2 text-sm font-medium transition-colors hover:bg-(--accent-glow) disabled:cursor-not-allowed disabled:opacity-50"
+							>
+								{#if isGenerating}
+									<span class="animate-pulse">Generating...</span>
+								{:else}
+									<i class="bi bi-magic" aria-hidden="true"></i> Auto-Generate with AI
+								{/if}
+							</button>
+						</div>
+					</div>
+
+					<div class="flex items-center gap-4">
+						<div class="h-px w-full" style="background: var(--border-default)"></div>
+						<span style="color: var(--text-tertiary);" class="text-xs font-medium uppercase tracking-widest">OR</span>
+						<div class="h-px w-full" style="background: var(--border-default)"></div>
+					</div>
+				{/if}
+
+				<div class="flex flex-col gap-3">
+					<label for="description" style="color: var(--text-primary);" class="text-sm font-medium">
+						Write Manually
+					</label>
+
+					<textarea
+						id="description"
+						bind:value={description}
+						placeholder="Use this skill when..."
+						rows="8"
+						style="background: var(--surface-sunken); color: var(--text-primary); border: 1px solid var(--border-strong);"
+						class="w-full resize-y rounded p-4 text-base transition-colors focus:border-(--accent) focus:outline-none focus:ring-1 focus:ring-(--focus-ring) placeholder:text-(--text-tertiary)"
+					></textarea>
+
+					<div class="flex items-center justify-between text-xs font-medium">
+						<span style="color: var(--text-tertiary)">Max 1024 characters</span>
+						<span style="color: {description.length > 1024 ? 'var(--secondary)' : 'var(--text-secondary)'}">
+							{description.length} / 1024
+						</span>
+					</div>
+				</div>
 			</div>
-		{/if}
 
-		<div class="mb-6">
-			<textarea
-				bind:value={description}
-				placeholder="Use this skill when..."
-				rows="6"
-				class="w-full resize-none rounded-lg border border-(--border-strong) bg-(--surface-sunken) px-4 py-3 text-(--text-primary) placeholder-(--text-tertiary) transition-colors focus:border-(--accent) focus:outline-none focus:ring-1 focus:ring-(--focus-ring)"
-			></textarea>
-			<div class="mt-2 flex justify-between text-xs font-medium">
-				<span class="text-(--text-tertiary)">Max 1024 characters</span>
-				<span class={description.length > 1024 ? 'text-(--secondary)' : 'text-(--text-secondary)'}>
-					{description.length} / 1024
-				</span>
+			<div class="flex justify-end">
+				<button
+					type="button"
+					disabled={!isValid}
+					class="rounded bg-(--accent) px-6 py-3 text-sm font-semibold text-(--surface-base) transition-colors hover:bg-(--accent-hover) disabled:cursor-not-allowed disabled:opacity-50"
+				>
+					Save Skill
+				</button>
 			</div>
+			
 		</div>
-
-		<button
-			type="button"
-			disabled={!isValid}
-			class="w-full rounded-lg bg-(--accent) px-4 py-3 text-sm font-semibold text-(--accent-fg) shadow-sm transition-all hover:bg-(--accent-hover) disabled:cursor-not-allowed disabled:opacity-50"
-		>
-			Save Skill
-		</button>
 	</div>
 </div>

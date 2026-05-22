@@ -22,40 +22,59 @@
 	);
 </script>
 
-<div class="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-4">
-	<div class="w-full max-w-md rounded-2xl border border-(--border-default) bg-(--surface-raised) p-8 shadow-2xl">
-		<h1 class="mb-2 text-2xl font-bold tracking-tight text-(--text-primary)">Create a New Skill</h1>
-		<p class="mb-6 text-sm text-(--text-secondary)">Give your agent skill a unique name to get started.</p>
-
-		<div class="mb-6">
-			<label for="skillName" class="mb-2 block text-sm font-medium text-(--text-primary)">Skill Name</label>
-			<input
-				id="skillName"
-				type="text"
-				bind:value={rawName}
-				placeholder="e.g. Code Reviewer"
-				class="w-full rounded-lg border border-(--border-strong) bg-(--surface-sunken) px-4 py-3 text-(--text-primary) placeholder-(--text-tertiary) transition-colors focus:border-(--accent) focus:outline-none focus:ring-1 focus:ring-(--focus-ring)"
-			/>
+<div class="mx-auto max-w-4xl px-6 py-12">
+	<div class="grid items-start gap-12 lg:grid-cols-[1fr_2fr]">
+		
+		<div class="flex flex-col gap-4 pt-2">
+			<h1 style="color: var(--text-primary);" class="text-3xl font-bold tracking-tight">
+				Create a New Skill
+			</h1>
+			<p style="color: var(--text-secondary);" class="text-base">
+				Give your agent skill a unique name to get started.
+			</p>
 		</div>
 
-		<div class="mb-8 rounded-lg border border-(--border-default) bg-(--surface-sunken) p-4">
-			<div class="mb-1 text-xs font-medium uppercase tracking-wider text-(--text-tertiary)">Generated ID</div>
-			<div class="font-mono text-sm text-(--accent) break-all min-h-5">
-				{#if validName}
-					{validName}
-				{:else}
-					<span class="opacity-50">your-skill-id</span>
-				{/if}
+		<div class="flex w-full flex-col gap-8">
+			
+			<div class="flex flex-col gap-3">
+				<label for="skillName" style="color: var(--text-primary);" class="text-sm font-medium">
+					Skill Name
+				</label>
+				
+				<input
+					id="skillName"
+					type="text"
+					bind:value={rawName}
+					placeholder="e.g. Code Reviewer"
+					style="background: var(--surface-sunken); color: var(--text-primary); border: 1px solid var(--border-strong);"
+					class="w-full rounded p-3 text-base transition-colors focus:border-(--accent) focus:outline-none focus:ring-1 focus:ring-(--focus-ring) placeholder:text-(--text-tertiary)"
+				/>
+
+				<div style="background: var(--surface-base); border: 1px solid var(--border-default)" class="mt-2 rounded p-4">
+					<div style="color: var(--text-tertiary);" class="mb-1 text-xs font-medium uppercase tracking-wider">
+						Generated ID
+					</div>
+					<div style="color: var(--accent); font-family: var(--font-mono)" class="break-all text-sm min-h-5">
+						{#if validName}
+							{validName}
+						{:else}
+							<span style="opacity: 0.5">your-skill-id</span>
+						{/if}
+					</div>
+				</div>
 			</div>
-		</div>
 
-		<button
-			type="button"
-			disabled={!validName}
-			onclick={() => goto(`/create/description?name=${validName}`)}
-			class="w-full rounded-lg bg-(--accent) px-4 py-3 text-sm font-semibold text-(--accent-fg) shadow-sm transition-all hover:bg-(--accent-hover) disabled:cursor-not-allowed disabled:opacity-50"
-		>
-			Continue
-		</button>
+			<div class="flex justify-end">
+				<button
+					type="button"
+					disabled={!validName}
+					onclick={() => goto(`/create/description?name=${validName}`)}
+					class="rounded bg-(--accent) px-6 py-3 text-sm font-semibold text-(--surface-base) transition-colors hover:bg-(--accent-hover) disabled:cursor-not-allowed disabled:opacity-50"
+				>
+					Continue
+				</button>
+			</div>
+			
+		</div>
 	</div>
 </div>
