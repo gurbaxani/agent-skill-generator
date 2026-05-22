@@ -4,9 +4,7 @@
 	import { userState } from '$lib/state/user.svelte';
 
 	onMount(() => {
-		if (!userState.hasKeys() && !userState.skipKeyRequirement) {
-			goto('/keys');
-		}
+		// Removed forceful redirect to allow keyless users to reach this page
 	});
 
 	let rawName = $state('');
@@ -68,7 +66,16 @@
 				</div>
 			</div>
 
-			<div class="flex justify-end">
+			<div class="flex justify-end gap-4">
+				{#if !userState.hasKeys()}
+					<a
+						href="/keys"
+						class="flex items-center gap-2 rounded px-4 py-3 text-sm font-bold uppercase tracking-wider transition-colors hover:bg-(--surface-sunken)"
+						style="color: var(--text-secondary); border: 1px solid var(--border-default);"
+					>
+						<i class="bi bi-key" aria-hidden="true"></i> Add API Key
+					</a>
+				{/if}
 				<button
 					type="button"
 					disabled={!validName}
@@ -76,7 +83,7 @@
 					class="flex items-center gap-2 rounded bg-(--accent) px-6 py-3 text-sm font-bold uppercase tracking-wider transition-colors hover:bg-(--accent-hover) disabled:cursor-not-allowed disabled:opacity-50"
 					style="color: var(--accent-fg);"
 				>
-					Next Step <i class="bi bi-arrow-right"></i>
+					Next Step <i class="bi bi-arrow-right" aria-hidden="true"></i>
 				</button>
 			</div>
 			

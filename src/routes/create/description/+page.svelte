@@ -13,9 +13,7 @@
 	let selectedProvider = $state('');
 
 	onMount(() => {
-		if (!userState.hasKeys() && !userState.skipKeyRequirement) {
-			goto('/keys');
-		} else if (!skillName) {
+		if (!skillName) {
 			goto('/create');
 		}
 		if (availableProviders.length > 0) {
@@ -212,7 +210,16 @@ Output ONLY the text of the description, nothing else.`;
 				</div>
 			</div>
 
-			<div class="flex justify-end">
+			<div class="flex justify-end gap-4">
+				{#if !userState.hasKeys()}
+					<a
+						href="/keys"
+						class="flex items-center gap-2 rounded px-4 py-3 text-sm font-semibold transition-colors hover:bg-(--surface-sunken)"
+						style="color: var(--text-secondary); border: 1px solid var(--border-default);"
+					>
+						<i class="bi bi-key" aria-hidden="true"></i> Add API Key
+					</a>
+				{/if}
 				<button
 					type="button"
 					disabled={!isValid}
