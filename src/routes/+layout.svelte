@@ -1,4 +1,14 @@
 <script lang="ts">
+	import '@fontsource/chakra-petch/300.css';
+	import '@fontsource/chakra-petch/400.css';
+	import '@fontsource/chakra-petch/500.css';
+	import '@fontsource/chakra-petch/600.css';
+	import '@fontsource/chakra-petch/700.css';
+	import '@fontsource/rajdhani/300.css';
+	import '@fontsource/rajdhani/400.css';
+	import '@fontsource/rajdhani/500.css';
+	import '@fontsource/rajdhani/600.css';
+	import '@fontsource/rajdhani/700.css';
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
@@ -8,12 +18,6 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
-	<link rel="preconnect" href="https://fonts.googleapis.com" />
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
-	<link
-		href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=Rajdhani:wght@300;400;500;600;700&display=swap"
-		rel="stylesheet"
-	/>
 </svelte:head>
 
 <div class="app-shell">
