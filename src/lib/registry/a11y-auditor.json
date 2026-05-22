@@ -1,8 +1,8 @@
 {
   "name": "a11y-auditor",
   "description": "Checks components against WCAG 2.2 and suggests ARIA fixes",
-  "author": "@tlee",
-  "tag": "a11y",
+  "author": "@ashwinwin",
+  "tag": "dev",
   "license": "MIT",
   "compatibility": "HTML, React, Svelte, Vue",
   "allowedTools": "axe",
