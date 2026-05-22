@@ -433,11 +433,11 @@
 	}
 
 	.hero-terminal-preview :global(.terminal-body) {
-		line-height: .5;
+		line-height: 0.5;
 	}
 
 	.hero-terminal-preview :global(.line) {
-		min-height: .75em;
+		min-height: 0.75em;
 	}
 
 	/* ─── Section Labels ─── */

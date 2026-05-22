@@ -2,8 +2,15 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { userState } from '$lib/state/user.svelte';
-	import { skillDraft, type ScriptLanguage, type AssetKind, type MetaEntry, type RefFile } from '$lib/state/draft.svelte';
+	import {
+		skillDraft,
+		type ScriptLanguage,
+		type AssetKind,
+		type MetaEntry,
+		type RefFile
+	} from '$lib/state/draft.svelte';
 	import { marked } from 'marked';
+	import { downloadSkillZip } from '$lib/utils/zip';
 
 	// ── Page States ──────────────────────────────────────────────────────────
 	let isGenerating = $state(false);
@@ -34,7 +41,9 @@
 		return lines.slice(start + 1, end);
 	});
 
-	let renderedBody = $derived(marked.parse(skillDraft.body.trim() || '_No content written yet._') as string);
+	let renderedBody = $derived(
+		marked.parse(skillDraft.body.trim() || '_No content written yet._') as string
+	);
 
 	// ── AI generation types ──────────────────────────────────────────────────
 	interface AIGeneratedSkill {
@@ -214,7 +223,8 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 			if (err instanceof Error) {
 				errorMsg = err.message;
 			} else {
-				errorMsg = 'Failed to auto-generate the skill. Please verify your keys configuration and prompt text.';
+				errorMsg =
+					'Failed to auto-generate the skill. Please verify your keys configuration and prompt text.';
 			}
 		} finally {
 			isGenerating = false;
@@ -223,7 +233,10 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 
 	// ── Form Adders / Removers ───────────────────────────────────────────────
 	function addMeta() {
-		skillDraft.metadata = [...skillDraft.metadata, { key: '', value: '', id: skillDraft.nextMetaId++ }];
+		skillDraft.metadata = [
+			...skillDraft.metadata,
+			{ key: '', value: '', id: skillDraft.nextMetaId++ }
+		];
 	}
 
 	function removeMeta(id: number) {
@@ -231,7 +244,10 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 	}
 
 	function addRefFile() {
-		skillDraft.refFiles = [...skillDraft.refFiles, { name: '', description: '', id: skillDraft.nextRefId++ }];
+		skillDraft.refFiles = [
+			...skillDraft.refFiles,
+			{ name: '', description: '', id: skillDraft.nextRefId++ }
+		];
 	}
 
 	function removeRefFile(id: number) {
@@ -256,7 +272,12 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 
 	// ── Assets List ──────────────────────────────────────────────────────────
 	const allAssetKinds: { value: AssetKind; label: string; icon: string; hint: string }[] = [
-		{ value: 'templates', label: 'Templates', icon: 'bi-file-earmark-text', hint: 'Document & config templates' },
+		{
+			value: 'templates',
+			label: 'Templates',
+			icon: 'bi-file-earmark-text',
+			hint: 'Document & config templates'
+		},
 		{ value: 'images', label: 'Images', icon: 'bi-image', hint: 'Diagrams, screenshots, examples' },
 		{ value: 'data', label: 'Data files', icon: 'bi-table', hint: 'Lookup tables, schemas, CSVs' }
 	];
@@ -276,16 +297,15 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 		setTimeout(() => (copied = false), 2000);
 	}
 
-	function handleDownload() {
-		const blob = new Blob([skillFile], { type: 'text/markdown' });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = 'SKILL.md';
-		a.click();
-		URL.revokeObjectURL(url);
-		downloaded = true;
-		setTimeout(() => (downloaded = false), 2000);
+	async function handleDownload() {
+		try {
+			await downloadSkillZip(skillDraft);
+			downloaded = true;
+			setTimeout(() => (downloaded = false), 2000);
+		} catch (err) {
+			console.error(err);
+			errorMsg = err instanceof Error ? err.message : 'Failed to generate ZIP download.';
+		}
 	}
 
 	function handleReset() {
@@ -297,7 +317,10 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 
 <svelte:head>
 	<title>Expert Skill Creator — ASG</title>
-	<meta name="description" content="Generate and edit complete AI agent skills inside a single unified dashboard." />
+	<meta
+		name="description"
+		content="Generate and edit complete AI agent skills inside a single unified dashboard."
+	/>
 </svelte:head>
 
 <div class="mx-auto max-w-7xl px-4 py-8 lg:px-6">
@@ -307,7 +330,7 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 			<h1 class="text-2xl font-extrabold tracking-widest text-(--text-primary)">
 				Expert Workspace
 			</h1>
-			<p class="text-sm text-(--text-secondary) mt-1">
+			<p class="mt-1 text-sm text-(--text-secondary)">
 				Configure the entire skill on a single dashboard or let AI generate the draft from a prompt.
 			</p>
 		</div>
@@ -316,7 +339,7 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 				type="button"
 				onclick={handleReset}
 				style="border: 1px solid var(--secondary); color: var(--secondary);"
-				class="flex items-center gap-2 px-4 py-2 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--secondary-subtle) focus:outline-none rounded-[2px]"
+				class="flex items-center gap-2 rounded-[2px] px-4 py-2 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--secondary-subtle) focus:outline-none"
 			>
 				<i class="bi bi-trash"></i> Reset Draft
 			</button>
@@ -335,20 +358,23 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 
 	<!-- Main Columns Grid -->
 	<div class="grid items-start gap-8 lg:grid-cols-[1.3fr_1fr]">
-		
 		<!-- Left: Form Controls Column -->
 		<div class="flex flex-col gap-6">
-
 			<!-- AI Generation Dashboard Panel -->
 			{#if availableProviders.length > 0}
-				<div class="cyber-panel glow-accent p-5 flex flex-col gap-4">
+				<div class="cyber-panel glow-accent flex flex-col gap-4 p-5">
 					<div class="flex items-center gap-2 border-b border-(--border-default) pb-3">
 						<i class="bi bi-magic text-lg text-(--accent)"></i>
-						<h2 class="text-sm font-bold tracking-widest text-(--text-primary)">AI Complete Generator</h2>
+						<h2 class="text-sm font-bold tracking-widest text-(--text-primary)">
+							AI Complete Generator
+						</h2>
 					</div>
 
 					<div class="flex flex-col gap-2">
-						<label for="ai-prompt-input" class="text-xs font-bold tracking-wider text-(--text-secondary) uppercase">
+						<label
+							for="ai-prompt-input"
+							class="text-xs font-bold tracking-wider text-(--text-secondary) uppercase"
+						>
 							What should this skill do?
 						</label>
 						<textarea
@@ -363,7 +389,11 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 
 					<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 						<div class="flex items-center gap-2">
-							<label for="provider-select" class="text-xs font-bold text-(--text-tertiary) uppercase whitespace-nowrap">Model Key:</label>
+							<label
+								for="provider-select"
+								class="text-xs font-bold whitespace-nowrap text-(--text-tertiary) uppercase"
+								>Model Key:</label
+							>
 							<select
 								id="provider-select"
 								bind:value={selectedProvider}
@@ -381,10 +411,12 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 							onclick={handleGenerateAll}
 							disabled={isGenerating || !aiPrompt.trim()}
 							style="background: var(--accent); color: var(--accent-fg);"
-							class="flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_12px_var(--accent-glow)] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none rounded-[2px]"
+							class="flex items-center justify-center gap-2 rounded-[2px] px-5 py-2.5 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_12px_var(--accent-glow)] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
 						>
 							{#if isGenerating}
-								<span class="animate-pulse flex items-center gap-1"><i class="bi bi-cpu animate-spin"></i> Writing...</span>
+								<span class="flex animate-pulse items-center gap-1"
+									><i class="bi bi-cpu animate-spin"></i> Writing...</span
+								>
 							{:else}
 								<i class="bi bi-lightning-fill"></i> Let AI Write Everything
 							{/if}
@@ -392,26 +424,37 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 					</div>
 				</div>
 			{:else}
-				<div class="cyber-panel border-secondary p-5 flex items-start gap-3">
+				<div class="cyber-panel border-secondary flex items-start gap-3 p-5">
 					<i class="bi bi-exclamation-triangle text-lg text-(--secondary)"></i>
 					<div class="flex-1">
-						<h3 class="text-sm font-bold text-(--text-primary) uppercase tracking-wide">AI Generation Disabled</h3>
-						<p class="text-xs text-(--text-secondary) mt-1">
-							No API Keys configured. Add a provider key in <a href="/keys" class="underline text-(--accent) hover:text-(--accent-hover)">Settings</a> to enable the one-click generator.
+						<h3 class="text-sm font-bold tracking-wide text-(--text-primary) uppercase">
+							AI Generation Disabled
+						</h3>
+						<p class="mt-1 text-xs text-(--text-secondary)">
+							No API Keys configured. Add a provider key in <a
+								href="/keys"
+								class="text-(--accent) underline hover:text-(--accent-hover)">Settings</a
+							> to enable the one-click generator.
 						</p>
 					</div>
 				</div>
 			{/if}
 
 			<!-- Step 1: Required Details -->
-			<div class="cyber-panel p-5 flex flex-col gap-4">
+			<div class="cyber-panel flex flex-col gap-4 p-5">
 				<div class="flex items-center gap-2 border-b border-(--border-default) pb-3">
 					<i class="bi bi-asterisk text-sm text-(--accent)"></i>
-					<h2 class="text-xs font-bold tracking-widest text-(--text-primary) uppercase">1. Core Information (Required)</h2>
+					<h2 class="text-xs font-bold tracking-widest text-(--text-primary) uppercase">
+						1. Core Information (Required)
+					</h2>
 				</div>
 
 				<div class="flex flex-col gap-2">
-					<label for="skill-name" class="text-xs font-bold text-(--text-secondary) uppercase tracking-wider">Skill Name</label>
+					<label
+						for="skill-name"
+						class="text-xs font-bold tracking-wider text-(--text-secondary) uppercase"
+						>Skill Name</label
+					>
 					<input
 						id="skill-name"
 						type="text"
@@ -420,16 +463,23 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 						style="background: var(--surface-sunken); border: 1px solid var(--border-strong); border-radius: 2px; color: var(--text-primary); font-family: var(--font-mono);"
 						class="w-full p-2.5 text-sm focus:border-(--accent) focus:outline-none"
 					/>
-					<div class="flex items-center gap-2 text-[11px] text-(--text-tertiary) font-mono">
+					<div class="flex items-center gap-2 font-mono text-[11px] text-(--text-tertiary)">
 						<span>Generated Identifier:</span>
-						<span class="text-(--accent) font-semibold">{skillDraft.validName || 'none'}</span>
+						<span class="font-semibold text-(--accent)">{skillDraft.validName || 'none'}</span>
 					</div>
 				</div>
 
 				<div class="flex flex-col gap-2">
 					<div class="flex items-center justify-between">
-						<label for="skill-desc" class="text-xs font-bold text-(--text-secondary) uppercase tracking-wider">Description</label>
-						<span class="text-xs font-mono text-(--text-tertiary)" class:text-(--secondary)={skillDraft.description.length > 1024}>
+						<label
+							for="skill-desc"
+							class="text-xs font-bold tracking-wider text-(--text-secondary) uppercase"
+							>Description</label
+						>
+						<span
+							class="font-mono text-xs text-(--text-tertiary)"
+							class:text-(--secondary)={skillDraft.description.length > 1024}
+						>
 							{skillDraft.description.length} / 1024
 						</span>
 					</div>
@@ -445,15 +495,21 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 			</div>
 
 			<!-- Step 2: Optional Settings -->
-			<div class="cyber-panel p-5 flex flex-col gap-4">
+			<div class="cyber-panel flex flex-col gap-4 p-5">
 				<div class="flex items-center gap-2 border-b border-(--border-default) pb-3">
 					<i class="bi bi-sliders text-sm text-(--accent)"></i>
-					<h2 class="text-xs font-bold tracking-widest text-(--text-primary) uppercase">2. Optional Configuration</h2>
+					<h2 class="text-xs font-bold tracking-widest text-(--text-primary) uppercase">
+						2. Optional Configuration
+					</h2>
 				</div>
 
 				<div class="grid gap-4 sm:grid-cols-2">
 					<div class="flex flex-col gap-2">
-						<label for="skill-license" class="text-xs font-bold text-(--text-secondary) uppercase tracking-wider">License</label>
+						<label
+							for="skill-license"
+							class="text-xs font-bold tracking-wider text-(--text-secondary) uppercase"
+							>License</label
+						>
 						<input
 							id="skill-license"
 							type="text"
@@ -465,7 +521,11 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 					</div>
 
 					<div class="flex flex-col gap-2">
-						<label for="allowed-tools-input" class="text-xs font-bold text-(--text-secondary) uppercase tracking-wider">Allowed Tools</label>
+						<label
+							for="allowed-tools-input"
+							class="text-xs font-bold tracking-wider text-(--text-secondary) uppercase"
+							>Allowed Tools</label
+						>
 						<input
 							id="allowed-tools-input"
 							type="text"
@@ -479,8 +539,15 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 
 				<div class="flex flex-col gap-2">
 					<div class="flex items-center justify-between">
-						<label for="skill-compat" class="text-xs font-bold text-(--text-secondary) uppercase tracking-wider">Compatibility</label>
-						<span class="text-xs font-mono text-(--text-tertiary)" class:text-(--secondary)={skillDraft.compatibility.length > 500}>
+						<label
+							for="skill-compat"
+							class="text-xs font-bold tracking-wider text-(--text-secondary) uppercase"
+							>Compatibility</label
+						>
+						<span
+							class="font-mono text-xs text-(--text-tertiary)"
+							class:text-(--secondary)={skillDraft.compatibility.length > 500}
+						>
 							{skillDraft.compatibility.length} / 500
 						</span>
 					</div>
@@ -496,7 +563,12 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 
 				<!-- Custom Metadata Key-Values -->
 				<div class="flex flex-col gap-3 pt-2">
-					<label for="meta-pairs-label" id="meta-pairs-label" class="text-xs font-bold text-(--text-secondary) uppercase tracking-wider">Custom Metadata</label>
+					<label
+						for="meta-pairs-label"
+						id="meta-pairs-label"
+						class="text-xs font-bold tracking-wider text-(--text-secondary) uppercase"
+						>Custom Metadata</label
+					>
 					{#if skillDraft.metadata.length > 0}
 						<div class="flex flex-col gap-2">
 							{#each skillDraft.metadata as item (item.id)}
@@ -520,7 +592,7 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 									<button
 										type="button"
 										onclick={() => removeMeta(item.id)}
-										class="p-2 text-(--text-tertiary) hover:text-(--secondary) transition-colors"
+										class="p-2 text-(--text-tertiary) transition-colors hover:text-(--secondary)"
 										title="Remove Field"
 									>
 										<i class="bi bi-x-lg text-xs"></i>
@@ -533,7 +605,7 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 						type="button"
 						onclick={addMeta}
 						style="border: 1px dashed var(--border-strong); color: var(--text-secondary);"
-						class="py-2 text-xs font-bold uppercase tracking-wider hover:border-(--accent) hover:text-(--accent) transition-all focus:outline-none rounded-[2px]"
+						class="rounded-[2px] py-2 text-xs font-bold tracking-wider uppercase transition-all hover:border-(--accent) hover:text-(--accent) focus:outline-none"
 					>
 						<i class="bi bi-plus-lg"></i> Add Custom Field
 					</button>
@@ -541,16 +613,24 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 			</div>
 
 			<!-- Step 3: Instructions (Markdown Body) -->
-			<div class="cyber-panel p-5 flex flex-col gap-4">
+			<div class="cyber-panel flex flex-col gap-4 p-5">
 				<div class="flex items-center gap-2 border-b border-(--border-default) pb-3">
 					<i class="bi bi-file-text-fill text-sm text-(--accent)"></i>
-					<h2 class="text-xs font-bold tracking-widest text-(--text-primary) uppercase">3. Instruction Guide (Markdown)</h2>
+					<h2 class="text-xs font-bold tracking-widest text-(--text-primary) uppercase">
+						3. Instruction Guide (Markdown)
+					</h2>
 				</div>
 
 				<div class="flex flex-col gap-2">
-					<div class="flex justify-between items-center">
-						<label for="expert-body-textarea" class="text-xs font-bold text-(--text-secondary) uppercase tracking-wider">Instructions Body</label>
-						<span class="text-xs font-mono text-(--text-tertiary)">{skillDraft.body.length.toLocaleString()} chars</span>
+					<div class="flex items-center justify-between">
+						<label
+							for="expert-body-textarea"
+							class="text-xs font-bold tracking-wider text-(--text-secondary) uppercase"
+							>Instructions Body</label
+						>
+						<span class="font-mono text-xs text-(--text-tertiary)"
+							>{skillDraft.body.length.toLocaleString()} chars</span
+						>
 					</div>
 					<textarea
 						id="expert-body-textarea"
@@ -564,18 +644,23 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 			</div>
 
 			<!-- Step 4: Directory Configuration -->
-			<div class="cyber-panel p-5 flex flex-col gap-4">
+			<div class="cyber-panel flex flex-col gap-4 p-5">
 				<div class="flex items-center gap-2 border-b border-(--border-default) pb-3">
 					<i class="bi bi-folder-fill text-sm text-(--accent)"></i>
-					<h2 class="text-xs font-bold tracking-widest text-(--text-primary) uppercase">4. Optional Directories</h2>
+					<h2 class="text-xs font-bold tracking-widest text-(--text-primary) uppercase">
+						4. Optional Directories
+					</h2>
 				</div>
 
 				<!-- scripts/ -->
-				<div class="border border-(--border-default) p-4 rounded-[2px]" style="background: var(--surface-sunken);">
+				<div
+					class="rounded-[2px] border border-(--border-default) p-4"
+					style="background: var(--surface-sunken);"
+				>
 					<div class="flex items-center justify-between">
 						<div class="flex items-center gap-2.5">
 							<i class="bi bi-terminal text-lg text-(--accent)"></i>
-							<span class="text-sm font-semibold font-mono text-(--text-primary)">scripts/</span>
+							<span class="font-mono text-sm font-semibold text-(--text-primary)">scripts/</span>
 						</div>
 						<button
 							type="button"
@@ -591,7 +676,7 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 					</div>
 
 					{#if skillDraft.enableScripts}
-						<div class="mt-4 border-t border-(--border-default) pt-4 flex flex-col gap-3">
+						<div class="mt-4 flex flex-col gap-3 border-t border-(--border-default) pt-4">
 							<span class="text-xs text-(--text-secondary)">Languages:</span>
 							<div class="flex flex-wrap gap-2">
 								{#each allLanguages as lang (lang.value)}
@@ -602,7 +687,8 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 										class="chip"
 										class:chip-active={skillDraft.scriptLanguages.includes(lang.value)}
 									>
-										<i class="bi {lang.icon}"></i> {lang.label}
+										<i class="bi {lang.icon}"></i>
+										{lang.label}
 									</button>
 								{/each}
 							</div>
@@ -611,11 +697,14 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 				</div>
 
 				<!-- references/ -->
-				<div class="border border-(--border-default) p-4 rounded-[2px]" style="background: var(--surface-sunken);">
+				<div
+					class="rounded-[2px] border border-(--border-default) p-4"
+					style="background: var(--surface-sunken);"
+				>
 					<div class="flex items-center justify-between">
 						<div class="flex items-center gap-2.5">
 							<i class="bi bi-book text-lg text-(--accent)"></i>
-							<span class="text-sm font-semibold font-mono text-(--text-primary)">references/</span>
+							<span class="font-mono text-sm font-semibold text-(--text-primary)">references/</span>
 						</div>
 						<button
 							type="button"
@@ -631,7 +720,7 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 					</div>
 
 					{#if skillDraft.enableReferences}
-						<div class="mt-4 border-t border-(--border-default) pt-4 flex flex-col gap-3">
+						<div class="mt-4 flex flex-col gap-3 border-t border-(--border-default) pt-4">
 							<span class="text-xs text-(--text-secondary)">Reference Files:</span>
 							{#if skillDraft.refFiles.length > 0}
 								<div class="flex flex-col gap-2">
@@ -656,7 +745,7 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 											<button
 												type="button"
 												onclick={() => removeRefFile(file.id)}
-												class="p-2 text-(--text-tertiary) hover:text-(--secondary) transition-colors"
+												class="p-2 text-(--text-tertiary) transition-colors hover:text-(--secondary)"
 												title="Remove Reference"
 											>
 												<i class="bi bi-x-lg text-xs"></i>
@@ -669,7 +758,7 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 								type="button"
 								onclick={addRefFile}
 								style="border: 1px dashed var(--border-strong); color: var(--text-secondary);"
-								class="py-2 text-xs font-bold uppercase tracking-wider hover:border-(--accent) hover:text-(--accent) transition-all focus:outline-none rounded-[2px]"
+								class="rounded-[2px] py-2 text-xs font-bold tracking-wider uppercase transition-all hover:border-(--accent) hover:text-(--accent) focus:outline-none"
 							>
 								<i class="bi bi-plus-lg"></i> Add Reference File
 							</button>
@@ -678,11 +767,14 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 				</div>
 
 				<!-- assets/ -->
-				<div class="border border-(--border-default) p-4 rounded-[2px]" style="background: var(--surface-sunken);">
+				<div
+					class="rounded-[2px] border border-(--border-default) p-4"
+					style="background: var(--surface-sunken);"
+				>
 					<div class="flex items-center justify-between">
 						<div class="flex items-center gap-2.5">
 							<i class="bi bi-folder2-open text-lg text-(--accent)"></i>
-							<span class="text-sm font-semibold font-mono text-(--text-primary)">assets/</span>
+							<span class="font-mono text-sm font-semibold text-(--text-primary)">assets/</span>
 						</div>
 						<button
 							type="button"
@@ -698,8 +790,8 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 					</div>
 
 					{#if skillDraft.enableAssets}
-						<div class="mt-4 border-t border-(--border-default) pt-4 flex flex-col gap-2">
-							<span class="text-xs text-(--text-secondary) mb-1">Asset Types:</span>
+						<div class="mt-4 flex flex-col gap-2 border-t border-(--border-default) pt-4">
+							<span class="mb-1 text-xs text-(--text-secondary)">Asset Types:</span>
 							{#each allAssetKinds as kind (kind.value)}
 								<button
 									type="button"
@@ -709,13 +801,21 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 									class:asset-row-active={skillDraft.assetKinds.includes(kind.value)}
 								>
 									<div class="flex items-center gap-3">
-										<i class="bi {kind.icon} text-base" style="color: {skillDraft.assetKinds.includes(kind.value) ? 'var(--accent)' : 'var(--text-tertiary)'};"></i>
+										<i
+											class="bi {kind.icon} text-base"
+											style="color: {skillDraft.assetKinds.includes(kind.value)
+												? 'var(--accent)'
+												: 'var(--text-tertiary)'};"
+										></i>
 										<div class="flex flex-col items-start gap-0.5">
 											<span class="asset-label">{kind.label}</span>
 											<span class="asset-hint">{kind.hint}</span>
 										</div>
 									</div>
-									<div class="check-box" class:check-box-active={skillDraft.assetKinds.includes(kind.value)}>
+									<div
+										class="check-box"
+										class:check-box-active={skillDraft.assetKinds.includes(kind.value)}
+									>
 										{#if skillDraft.assetKinds.includes(kind.value)}
 											<i class="bi bi-check2 text-xs"></i>
 										{/if}
@@ -731,12 +831,13 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 		<!-- Right: Compiled Live Output Preview Column -->
 		<div class="sticky-column">
 			<div class="flex flex-col gap-4">
-				
 				<!-- Normal Markdown Preview Panel -->
-				<div class="cyber-panel p-5 flex flex-col gap-4">
+				<div class="cyber-panel flex flex-col gap-4 p-5">
 					<div class="flex items-center gap-2 border-b border-(--border-default) pb-3">
 						<i class="bi bi-file-earmark-medical text-sm text-(--accent)"></i>
-						<h2 class="text-xs font-bold tracking-widest text-(--text-primary) uppercase">SKILL.md Live Preview</h2>
+						<h2 class="text-xs font-bold tracking-widest text-(--text-primary) uppercase">
+							SKILL.md Live Preview
+						</h2>
 					</div>
 
 					<div class="preview-scroll-container">
@@ -747,7 +848,9 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 								{@const colonIdx = fmLine.indexOf(':')}
 								{#if colonIdx > -1}
 									<div class="fm-row">
-										<span class="fm-key">{fmLine.slice(0, colonIdx)}:</span><span class="fm-val">{fmLine.slice(colonIdx + 1)}</span>
+										<span class="fm-key">{fmLine.slice(0, colonIdx)}:</span><span class="fm-val"
+											>{fmLine.slice(colonIdx + 1)}</span
+										>
 									</div>
 								{:else}
 									<div class="fm-row"><span class="fm-indent">{fmLine}</span></div>
@@ -771,8 +874,10 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 						id="expert-btn-copy"
 						onclick={handleCopy}
 						disabled={!isValid}
-						style="border: 1px solid var(--border-strong); color: {copied ? 'var(--accent)' : 'var(--text-secondary)'}; {copied ? 'border-color: var(--accent);' : ''}"
-						class="flex-1 flex items-center justify-center gap-2 py-3.5 text-xs font-bold tracking-widest uppercase transition-all hover:border-(--accent) hover:text-(--accent) disabled:cursor-not-allowed disabled:opacity-40 focus:outline-none rounded-[2px]"
+						style="border: 1px solid var(--border-strong); color: {copied
+							? 'var(--accent)'
+							: 'var(--text-secondary)'}; {copied ? 'border-color: var(--accent);' : ''}"
+						class="flex flex-1 items-center justify-center gap-2 rounded-[2px] py-3.5 text-xs font-bold tracking-widest uppercase transition-all hover:border-(--accent) hover:text-(--accent) focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
 					>
 						{#if copied}
 							<i class="bi bi-check-lg"></i> Copied Markdown!
@@ -787,18 +892,17 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 						onclick={handleDownload}
 						disabled={!isValid}
 						style="background: var(--accent); color: var(--accent-fg);"
-						class="flex-1 flex items-center justify-center gap-2 py-3.5 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_15px_var(--accent-glow)] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none focus:outline-none rounded-[2px]"
+						class="flex flex-1 items-center justify-center gap-2 rounded-[2px] py-3.5 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_15px_var(--accent-glow)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
 					>
 						{#if downloaded}
 							<i class="bi bi-check-lg"></i> Downloaded!
 						{:else}
-							<i class="bi bi-download"></i> Download SKILL.md
+							<i class="bi bi-download"></i> Download ZIP
 						{/if}
 					</button>
 				</div>
 			</div>
 		</div>
-
 	</div>
 </div>
 
@@ -1010,10 +1114,22 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 		margin-bottom: 0.4em;
 	}
 
-	.preview-prose :global(h1) { font-size: 1.25rem; }
-	.preview-prose :global(h2) { font-size: 1.05rem; border-bottom: 1px solid var(--border-default); padding-bottom: 0.25em; }
-	.preview-prose :global(h3) { font-size: 0.9rem; color: var(--accent); }
-	.preview-prose :global(h4) { font-size: 0.825rem; text-transform: uppercase; }
+	.preview-prose :global(h1) {
+		font-size: 1.25rem;
+	}
+	.preview-prose :global(h2) {
+		font-size: 1.05rem;
+		border-bottom: 1px solid var(--border-default);
+		padding-bottom: 0.25em;
+	}
+	.preview-prose :global(h3) {
+		font-size: 0.9rem;
+		color: var(--accent);
+	}
+	.preview-prose :global(h4) {
+		font-size: 0.825rem;
+		text-transform: uppercase;
+	}
 
 	.preview-prose :global(p) {
 		margin-top: 0;

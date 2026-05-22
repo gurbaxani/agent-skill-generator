@@ -118,8 +118,14 @@ Output ONLY the text of the description, nothing else.`;
 			>
 				Description
 			</h1>
-			<p style="color: var(--text-secondary); font-family: var(--font-body);" class="text-base leading-relaxed">
-				Describe what <span style="color: var(--accent); font-family: var(--font-mono)">{skillName}</span> does — and <em>when</em> an agent should reach for it.
+			<p
+				style="color: var(--text-secondary); font-family: var(--font-body);"
+				class="text-base leading-relaxed"
+			>
+				Describe what <span style="color: var(--accent); font-family: var(--font-mono)"
+					>{skillName}</span
+				>
+				does — and <em>when</em> an agent should reach for it.
 			</p>
 
 			<div
@@ -134,15 +140,16 @@ Output ONLY the text of the description, nothing else.`;
 					Tips
 				</h3>
 				<div class="flex flex-col gap-4" style="font-family: var(--font-mono);">
-					{#each [
-						['01 // When to use it', 'Tell the AI exactly when it should use this skill, not just what it does.'],
-						['02 // How to start', 'Begin with "Use this skill when…" — it primes retrieval.'],
-						['03 // Be specific', 'Mention domain keywords so the agent matches correctly.'],
-						['04 // Keep it short', 'Under 1 024 characters. One tight paragraph is ideal.']
-					] as [title, tip] (title)}
+					{#each [['01 // When to use it', 'Tell the AI exactly when it should use this skill, not just what it does.'], ['02 // How to start', 'Begin with "Use this skill when…" — it primes retrieval.'], ['03 // Be specific', 'Mention domain keywords so the agent matches correctly.'], ['04 // Keep it short', 'Under 1 024 characters. One tight paragraph is ideal.']] as [title, tip] (title)}
 						<div class="flex flex-col gap-1">
-							<span style="color: var(--text-primary);" class="text-xs font-semibold tracking-widest uppercase">{title}</span>
-							<span style="color: var(--text-secondary);" class="text-[11px] leading-relaxed opacity-80">{tip}</span>
+							<span
+								style="color: var(--text-primary);"
+								class="text-xs font-semibold tracking-widest uppercase">{title}</span
+							>
+							<span
+								style="color: var(--text-secondary);"
+								class="text-[11px] leading-relaxed opacity-80">{tip}</span
+							>
 						</div>
 					{/each}
 				</div>
@@ -231,9 +238,13 @@ Output ONLY the text of the description, nothing else.`;
 					></textarea>
 
 					<div class="flex items-center justify-between" style="font-family: var(--font-mono);">
-						<span style="color: var(--text-tertiary);" class="text-xs tracking-wider uppercase">Up to 1 024 characters</span>
+						<span style="color: var(--text-tertiary);" class="text-xs tracking-wider uppercase"
+							>Up to 1 024 characters</span
+						>
 						<span
-							style="color: {description.length > 1024 ? 'var(--secondary)' : 'var(--text-tertiary)'};"
+							style="color: {description.length > 1024
+								? 'var(--secondary)'
+								: 'var(--text-tertiary)'};"
 							class="text-xs tracking-wider uppercase"
 						>
 							{description.length} / 1024
@@ -265,8 +276,11 @@ Output ONLY the text of the description, nothing else.`;
 					<button
 						type="button"
 						disabled={!isValid}
-						onclick={() => goto(`/create/optional?name=${skillName}&description=${encodeURIComponent(description)}`)}
-						class="flex items-center gap-2 bg-(--accent) px-6 py-3 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_15px_var(--accent-glow)] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none focus:outline-none"
+						onclick={() =>
+							goto(
+								`/create/optional?name=${skillName}&description=${encodeURIComponent(description)}`
+							)}
+						class="flex items-center gap-2 bg-(--accent) px-6 py-3 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_15px_var(--accent-glow)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
 						style="color: var(--accent-fg); border-radius: 2px; font-family: var(--font-display);"
 					>
 						Next <i class="bi bi-arrow-right" aria-hidden="true"></i>

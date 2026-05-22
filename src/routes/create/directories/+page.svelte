@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { userState } from '$lib/state/user.svelte';
 	import { skillDraft, type ScriptLanguage, type AssetKind } from '$lib/state/draft.svelte';
+	import { downloadSkillZip } from '$lib/utils/zip';
 
 	let isGenerating = $state(false);
 	let errorMsg = $state('');
@@ -153,7 +154,8 @@ Output ONLY the JSON, nothing else.`;
 			if (err instanceof Error) {
 				errorMsg = err.message;
 			} else {
-				errorMsg = 'Failed to generate directory suggestions. Please check your API key configuration.';
+				errorMsg =
+					'Failed to generate directory suggestions. Please check your API key configuration.';
 			}
 		} finally {
 			isGenerating = false;
@@ -178,7 +180,10 @@ Output ONLY the JSON, nothing else.`;
 
 	// ── references/ config ────────────────────────────────────────
 	function addRefFile() {
-		skillDraft.refFiles = [...skillDraft.refFiles, { name: '', description: '', id: skillDraft.nextRefId++ }];
+		skillDraft.refFiles = [
+			...skillDraft.refFiles,
+			{ name: '', description: '', id: skillDraft.nextRefId++ }
+		];
 	}
 	function removeRefFile(id: number) {
 		skillDraft.refFiles = skillDraft.refFiles.filter((f) => f.id !== id);
@@ -186,7 +191,12 @@ Output ONLY the JSON, nothing else.`;
 
 	// ── assets/ config ────────────────────────────────────────────
 	const allAssetKinds: { value: AssetKind; label: string; icon: string; hint: string }[] = [
-		{ value: 'templates', label: 'Templates', icon: 'bi-file-earmark-text', hint: 'Document & config templates' },
+		{
+			value: 'templates',
+			label: 'Templates',
+			icon: 'bi-file-earmark-text',
+			hint: 'Document & config templates'
+		},
 		{ value: 'images', label: 'Images', icon: 'bi-image', hint: 'Diagrams, screenshots, examples' },
 		{ value: 'data', label: 'Data files', icon: 'bi-table', hint: 'Lookup tables, schemas, CSVs' }
 	];
@@ -202,22 +212,24 @@ Output ONLY the JSON, nothing else.`;
 	// ── Navigation ────────────────────────────────────────────────
 	let downloaded = $state(false);
 
-	function handleFinish() {
-		const blob = new Blob([skillDraft.assembledMarkdown], { type: 'text/markdown' });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = 'SKILL.md';
-		a.click();
-		URL.revokeObjectURL(url);
-		downloaded = true;
-		setTimeout(() => (downloaded = false), 2500);
+	async function handleFinish() {
+		try {
+			await downloadSkillZip(skillDraft);
+			downloaded = true;
+			setTimeout(() => (downloaded = false), 2500);
+		} catch (err) {
+			console.error(err);
+			errorMsg = err instanceof Error ? err.message : 'Failed to generate ZIP download.';
+		}
 	}
 </script>
 
 <svelte:head>
 	<title>Directories — ASG</title>
-	<meta name="description" content="Configure optional directories for your skill: scripts, references, and assets." />
+	<meta
+		name="description"
+		content="Configure optional directories for your skill: scripts, references, and assets."
+	/>
 </svelte:head>
 
 <div class="mx-auto max-w-4xl px-6 py-12">
@@ -230,8 +242,12 @@ Output ONLY the JSON, nothing else.`;
 			>
 				Directories
 			</h1>
-			<p style="color: var(--text-secondary); font-family: var(--font-body);" class="text-base leading-relaxed">
-				Enable optional directories to bundle executable scripts, reference docs, and static assets alongside your skill.
+			<p
+				style="color: var(--text-secondary); font-family: var(--font-body);"
+				class="text-base leading-relaxed"
+			>
+				Enable optional directories to bundle executable scripts, reference docs, and static assets
+				alongside your skill.
 			</p>
 
 			<div
@@ -246,15 +262,16 @@ Output ONLY the JSON, nothing else.`;
 					Tips
 				</h3>
 				<div class="flex flex-col gap-4" style="font-family: var(--font-mono);">
-					{#each [
-						['01 // scripts/', 'Self-contained executables. Document any external dependencies clearly.'],
-						['02 // references/', 'Keep files small — agents load them on demand, using context budget.'],
-						['03 // assets/', 'Static resources only. No executable code; prefer templates and schemas.'],
-						['04 // All optional', 'Skip any directory that doesn\'t apply. Less is more for context efficiency.']
-					] as [title, tip] (title)}
+					{#each [['01 // scripts/', 'Self-contained executables. Document any external dependencies clearly.'], ['02 // references/', 'Keep files small — agents load them on demand, using context budget.'], ['03 // assets/', 'Static resources only. No executable code; prefer templates and schemas.'], ['04 // All optional', "Skip any directory that doesn't apply. Less is more for context efficiency."]] as [title, tip] (title)}
 						<div class="flex flex-col gap-1">
-							<span style="color: var(--text-primary);" class="text-xs font-semibold tracking-widest uppercase">{title}</span>
-							<span style="color: var(--text-secondary);" class="text-[11px] leading-relaxed opacity-80">{tip}</span>
+							<span
+								style="color: var(--text-primary);"
+								class="text-xs font-semibold tracking-widest uppercase">{title}</span
+							>
+							<span
+								style="color: var(--text-secondary);"
+								class="text-[11px] leading-relaxed opacity-80">{tip}</span
+							>
 						</div>
 					{/each}
 				</div>
@@ -263,7 +280,6 @@ Output ONLY the JSON, nothing else.`;
 
 		<!-- Right: directory cards -->
 		<div class="flex w-full flex-col gap-6">
-
 			{#if errorMsg}
 				<div
 					style="border: 1px solid var(--secondary); background: var(--secondary-subtle); color: var(--secondary); font-family: var(--font-mono); border-radius: 2px;"
@@ -289,7 +305,10 @@ Output ONLY the JSON, nothing else.`;
 							style="color: var(--text-secondary); font-family: var(--font-body);"
 							class="mt-1 text-sm"
 						>
-							Let AI suggest the right directories and content for <span style="color: var(--accent); font-family: var(--font-mono);">{skillDraft.name || 'Skill'}</span>.
+							Let AI suggest the right directories and content for <span
+								style="color: var(--accent); font-family: var(--font-mono);"
+								>{skillDraft.name || 'Skill'}</span
+							>.
 						</p>
 					</div>
 					<div class="flex flex-col items-center gap-3 sm:flex-row">
@@ -322,7 +341,8 @@ Output ONLY the JSON, nothing else.`;
 					<div class="h-px w-full" style="background: var(--border-default)"></div>
 					<span
 						style="color: var(--text-tertiary); font-family: var(--font-display);"
-						class="text-xs font-medium tracking-widest uppercase whitespace-nowrap">OR configure manually</span
+						class="text-xs font-medium tracking-widest whitespace-nowrap uppercase"
+						>OR configure manually</span
 					>
 					<div class="h-px w-full" style="background: var(--border-default)"></div>
 				</div>
@@ -331,15 +351,23 @@ Output ONLY the JSON, nothing else.`;
 			<!-- scripts/ -->
 			<div
 				class="dir-card flex flex-col gap-0 transition-all"
-				style="border: 1px solid {skillDraft.enableScripts ? 'var(--accent)' : 'var(--border-strong)'}; border-radius: 2px; background: var(--surface-sunken);"
+				style="border: 1px solid {skillDraft.enableScripts
+					? 'var(--accent)'
+					: 'var(--border-strong)'}; border-radius: 2px; background: var(--surface-sunken);"
 			>
 				<!-- Header row -->
 				<div class="flex items-center justify-between gap-4 p-5">
 					<div class="flex items-center gap-3">
 						<i class="bi bi-terminal-fill text-lg" style="color: var(--accent);"></i>
 						<div class="flex flex-col gap-0.5">
-							<span style="color: var(--text-primary); font-family: var(--font-mono);" class="text-sm font-semibold">scripts/</span>
-							<span style="color: var(--text-secondary); font-family: var(--font-body);" class="text-xs leading-relaxed">
+							<span
+								style="color: var(--text-primary); font-family: var(--font-mono);"
+								class="text-sm font-semibold">scripts/</span
+							>
+							<span
+								style="color: var(--text-secondary); font-family: var(--font-body);"
+								class="text-xs leading-relaxed"
+							>
 								Executable code agents can invoke directly
 							</span>
 						</div>
@@ -360,8 +388,12 @@ Output ONLY the JSON, nothing else.`;
 				<!-- Expanded config -->
 				{#if skillDraft.enableScripts}
 					<div class="flex flex-col gap-4 border-t p-5" style="border-color: var(--border-strong);">
-						<p style="color: var(--text-secondary); font-family: var(--font-body);" class="text-xs leading-relaxed">
-							Select the languages your scripts will use. Agents will know what runtimes are expected.
+						<p
+							style="color: var(--text-secondary); font-family: var(--font-body);"
+							class="text-xs leading-relaxed"
+						>
+							Select the languages your scripts will use. Agents will know what runtimes are
+							expected.
 						</p>
 						<div class="flex flex-wrap gap-2">
 							{#each allLanguages as lang (lang.value)}
@@ -378,7 +410,10 @@ Output ONLY the JSON, nothing else.`;
 							{/each}
 						</div>
 						{#if skillDraft.scriptLanguages.length === 0}
-							<p style="color: var(--text-tertiary); font-family: var(--font-mono);" class="text-[11px]">
+							<p
+								style="color: var(--text-tertiary); font-family: var(--font-mono);"
+								class="text-[11px]"
+							>
 								⚠ Select at least one language.
 							</p>
 						{/if}
@@ -389,14 +424,22 @@ Output ONLY the JSON, nothing else.`;
 			<!-- references/ -->
 			<div
 				class="dir-card flex flex-col gap-0 transition-all"
-				style="border: 1px solid {skillDraft.enableReferences ? 'var(--accent)' : 'var(--border-strong)'}; border-radius: 2px; background: var(--surface-sunken);"
+				style="border: 1px solid {skillDraft.enableReferences
+					? 'var(--accent)'
+					: 'var(--border-strong)'}; border-radius: 2px; background: var(--surface-sunken);"
 			>
 				<div class="flex items-center justify-between gap-4 p-5">
 					<div class="flex items-center gap-3">
 						<i class="bi bi-book-fill text-lg" style="color: var(--accent);"></i>
 						<div class="flex flex-col gap-0.5">
-							<span style="color: var(--text-primary); font-family: var(--font-mono);" class="text-sm font-semibold">references/</span>
-							<span style="color: var(--text-secondary); font-family: var(--font-body);" class="text-xs leading-relaxed">
+							<span
+								style="color: var(--text-primary); font-family: var(--font-mono);"
+								class="text-sm font-semibold">references/</span
+							>
+							<span
+								style="color: var(--text-secondary); font-family: var(--font-body);"
+								class="text-xs leading-relaxed"
+							>
 								Documentation agents load on demand
 							</span>
 						</div>
@@ -416,15 +459,22 @@ Output ONLY the JSON, nothing else.`;
 
 				{#if skillDraft.enableReferences}
 					<div class="flex flex-col gap-4 border-t p-5" style="border-color: var(--border-strong);">
-						<p style="color: var(--text-secondary); font-family: var(--font-body);" class="text-xs leading-relaxed">
-							List the reference files you plan to include. Keep files focused — agents load these individually.
+						<p
+							style="color: var(--text-secondary); font-family: var(--font-body);"
+							class="text-xs leading-relaxed"
+						>
+							List the reference files you plan to include. Keep files focused — agents load these
+							individually.
 						</p>
 
 						{#if skillDraft.refFiles.length > 0}
 							<div class="flex flex-col gap-3">
 								{#each skillDraft.refFiles as file (file.id)}
 									<div class="flex items-center gap-2">
-										<i class="bi bi-file-earmark-text text-sm shrink-0" style="color: var(--text-tertiary);"></i>
+										<i
+											class="bi bi-file-earmark-text shrink-0 text-sm"
+											style="color: var(--text-tertiary);"
+										></i>
 										<input
 											type="text"
 											bind:value={file.name}
@@ -468,7 +518,10 @@ Output ONLY the JSON, nothing else.`;
 									type="button"
 									onclick={() => {
 										if (!skillDraft.refFiles.some((f) => f.name === suggestion)) {
-											skillDraft.refFiles = [...skillDraft.refFiles, { name: suggestion, description: '', id: skillDraft.nextRefId++ }];
+											skillDraft.refFiles = [
+												...skillDraft.refFiles,
+												{ name: suggestion, description: '', id: skillDraft.nextRefId++ }
+											];
 										}
 									}}
 									class="suggestion-pill"
@@ -486,14 +539,22 @@ Output ONLY the JSON, nothing else.`;
 			<!-- assets/ -->
 			<div
 				class="dir-card flex flex-col gap-0 transition-all"
-				style="border: 1px solid {skillDraft.enableAssets ? 'var(--accent)' : 'var(--border-strong)'}; border-radius: 2px; background: var(--surface-sunken);"
+				style="border: 1px solid {skillDraft.enableAssets
+					? 'var(--accent)'
+					: 'var(--border-strong)'}; border-radius: 2px; background: var(--surface-sunken);"
 			>
 				<div class="flex items-center justify-between gap-4 p-5">
 					<div class="flex items-center gap-3">
 						<i class="bi bi-folder2-open text-lg" style="color: var(--accent);"></i>
 						<div class="flex flex-col gap-0.5">
-							<span style="color: var(--text-primary); font-family: var(--font-mono);" class="text-sm font-semibold">assets/</span>
-							<span style="color: var(--text-secondary); font-family: var(--font-body);" class="text-xs leading-relaxed">
+							<span
+								style="color: var(--text-primary); font-family: var(--font-mono);"
+								class="text-sm font-semibold">assets/</span
+							>
+							<span
+								style="color: var(--text-secondary); font-family: var(--font-body);"
+								class="text-xs leading-relaxed"
+							>
 								Static resources: templates, images, data files
 							</span>
 						</div>
@@ -513,7 +574,10 @@ Output ONLY the JSON, nothing else.`;
 
 				{#if skillDraft.enableAssets}
 					<div class="flex flex-col gap-4 border-t p-5" style="border-color: var(--border-strong);">
-						<p style="color: var(--text-secondary); font-family: var(--font-body);" class="text-xs leading-relaxed">
+						<p
+							style="color: var(--text-secondary); font-family: var(--font-body);"
+							class="text-xs leading-relaxed"
+						>
 							Choose the types of static assets you'll include.
 						</p>
 						<div class="flex flex-col gap-3">
@@ -526,13 +590,21 @@ Output ONLY the JSON, nothing else.`;
 									class:asset-row-active={skillDraft.assetKinds.includes(kind.value)}
 								>
 									<div class="flex items-center gap-3">
-										<i class="bi {kind.icon} text-base" style="color: {skillDraft.assetKinds.includes(kind.value) ? 'var(--accent)' : 'var(--text-tertiary)'};"></i>
+										<i
+											class="bi {kind.icon} text-base"
+											style="color: {skillDraft.assetKinds.includes(kind.value)
+												? 'var(--accent)'
+												: 'var(--text-tertiary)'};"
+										></i>
 										<div class="flex flex-col items-start gap-0.5">
 											<span class="asset-label">{kind.label}</span>
 											<span class="asset-hint">{kind.hint}</span>
 										</div>
 									</div>
-									<div class="check-box" class:check-box-active={skillDraft.assetKinds.includes(kind.value)}>
+									<div
+										class="check-box"
+										class:check-box-active={skillDraft.assetKinds.includes(kind.value)}
+									>
 										{#if skillDraft.assetKinds.includes(kind.value)}
 											<i class="bi bi-check2 text-xs"></i>
 										{/if}
@@ -564,7 +636,7 @@ Output ONLY the JSON, nothing else.`;
 					{#if downloaded}
 						<i class="bi bi-check-lg" aria-hidden="true"></i> Downloaded!
 					{:else}
-						<i class="bi bi-download" aria-hidden="true"></i> Download SKILL.md
+						<i class="bi bi-download" aria-hidden="true"></i> Download ZIP
 					{/if}
 				</button>
 			</div>

@@ -21,7 +21,10 @@
 	});
 
 	function addMeta() {
-		skillDraft.metadata = [...skillDraft.metadata, { key: '', value: '', id: skillDraft.nextMetaId++ }];
+		skillDraft.metadata = [
+			...skillDraft.metadata,
+			{ key: '', value: '', id: skillDraft.nextMetaId++ }
+		];
 	}
 
 	function removeMeta(id: number) {
@@ -157,7 +160,9 @@ Output ONLY the JSON, nothing else.`;
 				style="color: var(--text-secondary); font-family: var(--font-body);"
 				class="text-base leading-relaxed"
 			>
-				Enrich <span style="color: var(--accent); font-family: var(--font-mono)">{skillDraft.name || 'Skill'}</span> with extra metadata. All fields are optional.
+				Enrich <span style="color: var(--accent); font-family: var(--font-mono)"
+					>{skillDraft.name || 'Skill'}</span
+				> with extra metadata. All fields are optional.
 			</p>
 
 			<div
@@ -172,15 +177,16 @@ Output ONLY the JSON, nothing else.`;
 					Tips
 				</h3>
 				<div class="flex flex-col gap-4" style="font-family: var(--font-mono);">
-					{#each [
-						['01 // License', 'Use a SPDX identifier like MIT, Apache-2.0, or GPL-3.0.'],
-						['02 // Compatibility', 'Describe env requirements: OS, runtime, tool versions.'],
-						['03 // Metadata', 'author, version, and team are common key–value pairs.'],
-						['04 // All optional', 'Skip anything that doesn\'t apply. These fields enrich — they don\'t gate.']
-					] as [title, tip] (title)}
+					{#each [['01 // License', 'Use a SPDX identifier like MIT, Apache-2.0, or GPL-3.0.'], ['02 // Compatibility', 'Describe env requirements: OS, runtime, tool versions.'], ['03 // Metadata', 'author, version, and team are common key–value pairs.'], ['04 // All optional', "Skip anything that doesn't apply. These fields enrich — they don't gate."]] as [title, tip] (title)}
 						<div class="flex flex-col gap-1">
-							<span style="color: var(--text-primary);" class="text-xs font-semibold tracking-widest uppercase">{title}</span>
-							<span style="color: var(--text-secondary);" class="text-[11px] leading-relaxed opacity-80">{tip}</span>
+							<span
+								style="color: var(--text-primary);"
+								class="text-xs font-semibold tracking-widest uppercase">{title}</span
+							>
+							<span
+								style="color: var(--text-secondary);"
+								class="text-[11px] leading-relaxed opacity-80">{tip}</span
+							>
 						</div>
 					{/each}
 				</div>

@@ -50,7 +50,9 @@ export class SkillDraftState {
 	}
 
 	get isValidRequired(): boolean {
-		return this.validName.length > 0 && this.description.length > 0 && this.description.length <= 1024;
+		return (
+			this.validName.length > 0 && this.description.length > 0 && this.description.length <= 1024
+		);
 	}
 
 	get isValidOptional(): boolean {

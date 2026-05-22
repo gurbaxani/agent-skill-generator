@@ -9,7 +9,6 @@
 	let isGenerating = $state(false);
 	let errorMsg = $state('');
 	let copied = $state(false);
-	let downloaded = $state(false);
 	let activeTab = $state<'write' | 'preview'>('write');
 
 	// ── Provider state ───────────────────────────────────────────────────────
@@ -42,7 +41,9 @@
 	});
 
 	/** Rendered HTML of the body markdown */
-	let renderedBody = $derived(marked.parse(skillDraft.body.trim() || '_No content written yet._') as string);
+	let renderedBody = $derived(
+		marked.parse(skillDraft.body.trim() || '_No content written yet._') as string
+	);
 
 	// ── AI generation ────────────────────────────────────────────────────────
 	async function handleGenerate() {
@@ -143,17 +144,6 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 		setTimeout(() => (copied = false), 2000);
 	}
 
-	function handleDownload() {
-		const blob = new Blob([skillFile], { type: 'text/markdown' });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = 'SKILL.md';
-		a.click();
-		URL.revokeObjectURL(url);
-		downloaded = true;
-		setTimeout(() => (downloaded = false), 2000);
-	}
 	function handleNext() {
 		goto('/create/directories');
 	}
@@ -169,10 +159,14 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 			>
 				Skill Body
 			</h1>
-			<p style="color: var(--text-secondary); font-family: var(--font-body);" class="text-base leading-relaxed">
+			<p
+				style="color: var(--text-secondary); font-family: var(--font-body);"
+				class="text-base leading-relaxed"
+			>
 				Write the instructions for <span style="color: var(--accent); font-family: var(--font-mono)"
 					>{skillDraft.name}</span
-				>. This becomes the markdown body of your <span style="font-family: var(--font-mono); color: var(--text-primary)">SKILL.md</span>.
+				>. This becomes the markdown body of your
+				<span style="font-family: var(--font-mono); color: var(--text-primary)">SKILL.md</span>.
 			</p>
 
 			<div
@@ -187,19 +181,15 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 					Tips
 				</h3>
 				<div class="flex flex-col gap-4" style="font-family: var(--font-mono);">
-					{#each [
-						['01 // Step-by-step', 'Numbered steps help the agent follow a predictable, auditable flow.'],
-						['02 // Examples', 'Show inputs and outputs. Agents learn patterns better from examples than rules.'],
-						['03 // Edge cases', 'Anticipate failure modes and ambiguity — what should the agent do when things go wrong?'],
-						['04 // Imperative tone', 'Write "Search the repository…" not "The skill searches…". Address the agent directly.']
-					] as [title, tip] (title)}
+					{#each [['01 // Step-by-step', 'Numbered steps help the agent follow a predictable, auditable flow.'], ['02 // Examples', 'Show inputs and outputs. Agents learn patterns better from examples than rules.'], ['03 // Edge cases', 'Anticipate failure modes and ambiguity — what should the agent do when things go wrong?'], ['04 // Imperative tone', 'Write "Search the repository…" not "The skill searches…". Address the agent directly.']] as [title, tip] (title)}
 						<div class="flex flex-col gap-1">
 							<span
 								style="color: var(--text-primary);"
 								class="text-xs font-semibold tracking-widest uppercase">{title}</span
 							>
-							<span style="color: var(--text-secondary);" class="text-[11px] leading-relaxed opacity-80"
-								>{tip}</span
+							<span
+								style="color: var(--text-secondary);"
+								class="text-[11px] leading-relaxed opacity-80">{tip}</span
 							>
 						</div>
 					{/each}
@@ -281,7 +271,12 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 						type="button"
 						id="tab-write"
 						onclick={() => (activeTab = 'write')}
-						style="font-family: var(--font-display); border-radius: 0; border-bottom: 2px solid {activeTab === 'write' ? 'var(--accent)' : 'transparent'}; color: {activeTab === 'write' ? 'var(--accent)' : 'var(--text-tertiary)'};"
+						style="font-family: var(--font-display); border-radius: 0; border-bottom: 2px solid {activeTab ===
+						'write'
+							? 'var(--accent)'
+							: 'transparent'}; color: {activeTab === 'write'
+							? 'var(--accent)'
+							: 'var(--text-tertiary)'};"
 						class="px-4 py-2.5 text-xs font-bold tracking-widest uppercase transition-colors hover:text-(--text-primary) focus:outline-none"
 					>
 						<i class="bi bi-pencil" aria-hidden="true"></i>
@@ -291,7 +286,12 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 						type="button"
 						id="tab-preview"
 						onclick={() => (activeTab = 'preview')}
-						style="font-family: var(--font-display); border-radius: 0; border-bottom: 2px solid {activeTab === 'preview' ? 'var(--accent)' : 'transparent'}; color: {activeTab === 'preview' ? 'var(--accent)' : 'var(--text-tertiary)'};"
+						style="font-family: var(--font-display); border-radius: 0; border-bottom: 2px solid {activeTab ===
+						'preview'
+							? 'var(--accent)'
+							: 'transparent'}; color: {activeTab === 'preview'
+							? 'var(--accent)'
+							: 'var(--text-tertiary)'};"
 						class="px-4 py-2.5 text-xs font-bold tracking-widest uppercase transition-colors hover:text-(--text-primary) focus:outline-none"
 					>
 						<i class="bi bi-eye" aria-hidden="true"></i>
@@ -324,7 +324,9 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 								Markdown supported
 							</span>
 							<span
-								style="color: {skillDraft.body.length > 0 ? 'var(--text-secondary)' : 'var(--text-tertiary)'}; font-family: var(--font-mono);"
+								style="color: {skillDraft.body.length > 0
+									? 'var(--text-secondary)'
+									: 'var(--text-tertiary)'}; font-family: var(--font-mono);"
 								class="text-xs tracking-wider uppercase"
 							>
 								{skillDraft.body.length.toLocaleString()} chars
@@ -356,7 +358,9 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 								{@const colonIdx = fmLine.indexOf(':')}
 								{#if colonIdx > -1}
 									<div class="fm-row">
-										<span class="fm-key">{fmLine.slice(0, colonIdx)}:</span><span class="fm-val">{fmLine.slice(colonIdx + 1)}</span>
+										<span class="fm-key">{fmLine.slice(0, colonIdx)}:</span><span class="fm-val"
+											>{fmLine.slice(colonIdx + 1)}</span
+										>
 									</div>
 								{:else}
 									<div class="fm-row"><span class="fm-indent">{fmLine}</span></div>
@@ -392,29 +396,17 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 						id="btn-copy"
 						onclick={handleCopy}
 						disabled={!isValid}
-						style="border: 1px solid var(--border-strong); color: {copied ? 'var(--accent)' : 'var(--text-secondary)'}; font-family: var(--font-display); border-radius: 2px; {copied ? 'border-color: var(--accent);' : ''}"
-						class="flex items-center gap-2 px-5 py-3 text-xs font-bold tracking-widest uppercase transition-all hover:border-(--accent) hover:text-(--accent) disabled:cursor-not-allowed disabled:opacity-40 focus:outline-none"
+						style="border: 1px solid var(--border-strong); color: {copied
+							? 'var(--accent)'
+							: 'var(--text-secondary)'}; font-family: var(--font-display); border-radius: 2px; {copied
+							? 'border-color: var(--accent);'
+							: ''}"
+						class="flex items-center gap-2 px-5 py-3 text-xs font-bold tracking-widest uppercase transition-all hover:border-(--accent) hover:text-(--accent) focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
 					>
 						{#if copied}
 							<i class="bi bi-check-lg" aria-hidden="true"></i> Copied!
 						{:else}
 							<i class="bi bi-clipboard" aria-hidden="true"></i> Copy
-						{/if}
-					</button>
-
-					<!-- Download button -->
-					<button
-						type="button"
-						id="btn-download"
-						onclick={handleDownload}
-						disabled={!isValid}
-						class="flex items-center gap-2 bg-(--accent) px-6 py-3 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_15px_var(--accent-glow)] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none focus:outline-none"
-						style="color: var(--accent-fg); border-radius: 2px; font-family: var(--font-display);"
-					>
-						{#if downloaded}
-							<i class="bi bi-check-lg" aria-hidden="true"></i> Downloaded!
-						{:else}
-							<i class="bi bi-download" aria-hidden="true"></i> Download SKILL.md
 						{/if}
 					</button>
 
@@ -424,10 +416,10 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 						id="btn-next-directories"
 						onclick={handleNext}
 						disabled={!isValid}
-						class="flex items-center gap-2 px-6 py-3 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--surface-sunken) hover:border-(--accent) hover:text-(--accent) disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none"
-						style="color: var(--text-secondary); border: 1px solid var(--border-strong); border-radius: 2px; font-family: var(--font-display);"
+						class="flex items-center gap-2 bg-(--accent) px-6 py-3 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_15px_var(--accent-glow)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+						style="color: var(--accent-fg); border-radius: 2px; font-family: var(--font-display);"
 					>
-						Directories <i class="bi bi-arrow-right" aria-hidden="true"></i>
+						Next <i class="bi bi-arrow-right" aria-hidden="true"></i>
 					</button>
 				</div>
 			</div>
@@ -509,10 +501,22 @@ Output ONLY the markdown body content. Do NOT include the YAML frontmatter (---)
 		margin-bottom: 0.4em;
 	}
 
-	.preview-prose :global(h1) { font-size: 1.25rem; }
-	.preview-prose :global(h2) { font-size: 1.05rem; border-bottom: 1px solid var(--border-default); padding-bottom: 0.25em; }
-	.preview-prose :global(h3) { font-size: 0.9rem; color: var(--accent); }
-	.preview-prose :global(h4) { font-size: 0.825rem; text-transform: uppercase; }
+	.preview-prose :global(h1) {
+		font-size: 1.25rem;
+	}
+	.preview-prose :global(h2) {
+		font-size: 1.05rem;
+		border-bottom: 1px solid var(--border-default);
+		padding-bottom: 0.25em;
+	}
+	.preview-prose :global(h3) {
+		font-size: 0.9rem;
+		color: var(--accent);
+	}
+	.preview-prose :global(h4) {
+		font-size: 0.825rem;
+		text-transform: uppercase;
+	}
 
 	/* Paragraphs */
 	.preview-prose :global(p) {

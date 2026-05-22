@@ -181,20 +181,20 @@
 		cursor: pointer;
 		inset: 0;
 		background-color: var(--border-strong);
-		transition: .2s var(--ease-out-quart);
+		transition: 0.2s var(--ease-out-quart);
 		border: 1px solid var(--border-default);
 		border-radius: 2px;
 	}
 
 	.slider::before {
 		position: absolute;
-		content: "";
+		content: '';
 		height: 12px;
 		width: 12px;
 		left: 3px;
 		bottom: 3px;
 		background-color: var(--text-tertiary);
-		transition: .2s var(--ease-out-quart);
+		transition: 0.2s var(--ease-out-quart);
 		border-radius: 1px;
 	}
 
