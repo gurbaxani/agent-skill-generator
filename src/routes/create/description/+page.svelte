@@ -13,7 +13,7 @@
 	let selectedProvider = $state('');
 
 	onMount(() => {
-		if (!userState.hasKeys()) {
+		if (!userState.hasKeys() && !userState.skipKeyRequirement) {
 			goto('/keys');
 		} else if (!skillName) {
 			goto('/create');
@@ -118,6 +118,31 @@ Output ONLY the text of the description, nothing else.`;
 			<p style="color: var(--text-secondary);" class="text-base">
 				Describe what your skill <span style="color: var(--accent); font-family: var(--font-mono)">{skillName}</span> does.
 			</p>
+			
+			<div class="mt-8 flex flex-col gap-5 border-l-2 border-(--accent) bg-(--surface-sunken) p-6 shadow-sm">
+				<h3 style="color: var(--accent); font-family: var(--font-display);" class="text-sm font-bold uppercase tracking-[0.1em] flex items-center gap-3">
+					<i class="bi bi-lightbulb"></i>
+					Helpful Tips
+				</h3>
+				<div class="flex flex-col gap-5" style="font-family: var(--font-mono);">
+					<div class="flex flex-col gap-1.5">
+						<span style="color: var(--text-primary);" class="text-xs font-semibold uppercase tracking-widest">01 // When to use it</span>
+						<span style="color: var(--text-secondary);" class="text-[12px] leading-relaxed opacity-80">Tell the AI exactly when it should use this skill, not just what the skill does.</span>
+					</div>
+					<div class="flex flex-col gap-1.5">
+						<span style="color: var(--text-primary);" class="text-xs font-semibold uppercase tracking-widest">02 // How to start</span>
+						<span style="color: var(--text-secondary);" class="text-[12px] leading-relaxed opacity-80">Always start your sentence with "Use this skill when..."</span>
+					</div>
+					<div class="flex flex-col gap-1.5">
+						<span style="color: var(--text-primary);" class="text-xs font-semibold uppercase tracking-widest">03 // Give clear examples</span>
+						<span style="color: var(--text-secondary);" class="text-[12px] leading-relaxed opacity-80">Mention specific words or situations so the AI knows exactly what to look for.</span>
+					</div>
+					<div class="flex flex-col gap-1.5">
+						<span style="color: var(--text-primary);" class="text-xs font-semibold uppercase tracking-widest">04 // Keep it short</span>
+						<span style="color: var(--text-secondary);" class="text-[12px] leading-relaxed opacity-80">Be direct and to the point. Don't write a long paragraph.</span>
+					</div>
+				</div>
+			</div>
 		</div>
 
 		<div class="flex w-full flex-col gap-8">
@@ -130,10 +155,10 @@ Output ONLY the text of the description, nothing else.`;
 
 			<div class="flex flex-col gap-6">
 				{#if availableProviders.length > 0}
-					<div style="background: var(--surface-sunken); border: 1px solid var(--border-default)" class="flex flex-col gap-4 rounded p-5 shadow-sm">
+					<div style="background: var(--surface-sunken); border: 1px solid var(--border-strong)" class="flex flex-col gap-4 rounded p-5 shadow-sm">
 						<div>
-							<h3 style="color: var(--text-primary);" class="text-sm font-medium">Don't want to write it yourself?</h3>
-							<p style="color: var(--text-secondary);" class="mt-1 text-sm">Have AI generate a perfect description based on your skill name.</p>
+							<h3 style="color: var(--text-primary);" class="text-sm font-semibold uppercase tracking-wider">Don't want to write it yourself?</h3>
+							<p style="color: var(--text-secondary);" class="mt-1 text-sm">Let our AI write a great description for you.</p>
 						</div>
 						<div class="flex flex-col sm:flex-row items-center gap-3">
 							<select bind:value={selectedProvider} style="color: var(--text-primary); border: 1px solid var(--border-strong);" class="w-full sm:w-auto appearance-none rounded bg-transparent px-3 py-2 text-sm focus:outline-none">
@@ -146,12 +171,12 @@ Output ONLY the text of the description, nothing else.`;
 								onclick={handleGenerate}
 								disabled={isGenerating}
 								style="border: 1px solid var(--accent); color: var(--accent);"
-								class="flex w-full sm:w-auto items-center justify-center gap-2 rounded px-4 py-2 text-sm font-medium transition-colors hover:bg-(--accent-glow) disabled:cursor-not-allowed disabled:opacity-50"
+								class="flex w-full sm:w-auto items-center justify-center gap-2 rounded px-4 py-2 text-sm font-medium uppercase tracking-wider transition-colors hover:bg-(--accent-glow) disabled:cursor-not-allowed disabled:opacity-50"
 							>
 								{#if isGenerating}
-									<span class="animate-pulse">Generating...</span>
+									<span class="animate-pulse">Writing...</span>
 								{:else}
-									<i class="bi bi-magic" aria-hidden="true"></i> Auto-Generate with AI
+									<i class="bi bi-magic" aria-hidden="true"></i> Let AI write it
 								{/if}
 							</button>
 						</div>
@@ -165,8 +190,8 @@ Output ONLY the text of the description, nothing else.`;
 				{/if}
 
 				<div class="flex flex-col gap-3">
-					<label for="description" style="color: var(--text-primary);" class="text-sm font-medium">
-						Write Manually
+					<label for="description" style="color: var(--text-primary);" class="text-sm font-semibold uppercase tracking-wider">
+						{availableProviders.length > 0 ? 'Write it yourself' : 'Description'}
 					</label>
 
 					<textarea
@@ -178,8 +203,8 @@ Output ONLY the text of the description, nothing else.`;
 						class="w-full resize-y rounded p-4 text-base transition-colors focus:border-(--accent) focus:outline-none focus:ring-1 focus:ring-(--focus-ring) placeholder:text-(--text-tertiary)"
 					></textarea>
 
-					<div class="flex items-center justify-between text-xs font-medium">
-						<span style="color: var(--text-tertiary)">Max 1024 characters</span>
+					<div class="flex items-center justify-between text-xs font-mono uppercase tracking-wider">
+						<span style="color: var(--text-tertiary)">Up to 1024 characters</span>
 						<span style="color: {description.length > 1024 ? 'var(--secondary)' : 'var(--text-secondary)'}">
 							{description.length} / 1024
 						</span>
@@ -191,7 +216,8 @@ Output ONLY the text of the description, nothing else.`;
 				<button
 					type="button"
 					disabled={!isValid}
-					class="rounded bg-(--accent) px-6 py-3 text-sm font-semibold text-(--surface-base) transition-colors hover:bg-(--accent-hover) disabled:cursor-not-allowed disabled:opacity-50"
+					class="rounded bg-(--accent) px-6 py-3 text-sm font-semibold transition-colors hover:bg-(--accent-hover) disabled:cursor-not-allowed disabled:opacity-50"
+					style="color: var(--accent-fg);"
 				>
 					Save Skill
 				</button>

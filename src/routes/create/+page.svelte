@@ -27,17 +27,17 @@
 		
 		<div class="flex flex-col gap-4 pt-2">
 			<h1 style="color: var(--text-primary);" class="text-3xl font-bold tracking-tight">
-				Create a New Skill
+				Name your skill
 			</h1>
 			<p style="color: var(--text-secondary);" class="text-base">
-				Give your agent skill a unique name to get started.
+				Pick a clear, simple name for your new AI skill.
 			</p>
 		</div>
 
 		<div class="flex w-full flex-col gap-8">
 			
 			<div class="flex flex-col gap-3">
-				<label for="skillName" style="color: var(--text-primary);" class="text-sm font-medium">
+				<label for="skillName" style="color: var(--text-primary);" class="text-sm font-semibold uppercase tracking-wider">
 					Skill Name
 				</label>
 				
@@ -50,15 +50,19 @@
 					class="w-full rounded p-3 text-base transition-colors focus:border-(--accent) focus:outline-none focus:ring-1 focus:ring-(--focus-ring) placeholder:text-(--text-tertiary)"
 				/>
 
-				<div style="background: var(--surface-base); border: 1px solid var(--border-default)" class="mt-2 rounded p-4">
-					<div style="color: var(--text-tertiary);" class="mb-1 text-xs font-medium uppercase tracking-wider">
-						Generated ID
+				<div style="background: var(--surface-sunken); border: 1px solid var(--border-strong)" class="mt-2 flex flex-col gap-1 rounded p-4 shadow-sm border-l-2 border-l-(--accent)">
+					<div style="color: var(--text-tertiary);" class="text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+						<i class="bi bi-link-45deg text-base"></i>
+						Unique Link ID
+					</div>
+					<div style="color: var(--text-secondary); font-family: var(--font-mono);" class="text-[11px] leading-relaxed opacity-80 mb-1">
+						This is the computer-friendly version of your name. It will be used for links and files.
 					</div>
 					<div style="color: var(--accent); font-family: var(--font-mono)" class="break-all text-sm min-h-5">
 						{#if validName}
 							{validName}
 						{:else}
-							<span style="opacity: 0.5">your-skill-id</span>
+							<span style="opacity: 0.5">your-skill-name</span>
 						{/if}
 					</div>
 				</div>
@@ -69,9 +73,10 @@
 					type="button"
 					disabled={!validName}
 					onclick={() => goto(`/create/description?name=${validName}`)}
-					class="rounded bg-(--accent) px-6 py-3 text-sm font-semibold text-(--surface-base) transition-colors hover:bg-(--accent-hover) disabled:cursor-not-allowed disabled:opacity-50"
+					class="flex items-center gap-2 rounded bg-(--accent) px-6 py-3 text-sm font-bold uppercase tracking-wider transition-colors hover:bg-(--accent-hover) disabled:cursor-not-allowed disabled:opacity-50"
+					style="color: var(--accent-fg);"
 				>
-					Continue
+					Next Step <i class="bi bi-arrow-right"></i>
 				</button>
 			</div>
 			
