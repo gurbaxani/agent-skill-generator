@@ -27,7 +27,7 @@
 
 	onMount(() => {
 		if (!skillName) {
-			goto('/create');
+			goto('/create/required');
 		}
 		if (availableProviders.length > 0) {
 			selectedProvider = availableProviders[0];

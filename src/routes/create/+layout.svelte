@@ -2,18 +2,16 @@
 	import { page } from '$app/stores';
 
 	const STEPS = [
-		{ index: 1, label: 'Name', segment: '/create', exact: true },
-		{ index: 2, label: 'Description', segment: '/create/description', exact: false },
-		{ index: 3, label: 'Optional', segment: '/create/optional', exact: false },
-		{ index: 4, label: 'Body', segment: '/create/skill', exact: false }
+		{ index: 1, label: 'Required', segment: '/create/required', exact: false },
+		{ index: 2, label: 'Optional', segment: '/create/optional', exact: false },
+		{ index: 3, label: 'Body', segment: '/create/skill', exact: false }
 	] as const;
 
 	let currentStep = $derived.by(() => {
 		const path = $page.url.pathname;
-		if (path === '/create' || path === '/create/') return 1;
-		if (path.startsWith('/create/description')) return 2;
-		if (path.startsWith('/create/optional')) return 3;
-		if (path.startsWith('/create/skill')) return 4;
+		if (path.startsWith('/create/required')) return 1;
+		if (path.startsWith('/create/optional')) return 2;
+		if (path.startsWith('/create/skill')) return 3;
 		return 1;
 	});
 
