@@ -59,6 +59,18 @@
 	function handleRemove(providerId: string) {
 		userState.removeKey(providerId);
 	}
+
+	function handleEdit(providerId: string) {
+		const config = userState.keys[providerId];
+		if (!config) return;
+		
+		selectedProvider = providerId;
+		apiKeyValue = config.key || '';
+		endpointValue = config.endpoint || '';
+		modelValue = config.model || '';
+		
+		window.scrollTo({ top: 0, behavior: 'smooth' });
+	}
 </script>
 
 <div class="mx-auto max-w-6xl px-6 py-12 lg:px-12">
@@ -247,14 +259,24 @@
 									{/if}
 								</span>
 								
-								<button 
-									type="button" 
-									onclick={() => handleRemove(providerId)} 
-									aria-label="Remove {provider.name} key"
-									class="flex h-8 w-8 items-center justify-center rounded-md text-(--text-tertiary) transition-colors hover:bg-(--secondary-subtle) hover:text-(--secondary)"
-								>
-									<i class="bi bi-x-lg"></i>
-								</button>
+								<div class="flex items-center gap-1">
+									<button 
+										type="button" 
+										onclick={() => handleEdit(providerId)} 
+										aria-label="Edit {provider.name} key"
+										class="flex h-8 w-8 items-center justify-center rounded-md text-(--text-tertiary) transition-colors hover:bg-(--secondary-subtle) hover:text-(--secondary)"
+									>
+										<i class="bi bi-pencil"></i>
+									</button>
+									<button 
+										type="button" 
+										onclick={() => handleRemove(providerId)} 
+										aria-label="Remove {provider.name} key"
+										class="flex h-8 w-8 items-center justify-center rounded-md text-(--text-tertiary) transition-colors hover:bg-(--secondary-subtle) hover:text-(--secondary)"
+									>
+										<i class="bi bi-x-lg"></i>
+									</button>
+								</div>
 							</div>
 						</div>
 					{/each}
