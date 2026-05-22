@@ -178,16 +178,40 @@ Output ONLY the JSON, nothing else.`;
 				style="color: var(--text-primary); font-family: var(--font-display);"
 				class="text-3xl font-extrabold tracking-widest uppercase"
 			>
-				Optional Data
+				Optional
 			</h1>
 			<p
 				style="color: var(--text-secondary); font-family: var(--font-body);"
 				class="text-base leading-relaxed"
 			>
-				Add extra metadata to your skill <span
-					style="color: var(--accent); font-family: var(--font-mono)">{skillName}</span
-				>.
+				Enrich <span style="color: var(--accent); font-family: var(--font-mono)">{skillName}</span> with extra metadata. All fields are optional.
 			</p>
+
+			<div
+				class="mt-6 flex flex-col gap-5 border-l-2 border-(--accent) p-5"
+				style="background: var(--surface-sunken);"
+			>
+				<h3
+					style="color: var(--accent); font-family: var(--font-display);"
+					class="flex items-center gap-3 text-xs font-bold tracking-widest uppercase"
+				>
+					<i class="bi bi-lightbulb"></i>
+					Tips
+				</h3>
+				<div class="flex flex-col gap-4" style="font-family: var(--font-mono);">
+					{#each [
+						['01 // License', 'Use a SPDX identifier like MIT, Apache-2.0, or GPL-3.0.'],
+						['02 // Compatibility', 'Describe env requirements: OS, runtime, tool versions.'],
+						['03 // Metadata', 'author, version, and team are common key–value pairs.'],
+						['04 // All optional', 'Skip anything that doesn\'t apply. These fields enrich — they don\'t gate.']
+					] as [title, tip] (title)}
+						<div class="flex flex-col gap-1">
+							<span style="color: var(--text-primary);" class="text-xs font-semibold tracking-widest uppercase">{title}</span>
+							<span style="color: var(--text-secondary);" class="text-[11px] leading-relaxed opacity-80">{tip}</span>
+						</div>
+					{/each}
+				</div>
+			</div>
 		</div>
 
 		<div class="flex w-full flex-col gap-8">
@@ -225,7 +249,7 @@ Output ONLY the JSON, nothing else.`;
 							style="color: var(--text-primary); border: 1px solid var(--border-strong); border-radius: 2px; font-family: var(--font-mono);"
 							class="w-full appearance-none bg-transparent px-3 py-2 text-sm focus:outline-none sm:w-auto"
 						>
-							{#each availableProviders as provider}
+							{#each availableProviders as provider (provider)}
 								<option value={provider}>{provider}</option>
 							{/each}
 						</select>
@@ -395,7 +419,7 @@ Output ONLY the JSON, nothing else.`;
 				</div>
 			</div>
 
-			<div class="mt-6 flex justify-end gap-4">
+			<div class="mt-6 flex flex-wrap items-center justify-between gap-4">
 				<button
 					type="button"
 					onclick={() => history.back()}
@@ -411,7 +435,7 @@ Output ONLY the JSON, nothing else.`;
 					class="flex items-center gap-2 bg-(--accent) px-6 py-3.5 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_15px_var(--accent-glow)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
 					style="color: var(--accent-fg); border-radius: 2px; font-family: var(--font-display);"
 				>
-					Save Skill <i class="bi bi-check-lg" aria-hidden="true"></i>
+					Next <i class="bi bi-arrow-right" aria-hidden="true"></i>
 				</button>
 			</div>
 		</div>

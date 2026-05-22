@@ -112,71 +112,39 @@ Output ONLY the text of the description, nothing else.`;
 <div class="mx-auto max-w-4xl px-6 py-12">
 	<div class="grid items-start gap-12 lg:grid-cols-[1fr_2fr]">
 		<div class="flex flex-col gap-4 pt-2">
-			<h1 style="color: var(--text-primary);" class="text-3xl font-bold tracking-tight">
-				Skill Description
+			<h1
+				style="color: var(--text-primary); font-family: var(--font-display);"
+				class="text-3xl font-extrabold tracking-widest uppercase"
+			>
+				Description
 			</h1>
-			<p style="color: var(--text-secondary);" class="text-base">
-				Describe what your skill <span style="color: var(--accent); font-family: var(--font-mono)"
-					>{skillName}</span
-				> does.
+			<p style="color: var(--text-secondary); font-family: var(--font-body);" class="text-base leading-relaxed">
+				Describe what <span style="color: var(--accent); font-family: var(--font-mono)">{skillName}</span> does — and <em>when</em> an agent should reach for it.
 			</p>
 
 			<div
-				class="mt-8 flex flex-col gap-5 border-l-2 border-(--accent) bg-(--surface-sunken) p-6 shadow-sm"
+				class="mt-6 flex flex-col gap-5 border-l-2 border-(--accent) p-5"
+				style="background: var(--surface-sunken);"
 			>
 				<h3
 					style="color: var(--accent); font-family: var(--font-display);"
-					class="flex items-center gap-3 text-sm font-bold tracking-widest uppercase"
+					class="flex items-center gap-3 text-xs font-bold tracking-widest uppercase"
 				>
 					<i class="bi bi-lightbulb"></i>
-					Helpful Tips
+					Tips
 				</h3>
-				<div class="flex flex-col gap-5" style="font-family: var(--font-mono);">
-					<div class="flex flex-col gap-1.5">
-						<span
-							style="color: var(--text-primary);"
-							class="text-xs font-semibold tracking-widest uppercase">01 // When to use it</span
-						>
-						<span
-							style="color: var(--text-secondary);"
-							class="text-[12px] leading-relaxed opacity-80"
-							>Tell the AI exactly when it should use this skill, not just what the skill does.</span
-						>
-					</div>
-					<div class="flex flex-col gap-1.5">
-						<span
-							style="color: var(--text-primary);"
-							class="text-xs font-semibold tracking-widest uppercase">02 // How to start</span
-						>
-						<span
-							style="color: var(--text-secondary);"
-							class="text-[12px] leading-relaxed opacity-80"
-							>Always start your sentence with "Use this skill when..."</span
-						>
-					</div>
-					<div class="flex flex-col gap-1.5">
-						<span
-							style="color: var(--text-primary);"
-							class="text-xs font-semibold tracking-widest uppercase"
-							>03 // Give clear examples</span
-						>
-						<span
-							style="color: var(--text-secondary);"
-							class="text-[12px] leading-relaxed opacity-80"
-							>Mention specific words or situations so the AI knows exactly what to look for.</span
-						>
-					</div>
-					<div class="flex flex-col gap-1.5">
-						<span
-							style="color: var(--text-primary);"
-							class="text-xs font-semibold tracking-widest uppercase">04 // Keep it short</span
-						>
-						<span
-							style="color: var(--text-secondary);"
-							class="text-[12px] leading-relaxed opacity-80"
-							>Be direct and to the point. Don't write a long paragraph.</span
-						>
-					</div>
+				<div class="flex flex-col gap-4" style="font-family: var(--font-mono);">
+					{#each [
+						['01 // When to use it', 'Tell the AI exactly when it should use this skill, not just what it does.'],
+						['02 // How to start', 'Begin with "Use this skill when…" — it primes retrieval.'],
+						['03 // Be specific', 'Mention domain keywords so the agent matches correctly.'],
+						['04 // Keep it short', 'Under 1 024 characters. One tight paragraph is ideal.']
+					] as [title, tip] (title)}
+						<div class="flex flex-col gap-1">
+							<span style="color: var(--text-primary);" class="text-xs font-semibold tracking-widest uppercase">{title}</span>
+							<span style="color: var(--text-secondary);" class="text-[11px] leading-relaxed opacity-80">{tip}</span>
+						</div>
+					{/each}
 				</div>
 			</div>
 		</div>
@@ -247,8 +215,8 @@ Output ONLY the text of the description, nothing else.`;
 				<div class="flex flex-col gap-3">
 					<label
 						for="description"
-						style="color: var(--text-primary);"
-						class="text-sm font-semibold tracking-wider uppercase"
+						style="color: var(--text-primary); font-family: var(--font-display);"
+						class="text-xs font-bold tracking-widest uppercase"
 					>
 						{availableProviders.length > 0 ? 'Write it yourself' : 'Description'}
 					</label>
@@ -258,16 +226,15 @@ Output ONLY the text of the description, nothing else.`;
 						bind:value={description}
 						placeholder="Use this skill when..."
 						rows="8"
-						style="background: var(--surface-sunken); color: var(--text-primary); border: 1px solid var(--border-strong);"
-						class="w-full resize-y rounded p-4 text-base transition-colors placeholder:text-(--text-tertiary) focus:border-(--accent) focus:ring-1 focus:ring-(--focus-ring) focus:outline-none"
+						style="background: var(--surface-sunken); color: var(--text-primary); border: 1px solid var(--border-strong); border-radius: 2px; font-family: var(--font-body);"
+						class="w-full resize-y p-4 text-base transition-all placeholder:text-(--text-tertiary) focus:border-(--accent) focus:shadow-[0_0_8px_var(--accent-glow)] focus:ring-1 focus:ring-(--accent) focus:outline-none"
 					></textarea>
 
-					<div class="flex items-center justify-between font-mono text-xs tracking-wider uppercase">
-						<span style="color: var(--text-tertiary)">Up to 1024 characters</span>
+					<div class="flex items-center justify-between" style="font-family: var(--font-mono);">
+						<span style="color: var(--text-tertiary);" class="text-xs tracking-wider uppercase">Up to 1 024 characters</span>
 						<span
-							style="color: {description.length > 1024
-								? 'var(--secondary)'
-								: 'var(--text-secondary)'}"
+							style="color: {description.length > 1024 ? 'var(--secondary)' : 'var(--text-tertiary)'};"
+							class="text-xs tracking-wider uppercase"
 						>
 							{description.length} / 1024
 						</span>
@@ -275,28 +242,36 @@ Output ONLY the text of the description, nothing else.`;
 				</div>
 			</div>
 
-			<div class="flex justify-end gap-4">
-				{#if !userState.hasKeys()}
-					<a
-						href="/keys"
-						class="flex items-center gap-2 rounded px-4 py-3 text-sm font-semibold transition-colors hover:bg-(--surface-sunken)"
-						style="color: var(--text-secondary); border: 1px solid var(--border-default);"
-					>
-						<i class="bi bi-key" aria-hidden="true"></i> Add API Key
-					</a>
-				{/if}
+			<div class="flex flex-wrap items-center justify-between gap-4">
 				<button
 					type="button"
-					disabled={!isValid}
-					onclick={() =>
-						goto(
-							`/create/optional?name=${skillName}&description=${encodeURIComponent(description)}`
-						)}
-					class="rounded bg-(--accent) px-6 py-3 text-sm font-semibold transition-colors hover:bg-(--accent-hover) disabled:cursor-not-allowed disabled:opacity-50"
-					style="color: var(--accent-fg);"
+					onclick={() => history.back()}
+					class="flex items-center gap-2 px-5 py-3 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--surface-sunken) focus:outline-none"
+					style="color: var(--text-secondary); border: 1px solid var(--border-default); border-radius: 2px; font-family: var(--font-display);"
 				>
-					Next Step
+					<i class="bi bi-arrow-left" aria-hidden="true"></i> Back
 				</button>
+
+				<div class="flex items-center gap-3">
+					{#if !userState.hasKeys()}
+						<a
+							href="/keys"
+							class="flex items-center gap-2 px-5 py-3 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--surface-sunken)"
+							style="color: var(--text-secondary); border: 1px solid var(--border-default); border-radius: 2px; font-family: var(--font-display);"
+						>
+							<i class="bi bi-key" aria-hidden="true"></i> Add API Key
+						</a>
+					{/if}
+					<button
+						type="button"
+						disabled={!isValid}
+						onclick={() => goto(`/create/optional?name=${skillName}&description=${encodeURIComponent(description)}`)}
+						class="flex items-center gap-2 bg-(--accent) px-6 py-3 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_15px_var(--accent-glow)] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none focus:outline-none"
+						style="color: var(--accent-fg); border-radius: 2px; font-family: var(--font-display);"
+					>
+						Next <i class="bi bi-arrow-right" aria-hidden="true"></i>
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>
