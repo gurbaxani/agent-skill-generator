@@ -52,6 +52,7 @@
 		<button
 			type="button"
 			disabled={!validName}
+			onclick={() => goto(`/create/description?name=${validName}`)}
 			class="w-full rounded-lg bg-[var(--accent)] px-4 py-3 text-sm font-semibold text-[var(--accent-fg)] shadow-sm transition-all hover:bg-[var(--accent-hover)] disabled:cursor-not-allowed disabled:opacity-50"
 		>
 			Continue
