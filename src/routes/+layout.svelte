@@ -10,7 +10,7 @@
 	import '@fontsource/rajdhani/600.css';
 	import '@fontsource/rajdhani/700.css';
 	import './layout.css';
-	import favicon from '$lib/assets/favicon.svg';
+	import favicon from '$lib/assets/asg.svg';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 
 	let { children } = $props();
