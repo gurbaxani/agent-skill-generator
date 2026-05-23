@@ -11,6 +11,11 @@
 	let selectedProvider = $state('');
 
 	onMount(() => {
+		if (!userState.hasKeys() && !userState.skipKeyRequirement) {
+			goto('/keys');
+			return;
+		}
+
 		if (availableProviders.length > 0) {
 			selectedProvider = availableProviders[0];
 		}
