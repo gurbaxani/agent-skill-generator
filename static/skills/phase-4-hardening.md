@@ -1,12 +1,11 @@
 ---
 name: "phase-4-hardening"
-description: "> Duration: 3-7 days | Agents: 8 | Gate Keeper: Reality Checker (sole authority)"
+description: ""
 license: "MIT"
 author: "@msitarzewski"
 tags:
   - "playbooks"
 ---
-
 # 🛡️ Phase 4 Playbook — Quality & Hardening
 
 > **Duration**: 3-7 days | **Agents**: 8 | **Gate Keeper**: Reality Checker (sole authority)

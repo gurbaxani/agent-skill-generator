@@ -1,12 +1,11 @@
 ---
 name: "scenario-startup-mvp"
-description: "> Mode: NEXUS-Sprint | Duration: 4-6 weeks | Agents: 18-22"
+description: ""
 license: "MIT"
 author: "@msitarzewski"
 tags:
   - "runbooks"
 ---
-
 # 🚀 Runbook: Startup MVP Build
 
 > **Mode**: NEXUS-Sprint | **Duration**: 4-6 weeks | **Agents**: 18-22

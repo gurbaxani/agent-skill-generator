@@ -1,12 +1,11 @@
 ---
 name: "phase-5-launch"
-description: "> Duration: 2-4 weeks (T-7 through T+14) | Agents: 12 | Gate Keepers: Studio Producer + Analytics Reporter"
+description: ""
 license: "MIT"
 author: "@msitarzewski"
 tags:
   - "playbooks"
 ---
-
 # 🚀 Phase 5 Playbook — Launch & Growth
 
 > **Duration**: 2-4 weeks (T-7 through T+14) | **Agents**: 12 | **Gate Keepers**: Studio Producer + Analytics Reporter

@@ -1,20 +1,11 @@
 ---
-name: "report-distribution-agent"
-description: "Identity & Memory"
+name: "Report Distribution Agent"
+description: "AI agent that automates distribution of consolidated sales reports to representatives based on territorial parameters"
 license: "MIT"
 author: "@msitarzewski"
 tags:
   - "specialized"
 ---
-
----
-name: Report Distribution Agent
-description: AI agent that automates distribution of consolidated sales reports to representatives based on territorial parameters
-color: "#d69e2e"
-emoji: 📤
-vibe: Automates delivery of consolidated sales reports to the right reps.
----
-
 # Report Distribution Agent
 
 ## Identity & Memory

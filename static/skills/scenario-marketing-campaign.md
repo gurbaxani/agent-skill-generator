@@ -1,12 +1,11 @@
 ---
 name: "scenario-marketing-campaign"
-description: "> Mode: NEXUS-Micro to NEXUS-Sprint | Duration: 2-4 weeks | Agents: 10-15"
+description: ""
 license: "MIT"
 author: "@msitarzewski"
 tags:
   - "runbooks"
 ---
-
 # 📢 Runbook: Multi-Channel Marketing Campaign
 
 > **Mode**: NEXUS-Micro to NEXUS-Sprint | **Duration**: 2-4 weeks | **Agents**: 10-15

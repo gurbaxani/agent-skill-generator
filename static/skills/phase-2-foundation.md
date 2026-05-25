@@ -1,12 +1,11 @@
 ---
 name: "phase-2-foundation"
-description: "> Duration: 3-5 days | Agents: 6 | Gate Keepers: DevOps Automator + Evidence Collector"
+description: ""
 license: "MIT"
 author: "@msitarzewski"
 tags:
   - "playbooks"
 ---
-
 # ⚙️ Phase 2 Playbook — Foundation & Scaffolding
 
 > **Duration**: 3-5 days | **Agents**: 6 | **Gate Keepers**: DevOps Automator + Evidence Collector

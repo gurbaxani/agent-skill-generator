@@ -1,12 +1,11 @@
 ---
 name: "phase-1-strategy"
-description: "> Duration: 5-10 days | Agents: 8 | Gate Keepers: Studio Producer + Reality Checker"
+description: ""
 license: "MIT"
 author: "@msitarzewski"
 tags:
   - "playbooks"
 ---
-
 # 🏗️ Phase 1 Playbook — Strategy & Architecture
 
 > **Duration**: 5-10 days | **Agents**: 8 | **Gate Keepers**: Studio Producer + Reality Checker

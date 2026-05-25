@@ -1,12 +1,11 @@
 ---
 name: "phase-6-operate"
-description: "> Duration: Ongoing | Agents: 12+ (rotating) | Governance: Studio Producer"
+description: ""
 license: "MIT"
 author: "@msitarzewski"
 tags:
   - "playbooks"
 ---
-
 # 🔄 Phase 6 Playbook — Operate & Evolve
 
 > **Duration**: Ongoing | **Agents**: 12+ (rotating) | **Governance**: Studio Producer

@@ -1,12 +1,11 @@
 ---
-name: "quickstart"
-description: "> Get from zero to orchestrated multi-agent pipeline in 5 minutes."
+name: "QUICKSTART"
+description: ""
 license: "MIT"
 author: "@msitarzewski"
 tags:
   - "strategy"
 ---
-
 # ⚡ NEXUS Quick-Start Guide
 
 > **Get from zero to orchestrated multi-agent pipeline in 5 minutes.**

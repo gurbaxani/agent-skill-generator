@@ -1,12 +1,11 @@
 ---
 name: "phase-0-discovery"
-description: "> Duration: 3-7 days | Agents: 6 | Gate Keeper: Executive Summary Generator"
+description: ""
 license: "MIT"
 author: "@msitarzewski"
 tags:
   - "playbooks"
 ---
-
 # 🔍 Phase 0 Playbook — Intelligence & Discovery
 
 > **Duration**: 3-7 days | **Agents**: 6 | **Gate Keeper**: Executive Summary Generator

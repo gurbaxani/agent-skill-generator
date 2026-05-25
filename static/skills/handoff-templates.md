@@ -1,12 +1,11 @@
 ---
 name: "handoff-templates"
-description: "> Standardized templates for every type of agent-to-agent handoff in the NEXUS pipeline. Consistent handoffs prevent context loss — the #1 cause of multi-agent coordination failure."
+description: ""
 license: "MIT"
 author: "@msitarzewski"
 tags:
   - "coordination"
 ---
-
 # 📋 NEXUS Handoff Templates
 
 > Standardized templates for every type of agent-to-agent handoff in the NEXUS pipeline. Consistent handoffs prevent context loss — the #1 cause of multi-agent coordination failure.

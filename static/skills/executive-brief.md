@@ -1,12 +1,11 @@
 ---
-name: "executive-brief"
-description: "Network of EXperts, Unified in Strategy"
+name: "EXECUTIVE-BRIEF"
+description: ""
 license: "MIT"
 author: "@msitarzewski"
 tags:
   - "strategy"
 ---
-
 # 📑 NEXUS Executive Brief
 
 ## Network of EXperts, Unified in Strategy

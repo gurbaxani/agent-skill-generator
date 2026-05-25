@@ -1,12 +1,11 @@
 ---
 name: "scenario-enterprise-feature"
-description: "> Mode: NEXUS-Sprint | Duration: 6-12 weeks | Agents: 20-30"
+description: ""
 license: "MIT"
 author: "@msitarzewski"
 tags:
   - "runbooks"
 ---
-
 # 🏢 Runbook: Enterprise Feature Development
 
 > **Mode**: NEXUS-Sprint | **Duration**: 6-12 weeks | **Agents**: 20-30

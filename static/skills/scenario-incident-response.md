@@ -1,12 +1,11 @@
 ---
 name: "scenario-incident-response"
-description: "> Mode: NEXUS-Micro | Duration: Minutes to hours | Agents: 3-8"
+description: ""
 license: "MIT"
 author: "@msitarzewski"
 tags:
   - "runbooks"
 ---
-
 # 🚨 Runbook: Incident Response
 
 > **Mode**: NEXUS-Micro | **Duration**: Minutes to hours | **Agents**: 3-8

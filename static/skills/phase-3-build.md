@@ -1,12 +1,11 @@
 ---
 name: "phase-3-build"
-description: "> Duration: 2-12 weeks (varies by scope) | Agents: 15-30+ | Gate Keeper: Agents Orchestrator"
+description: ""
 license: "MIT"
 author: "@msitarzewski"
 tags:
   - "playbooks"
 ---
-
 # 🔨 Phase 3 Playbook — Build & Iterate
 
 > **Duration**: 2-12 weeks (varies by scope) | **Agents**: 15-30+ | **Gate Keeper**: Agents Orchestrator

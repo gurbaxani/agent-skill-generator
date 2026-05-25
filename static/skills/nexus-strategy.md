@@ -1,12 +1,11 @@
 ---
 name: "nexus-strategy"
-description: "The Agency's Complete Operational Playbook for Multi-Agent Orchestration"
+description: ""
 license: "MIT"
 author: "@msitarzewski"
 tags:
   - "strategy"
 ---
-
 # 🌐 NEXUS — Network of EXperts, Unified in Strategy
 
 ## The Agency's Complete Operational Playbook for Multi-Agent Orchestration
