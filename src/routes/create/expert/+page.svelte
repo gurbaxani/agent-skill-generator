@@ -10,7 +10,7 @@
 		type RefFile
 	} from '$lib/state/draft.svelte';
 	import { marked } from 'marked';
-	import { downloadSkillZip } from '$lib/utils/zip';
+	import { serializeSkill, draftToSkill } from '$lib/parse-skill';
 
 	// ── Page States ──────────────────────────────────────────────────────────
 	let isGenerating = $state(false);
@@ -471,14 +471,24 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 		setTimeout(() => (copied = false), 2000);
 	}
 
-	async function handleDownload() {
+	function handleDownload() {
 		try {
-			await downloadSkillZip(skillDraft);
+			const skill = draftToSkill(skillDraft);
+			const serialized = serializeSkill(skill);
+			const blob = new Blob([serialized], { type: 'text/markdown;charset=utf-8;' });
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement('a');
+			link.href = url;
+			link.setAttribute('download', `${skill.name || 'skill'}.md`);
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			URL.revokeObjectURL(url);
 			downloaded = true;
 			setTimeout(() => (downloaded = false), 2000);
 		} catch (err) {
 			console.error(err);
-			errorMsg = err instanceof Error ? err.message : 'Failed to generate ZIP download.';
+			errorMsg = err instanceof Error ? err.message : 'Failed to generate Markdown download.';
 		}
 	}
 
@@ -1492,7 +1502,7 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 							{#if downloaded}
 								<i class="bi bi-check-lg"></i> Downloaded!
 							{:else}
-								<i class="bi bi-download" aria-hidden="true"></i> Download ZIP
+								<i class="bi bi-download" aria-hidden="true"></i> Download Markdown
 							{/if}
 						</button>
 					</div>

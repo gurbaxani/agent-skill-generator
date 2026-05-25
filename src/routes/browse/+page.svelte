@@ -7,7 +7,6 @@
 	import type { Skill } from '$lib/types';
 	import { serializeSkill } from '$lib/parse-skill';
 	import { marked } from 'marked';
-	import { downloadSkillZip } from '$lib/utils/zip';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -70,56 +69,23 @@
 			: ''
 	);
 
-	function populateDraftFromSkill(skill: Skill) {
-		skillDraft.reset();
-		skillDraft.name = skill.name;
-		skillDraft.description = skill.description;
-		skillDraft.license = skill.license || '';
-		skillDraft.compatibility = skill.compatibility || '';
-		skillDraft.allowedTools = skill.allowedTools || '';
-		skillDraft.body = skill.body || '';
-
-		skillDraft.enableScripts = false;
-		skillDraft.scriptLanguages = [];
-		skillDraft.scriptFiles = [];
-		skillDraft.nextScriptId = 1;
-
-		skillDraft.enableReferences = false;
-		skillDraft.refFiles = [];
-		skillDraft.nextRefId = 1;
-
-		skillDraft.enableAssets = false;
-		skillDraft.assetKinds = [];
-		skillDraft.assetFiles = [];
-		skillDraft.nextAssetId = 1;
-
-		if (skill.author) {
-			skillDraft.metadata = [
-				{ key: 'author', value: skill.author, id: 1 },
-				{ key: 'version', value: skill.version || '1.0', id: 2 }
-			];
-		}
-	}
-
 	// Fork and load into draft
 	function handleFork(skill: Skill) {
-		populateDraftFromSkill(skill);
-		forkSuccessMessage = `Remixing skill: "${skill.name}". Loading workspace...`;
-
-		setTimeout(() => {
-			forkSuccessMessage = '';
-			if (userState.expertMode) {
-				goto('/create/expert');
-			} else {
-				goto('/create/required');
-			}
-		}, 1500);
+		goto('/create', { state: { prefill: skill } });
 	}
 
-	async function handleDownload(skill: Skill) {
-		populateDraftFromSkill(skill);
+	function handleDownload(skill: Skill) {
 		try {
-			await downloadSkillZip(skillDraft);
+			const serialized = serializeSkill(skill);
+			const blob = new Blob([serialized], { type: 'text/markdown;charset=utf-8;' });
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement('a');
+			link.href = url;
+			link.setAttribute('download', `${skill.name}.md`);
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			URL.revokeObjectURL(url);
 		} catch (error) {
 			console.error('Failed to download skill:', error);
 		}

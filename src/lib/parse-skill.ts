@@ -1,5 +1,6 @@
 import matter from 'gray-matter';
 import type { Skill } from '$lib/types';
+import type { SkillDraftState } from '$lib/state/draft.svelte';
 
 /**
  * Parses raw SKILL.md contents into a Skill object.
@@ -58,4 +59,40 @@ export function serializeSkill(skill: Skill): string {
 	}
 
 	return matter.stringify(skill.body, data);
+}
+
+/**
+ * Converts a SkillDraftState form state object into a Skill object.
+ */
+export function draftToSkill(draft: SkillDraftState): Skill {
+	const author = draft.metadata.find((m) => m.key === 'author')?.value || '';
+	const version = draft.metadata.find((m) => m.key === 'version')?.value || undefined;
+	const tagsEntry = draft.metadata.find((m) => m.key === 'tags' || m.key === 'tag');
+	let tags: string[] | undefined = undefined;
+	if (tagsEntry) {
+		tags = tagsEntry.value.split(',').map((t) => t.trim()).filter(Boolean);
+	}
+
+	const skill: Skill = {
+		name: draft.validName,
+		description: draft.description,
+		license: draft.license || 'MIT',
+		author: author,
+		body: draft.body
+	};
+
+	if (draft.compatibility) {
+		skill.compatibility = draft.compatibility;
+	}
+	if (draft.allowedTools) {
+		skill.allowedTools = draft.allowedTools;
+	}
+	if (version) {
+		skill.version = version;
+	}
+	if (tags) {
+		skill.tags = tags;
+	}
+
+	return skill;
 }

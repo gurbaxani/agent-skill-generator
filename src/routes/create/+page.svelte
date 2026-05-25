@@ -1,13 +1,38 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import { page } from '$app/state';
 	import { userState } from '$lib/state/user.svelte';
+	import { skillDraft } from '$lib/state/draft.svelte';
+	import type { Skill } from '$lib/types';
 
 	onMount(() => {
+		const prefill = page.state?.prefill as Skill | undefined;
+		if (prefill) {
+			skillDraft.reset();
+			skillDraft.name = prefill.name;
+			skillDraft.description = prefill.description;
+			skillDraft.license = prefill.license || '';
+			skillDraft.compatibility = prefill.compatibility || '';
+			skillDraft.allowedTools = prefill.allowedTools || '';
+			skillDraft.body = prefill.body || '';
+
+			// Rebuild metadata entries
+			const metadata = [];
+			metadata.push({ key: 'author', value: prefill.author || '', id: 1 });
+			metadata.push({ key: 'version', value: prefill.version || '1.0', id: 2 });
+			if (prefill.tags && prefill.tags.length > 0) {
+				metadata.push({ key: 'tags', value: prefill.tags.join(', '), id: 3 });
+			}
+			skillDraft.metadata = metadata;
+			skillDraft.nextMetaId = metadata.length + 1;
+		}
+
+		const options = { replaceState: true, state: page.state };
 		if (userState.expertMode) {
-			goto('/create/expert', { replaceState: true });
+			goto('/create/expert', options);
 		} else {
-			goto('/create/required', { replaceState: true });
+			goto('/create/required', options);
 		}
 	});
 </script>
