@@ -1,9 +1,11 @@
 <script lang="ts">
 	import SkillPreview from '$lib/components/SkillPreview.svelte';
 	import CatalogEntry from '$lib/components/CatalogEntry.svelte';
-	import { getRegistrySkills } from '$lib/registry';
+	import type { PageData } from './$types';
 
-	const CATALOG_SKILLS = getRegistrySkills();
+	let { data }: { data: PageData } = $props();
+
+	const CATALOG_SKILLS = $derived(data.skills);
 
 	interface ValueProp {
 		icon: string;
@@ -134,7 +136,7 @@
 				name={skill.name}
 				description={skill.description}
 				author={skill.author}
-				tag={skill.tag}
+				tag={skill.tags?.[0] || 'all'}
 			/>
 		{/each}
 	</div>

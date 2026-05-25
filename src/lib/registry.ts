@@ -34,7 +34,4 @@ export interface RegistrySkill {
 	assetFiles?: RegistryAssetFile[];
 }
 
-export function getRegistrySkills(): RegistrySkill[] {
-	const modules = import.meta.glob('./registry/*.json', { eager: true });
-	return Object.values(modules).map((mod: any) => mod.default as RegistrySkill);
-}
+

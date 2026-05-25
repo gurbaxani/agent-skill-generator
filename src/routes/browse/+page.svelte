@@ -4,11 +4,14 @@
 	import { goto } from '$app/navigation';
 	import { userState } from '$lib/state/user.svelte';
 	import { skillDraft, type ScriptLanguage, type AssetKind } from '$lib/state/draft.svelte';
-	import { getRegistrySkills, type RegistrySkill } from '$lib/registry';
+	import type { Skill } from '$lib/types';
+	import { serializeSkill } from '$lib/parse-skill';
 	import { marked } from 'marked';
 	import { downloadSkillZip } from '$lib/utils/zip';
+	import type { PageData } from './$types';
 
-	const skills = getRegistrySkills();
+	let { data }: { data: PageData } = $props();
+	const skills = $derived(data.skills);
 
 	// ── Filter & Search State ───────────────────────────────────────────────
 	let searchQuery = $state('');
@@ -28,12 +31,12 @@
 	let forkSuccessMessage = $state('');
 
 	// Determine all available tags dynamically
-	const allTags = $derived(['all', ...new Set(skills.map((s) => s.tag))]);
+	const allTags = $derived(['all', ...new Set(skills.flatMap((s) => s.tags || []))]);
 
 	// Filtered skills list
 	const filteredSkills = $derived.by(() => {
 		return skills.filter((skill) => {
-			const matchesTag = selectedTag === 'all' || skill.tag === selectedTag;
+			const matchesTag = selectedTag === 'all' || (skill.tags && skill.tags.includes(selectedTag));
 			const matchesSearch =
 				skill.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
 				skill.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -48,35 +51,8 @@
 		return filteredSkills[0] || null;
 	});
 
-	// Helper to assemble markdown for preview
-	function getSkillAssembledMarkdown(skill: RegistrySkill): string {
-		const lines: string[] = ['---'];
-		lines.push(`name: ${skill.name}`);
-		if (skill.description) {
-			lines.push(`description: "${skill.description.replace(/"/g, '\\"')}"`);
-		}
-		if (skill.license) {
-			lines.push(`license: ${skill.license}`);
-		}
-		if (skill.compatibility) {
-			lines.push(`compatibility: "${skill.compatibility.replace(/"/g, '\\"')}"`);
-		}
-		if (skill.allowedTools) {
-			lines.push(`allowed-tools: ${skill.allowedTools}`);
-		}
-		if (skill.author) {
-			lines.push(`author: ${skill.author}`);
-		}
-		lines.push('---');
-		if (skill.body?.trim()) {
-			lines.push('');
-			lines.push(skill.body.trim());
-		}
-		return lines.join('\n');
-	}
-
 	const selectedSkillMarkdown = $derived(
-		selectedSkill ? getSkillAssembledMarkdown(selectedSkill) : ''
+		selectedSkill ? serializeSkill(selectedSkill) : ''
 	);
 
 	const frontmatterLines = $derived.by(() => {
@@ -94,7 +70,7 @@
 			: ''
 	);
 
-	function populateDraftFromSkill(skill: RegistrySkill) {
+	function populateDraftFromSkill(skill: Skill) {
 		skillDraft.reset();
 		skillDraft.name = skill.name;
 		skillDraft.description = skill.description;
@@ -103,58 +79,30 @@
 		skillDraft.allowedTools = skill.allowedTools || '';
 		skillDraft.body = skill.body || '';
 
-		skillDraft.enableScripts = skill.enableScripts || false;
-		if (skill.scriptLanguages) {
-			skillDraft.scriptLanguages = skill.scriptLanguages.filter((l): l is ScriptLanguage =>
-				['python', 'bash', 'javascript', 'other'].includes(l)
-			);
-		}
-		if (skill.scriptFiles) {
-			skillDraft.scriptFiles = skill.scriptFiles.map((f, i) => ({
-				name: f.name,
-				content: f.content || '',
-				id: i + 1
-			}));
-			skillDraft.nextScriptId = skill.scriptFiles.length + 1;
-		}
+		skillDraft.enableScripts = false;
+		skillDraft.scriptLanguages = [];
+		skillDraft.scriptFiles = [];
+		skillDraft.nextScriptId = 1;
 
-		skillDraft.enableReferences = skill.enableReferences || false;
-		if (skill.refFiles) {
-			skillDraft.refFiles = skill.refFiles.map((f, i) => ({
-				name: f.name,
-				description: f.description || '',
-				content: f.content || '',
-				id: i + 1
-			}));
-			skillDraft.nextRefId = skill.refFiles.length + 1;
-		}
+		skillDraft.enableReferences = false;
+		skillDraft.refFiles = [];
+		skillDraft.nextRefId = 1;
 
-		skillDraft.enableAssets = skill.enableAssets || false;
-		if (skill.assetKinds) {
-			skillDraft.assetKinds = skill.assetKinds.filter((k): k is AssetKind =>
-				['templates', 'images', 'data'].includes(k)
-			);
-		}
-		if (skill.assetFiles) {
-			skillDraft.assetFiles = skill.assetFiles.map((f, i) => ({
-				name: f.name,
-				kind: ['templates', 'images', 'data'].includes(f.kind) ? (f.kind as AssetKind) : 'data',
-				content: f.content || '',
-				id: i + 1
-			}));
-			skillDraft.nextAssetId = skill.assetFiles.length + 1;
-		}
+		skillDraft.enableAssets = false;
+		skillDraft.assetKinds = [];
+		skillDraft.assetFiles = [];
+		skillDraft.nextAssetId = 1;
 
 		if (skill.author) {
 			skillDraft.metadata = [
 				{ key: 'author', value: skill.author, id: 1 },
-				{ key: 'version', value: '1.0', id: 2 }
+				{ key: 'version', value: skill.version || '1.0', id: 2 }
 			];
 		}
 	}
 
 	// Fork and load into draft
-	function handleFork(skill: RegistrySkill) {
+	function handleFork(skill: Skill) {
 		populateDraftFromSkill(skill);
 		forkSuccessMessage = `Remixing skill: "${skill.name}". Loading workspace...`;
 
@@ -168,7 +116,7 @@
 		}, 1500);
 	}
 
-	async function handleDownload(skill: RegistrySkill) {
+	async function handleDownload(skill: Skill) {
 		populateDraftFromSkill(skill);
 		try {
 			await downloadSkillZip(skillDraft);
@@ -177,6 +125,7 @@
 		}
 	}
 </script>
+
 
 <svelte:head>
 	<title>Browse Skills — ASG</title>
@@ -296,12 +245,14 @@
 										>
 											{skill.name}
 										</span>
-										<span
-											class="tag-pill font-mono text-[9px] font-bold uppercase"
-											style="border: 1px solid var(--border-accent); color: var(--accent);"
-										>
-											{skill.tag}
-										</span>
+										{#each skill.tags || [] as tag (tag)}
+											<span
+												class="tag-pill font-mono text-[9px] font-bold uppercase mr-1"
+												style="border: 1px solid var(--border-accent); color: var(--accent);"
+											>
+												{tag}
+											</span>
+										{/each}
 									</div>
 									<p
 										style="font-family: var(--font-body);"
