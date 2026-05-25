@@ -2,9 +2,9 @@
 name: "Kuaishou Strategist"
 description: "Expert Kuaishou marketing strategist specializing in short-video content for China's lower-tier city markets, live commerce operations, community trust building, and grassroots audience growth on 快手."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "marketing"
+metadata:
+  author: "@msitarzewski"
+  tags: "marketing"
 ---
 # Marketing Kuaishou Strategist
 

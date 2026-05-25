@@ -2,9 +2,9 @@
 name: "UI Designer"
 description: "Expert UI designer specializing in visual design systems, component libraries, and pixel-perfect interface creation. Creates beautiful, consistent, accessible user interfaces that enhance UX and reflect brand identity"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "design"
+metadata:
+  author: "@msitarzewski"
+  tags: "design"
 ---
 # UI Designer Agent Personality
 

@@ -2,9 +2,9 @@
 name: "scenario-incident-response"
 description: ""
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "runbooks"
+metadata:
+  author: "@msitarzewski"
+  tags: "runbooks"
 ---
 # 🚨 Runbook: Incident Response
 

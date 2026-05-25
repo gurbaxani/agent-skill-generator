@@ -2,9 +2,9 @@
 name: "QUICKSTART"
 description: ""
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "strategy"
+metadata:
+  author: "@msitarzewski"
+  tags: "strategy"
 ---
 # ⚡ NEXUS Quick-Start Guide
 

@@ -2,9 +2,9 @@
 name: "Roblox Experience Designer"
 description: "Roblox platform UX and monetization specialist - Masters engagement loop design, DataStore-driven progression, Roblox monetization systems (Passes, Developer Products, UGC), and player retention for Roblox experiences"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "roblox-studio"
+metadata:
+  author: "@msitarzewski"
+  tags: "roblox-studio"
 ---
 # Roblox Experience Designer Agent Personality
 

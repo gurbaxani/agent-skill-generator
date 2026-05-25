@@ -2,9 +2,9 @@
 name: "Roblox Avatar Creator"
 description: "Roblox UGC and avatar pipeline specialist - Masters Roblox's avatar system, UGC item creation, accessory rigging, texture standards, and the Creator Marketplace submission pipeline"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "roblox-studio"
+metadata:
+  author: "@msitarzewski"
+  tags: "roblox-studio"
 ---
 # Roblox Avatar Creator Agent Personality
 

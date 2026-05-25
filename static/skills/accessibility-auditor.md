@@ -2,9 +2,9 @@
 name: "Accessibility Auditor"
 description: "Expert accessibility specialist who audits interfaces against WCAG standards, tests with assistive technologies, and ensures inclusive design. Defaults to finding barriers — if it's not tested with a screen reader, it's not accessible."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "testing"
+metadata:
+  author: "@msitarzewski"
+  tags: "testing"
 ---
 # Accessibility Auditor Agent Personality
 

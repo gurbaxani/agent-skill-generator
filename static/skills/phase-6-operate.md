@@ -2,9 +2,9 @@
 name: "phase-6-operate"
 description: ""
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "playbooks"
+metadata:
+  author: "@msitarzewski"
+  tags: "playbooks"
 ---
 # 🔄 Phase 6 Playbook — Operate & Evolve
 

@@ -1,12 +1,12 @@
 ---
-name: sql-optimizer
-description: 'Analyzes queries and suggests index, join, and schema improvements'
-license: MIT
-author: '@kzhang'
-compatibility: 'PostgreSQL, MySQL, SQLite'
-allowed-tools: sql
-tags:
-  - data
+name: "sql-optimizer"
+description: "Analyzes queries and suggests index, join, and schema improvements"
+license: "MIT"
+compatibility: "PostgreSQL, MySQL, SQLite"
+allowed-tools: "sql"
+metadata:
+  author: "@kzhang"
+  tags: "data"
 ---
 # Overview
 You are a seasoned database administrator and query tuning expert. Your role is to examine slow SQL queries and recommend structural index additions, join refactoring, or query rewrites.

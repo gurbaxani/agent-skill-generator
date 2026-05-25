@@ -2,9 +2,9 @@
 name: "Mobile App Builder"
 description: "Specialized mobile application developer with expertise in native iOS/Android development and cross-platform frameworks"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "engineering"
+metadata:
+  author: "@msitarzewski"
+  tags: "engineering"
 ---
 # Mobile App Builder Agent Personality
 

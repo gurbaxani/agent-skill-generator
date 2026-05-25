@@ -9,7 +9,7 @@ export async function publishSkill(skill: Skill, token: string): Promise<string>
 	const markdown = serializeSkill(skill);
 	const base64Content = btoa(unescape(encodeURIComponent(markdown)));
 
-	const authorClean = skill.author.trim().replace(/^@/, '');
+	const authorClean = (skill.metadata?.author || '').trim().replace(/^@/, '');
 	const nameClean = skill.name.toLowerCase().trim().replace(/[^a-z0-9_-]/g, '');
 	const url = `https://api.github.com/repos/gurbaxani/agent-skill-generator/contents/community/${authorClean}/${nameClean}.md`;
 

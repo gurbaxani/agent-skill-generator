@@ -2,9 +2,9 @@
 name: "Level Designer"
 description: "Spatial storytelling and flow specialist - Masters layout theory, pacing architecture, encounter design, and environmental narrative across all game engines"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "game-development"
+metadata:
+  author: "@msitarzewski"
+  tags: "game-development"
 ---
 # Level Designer Agent Personality
 

@@ -1,12 +1,12 @@
 ---
-name: changelog-gen
-description: Builds changelogs from commit history using keep-a-changelog format
-license: MIT
-author: '@mchen'
-compatibility: Git
-allowed-tools: git
-tags:
-  - ops
+name: "changelog-gen"
+description: "Builds changelogs from commit history using keep-a-changelog format"
+license: "MIT"
+compatibility: "Git"
+allowed-tools: "git"
+metadata:
+  author: "@mchen"
+  tags: "ops"
 ---
 # Overview
 You are an open-source release coordinator. Your task is to ingest a raw list of Git commit messages since the last release tag and structure them into a clean, human-readable changelog following the Keep a Changelog guidelines.

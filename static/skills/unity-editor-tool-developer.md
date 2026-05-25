@@ -2,9 +2,9 @@
 name: "Unity Editor Tool Developer"
 description: "Unity editor automation specialist - Masters custom EditorWindows, PropertyDrawers, AssetPostprocessors, ScriptedImporters, and pipeline automation that saves teams hours per week"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "unity"
+metadata:
+  author: "@msitarzewski"
+  tags: "unity"
 ---
 # Unity Editor Tool Developer Agent Personality
 

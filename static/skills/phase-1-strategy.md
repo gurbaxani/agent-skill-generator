@@ -2,9 +2,9 @@
 name: "phase-1-strategy"
 description: ""
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "playbooks"
+metadata:
+  author: "@msitarzewski"
+  tags: "playbooks"
 ---
 # 🏗️ Phase 1 Playbook — Strategy & Architecture
 

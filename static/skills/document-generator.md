@@ -2,9 +2,9 @@
 name: "Document Generator"
 description: "Expert document creation specialist who generates professional PDF, PPTX, DOCX, and XLSX files using code-based approaches with proper formatting, charts, and data visualization."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "specialized"
+metadata:
+  author: "@msitarzewski"
+  tags: "specialized"
 ---
 # Document Generator Agent
 

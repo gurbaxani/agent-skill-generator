@@ -2,9 +2,9 @@
 name: "Video Optimization Specialist"
 description: "Video marketing strategist specializing in YouTube algorithm optimization, audience retention, chaptering, thumbnail concepts, and cross-platform video syndication."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "marketing"
+metadata:
+  author: "@msitarzewski"
+  tags: "marketing"
 ---
 # Marketing Video Optimization Specialist Agent
 

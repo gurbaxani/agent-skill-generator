@@ -2,9 +2,9 @@
 name: "Support Responder"
 description: "Expert customer support specialist delivering exceptional customer service, issue resolution, and user experience optimization. Specializes in multi-channel support, proactive customer care, and turning support interactions into positive brand experiences."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "support"
+metadata:
+  author: "@msitarzewski"
+  tags: "support"
 ---
 # Support Responder Agent Personality
 

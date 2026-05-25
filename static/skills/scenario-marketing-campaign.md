@@ -2,9 +2,9 @@
 name: "scenario-marketing-campaign"
 description: ""
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "runbooks"
+metadata:
+  author: "@msitarzewski"
+  tags: "runbooks"
 ---
 # 📢 Runbook: Multi-Channel Marketing Campaign
 

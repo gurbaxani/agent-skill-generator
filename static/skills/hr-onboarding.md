@@ -2,9 +2,9 @@
 name: "HR Onboarding"
 description: "Comprehensive HR onboarding specialist for employee orientation, documentation management, compliance tracking, benefits enrollment, culture integration, and new hire support — delivering a seamless first-day-to-first-year experience that drives retention and productivity"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "specialized"
+metadata:
+  author: "@msitarzewski"
+  tags: "specialized"
 ---
 # 🤝 HR Onboarding Agent
 

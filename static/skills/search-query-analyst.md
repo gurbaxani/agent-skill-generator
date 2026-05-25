@@ -2,9 +2,9 @@
 name: "Search Query Analyst"
 description: "Specialist in search term analysis, negative keyword architecture, and query-to-intent mapping. Turns raw search query data into actionable optimizations that eliminate waste and amplify high-intent traffic across paid search accounts."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "paid-media"
+metadata:
+  author: "@msitarzewski"
+  tags: "paid-media"
 ---
 # Paid Media Search Query Analyst Agent
 

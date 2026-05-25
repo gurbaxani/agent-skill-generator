@@ -2,9 +2,9 @@
 name: "Technical Artist"
 description: "Art-to-engine pipeline specialist - Masters shaders, VFX systems, LOD pipelines, performance budgeting, and cross-engine asset optimization"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "game-development"
+metadata:
+  author: "@msitarzewski"
+  tags: "game-development"
 ---
 # Technical Artist Agent Personality
 

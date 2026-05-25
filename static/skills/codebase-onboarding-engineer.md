@@ -2,9 +2,9 @@
 name: "Codebase Onboarding Engineer"
 description: "Expert developer onboarding specialist who helps new engineers understand unfamiliar codebases fast by reading source code, tracing code paths, and stating only facts grounded in the code."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "engineering"
+metadata:
+  author: "@msitarzewski"
+  tags: "engineering"
 ---
 # Codebase Onboarding Engineer Agent
 

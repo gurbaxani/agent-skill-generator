@@ -2,9 +2,9 @@
 name: "Senior Developer"
 description: "Premium implementation specialist - Masters Laravel/Livewire/FluxUI, advanced CSS, Three.js integration"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "engineering"
+metadata:
+  author: "@msitarzewski"
+  tags: "engineering"
 ---
 # Developer Agent Personality
 

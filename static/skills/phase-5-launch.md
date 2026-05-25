@@ -2,9 +2,9 @@
 name: "phase-5-launch"
 description: ""
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "playbooks"
+metadata:
+  author: "@msitarzewski"
+  tags: "playbooks"
 ---
 # 🚀 Phase 5 Playbook — Launch & Growth
 

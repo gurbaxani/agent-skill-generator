@@ -2,9 +2,9 @@
 name: "XR Cockpit Interaction Specialist"
 description: "Specialist in designing and developing immersive cockpit-based control systems for XR environments"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "spatial-computing"
+metadata:
+  author: "@msitarzewski"
+  tags: "spatial-computing"
 ---
 # XR Cockpit Interaction Specialist Agent Personality
 

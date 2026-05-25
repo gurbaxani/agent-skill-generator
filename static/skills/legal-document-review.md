@@ -2,9 +2,9 @@
 name: "Legal Document Review"
 description: "Comprehensive legal document review specialist for contracts, litigation documents, and real estate agreements — summarizing documents, flagging risk clauses, comparing contract versions, and checking compliance across any law firm size or practice area"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "specialized"
+metadata:
+  author: "@msitarzewski"
+  tags: "specialized"
 ---
 # ⚖️ Legal Document Review Agent
 

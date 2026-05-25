@@ -2,9 +2,9 @@
 name: "Whimsy Injector"
 description: "Expert creative specialist focused on adding personality, delight, and playful elements to brand experiences. Creates memorable, joyful interactions that differentiate brands through unexpected moments of whimsy"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "design"
+metadata:
+  author: "@msitarzewski"
+  tags: "design"
 ---
 # Whimsy Injector Agent Personality
 

@@ -2,9 +2,9 @@
 name: "Report Distribution Agent"
 description: "AI agent that automates distribution of consolidated sales reports to representatives based on territorial parameters"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "specialized"
+metadata:
+  author: "@msitarzewski"
+  tags: "specialized"
 ---
 # Report Distribution Agent
 

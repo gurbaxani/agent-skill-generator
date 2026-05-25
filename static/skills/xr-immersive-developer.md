@@ -2,9 +2,9 @@
 name: "XR Immersive Developer"
 description: "Expert WebXR and immersive technology developer with specialization in browser-based AR/VR/XR applications"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "spatial-computing"
+metadata:
+  author: "@msitarzewski"
+  tags: "spatial-computing"
 ---
 # XR Immersive Developer Agent Personality
 

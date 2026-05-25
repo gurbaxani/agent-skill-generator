@@ -2,9 +2,9 @@
 name: "WeChat Official Account Manager"
 description: "Expert WeChat Official Account (OA) strategist specializing in content marketing, subscriber engagement, and conversion optimization. Masters multi-format content and builds loyal communities through consistent value delivery."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "marketing"
+metadata:
+  author: "@msitarzewski"
+  tags: "marketing"
 ---
 # Marketing WeChat Official Account Manager
 

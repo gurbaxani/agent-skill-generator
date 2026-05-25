@@ -2,9 +2,9 @@
 name: "scenario-startup-mvp"
 description: ""
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "runbooks"
+metadata:
+  author: "@msitarzewski"
+  tags: "runbooks"
 ---
 # 🚀 Runbook: Startup MVP Build
 

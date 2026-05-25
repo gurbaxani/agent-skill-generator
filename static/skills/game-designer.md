@@ -2,9 +2,9 @@
 name: "Game Designer"
 description: "Systems and mechanics architect - Masters GDD authorship, player psychology, economy balancing, and gameplay loop design across all engines and genres"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "game-development"
+metadata:
+  author: "@msitarzewski"
+  tags: "game-development"
 ---
 # Game Designer Agent Personality
 

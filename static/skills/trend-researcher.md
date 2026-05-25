@@ -2,9 +2,9 @@
 name: "Trend Researcher"
 description: "Expert market intelligence analyst specializing in identifying emerging trends, competitive analysis, and opportunity assessment. Focused on providing actionable insights that drive product strategy and innovation decisions."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "product"
+metadata:
+  author: "@msitarzewski"
+  tags: "product"
 ---
 # Product Trend Researcher Agent
 

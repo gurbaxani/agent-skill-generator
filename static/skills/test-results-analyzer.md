@@ -2,9 +2,9 @@
 name: "Test Results Analyzer"
 description: "Expert test analysis specialist focused on comprehensive test result evaluation, quality metrics analysis, and actionable insight generation from testing activities"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "testing"
+metadata:
+  author: "@msitarzewski"
+  tags: "testing"
 ---
 # Test Results Analyzer Agent Personality
 

@@ -12,22 +12,24 @@ export function parseSkill(raw: string): Skill {
 	const skill: Skill = {
 		name: data.name !== undefined ? String(data.name) : '',
 		description: data.description !== undefined ? String(data.description) : '',
-		license: data.license !== undefined ? String(data.license) : '',
-		author: data.author !== undefined ? String(data.author) : '',
 		body: content.trim()
 	};
 
+	if (data.license !== undefined) {
+		skill.license = String(data.license);
+	}
 	if (data.compatibility !== undefined) {
 		skill.compatibility = String(data.compatibility);
 	}
 	if (data['allowed-tools'] !== undefined) {
 		skill.allowedTools = String(data['allowed-tools']);
 	}
-	if (data.version !== undefined) {
-		skill.version = String(data.version);
-	}
-	if (data.tags !== undefined) {
-		skill.tags = Array.isArray(data.tags) ? data.tags.map(String) : [String(data.tags)];
+	if (data.metadata !== undefined && data.metadata !== null) {
+		const metadata: Record<string, string> = {};
+		for (const [k, v] of Object.entries(data.metadata)) {
+			metadata[k] = String(v);
+		}
+		skill.metadata = metadata;
 	}
 
 	return skill;
@@ -38,38 +40,28 @@ export function parseSkill(raw: string): Skill {
  * Maps allowedTools back to 'allowed-tools', and omits undefined optional fields.
  */
 export function serializeSkill(skill: Skill): string {
-	const data: Record<string, unknown> = {
-		name: skill.name,
-		description: skill.description,
-		license: skill.license,
-		author: skill.author
-	};
+	const yamlLines: string[] = ['---'];
 
+	yamlLines.push(`name: ${escapeYamlValue(skill.name)}`);
+	yamlLines.push(`description: ${escapeYamlValue(skill.description)}`);
+
+	if (skill.license !== undefined) {
+		yamlLines.push(`license: ${escapeYamlValue(skill.license)}`);
+	}
 	if (skill.compatibility !== undefined) {
-		data.compatibility = skill.compatibility;
+		yamlLines.push(`compatibility: ${escapeYamlValue(skill.compatibility)}`);
 	}
 	if (skill.allowedTools !== undefined) {
-		data['allowed-tools'] = skill.allowedTools;
-	}
-	if (skill.version !== undefined) {
-		data.version = skill.version;
-	}
-	if (skill.tags !== undefined) {
-		data.tags = skill.tags;
+		yamlLines.push(`allowed-tools: ${escapeYamlValue(skill.allowedTools)}`);
 	}
 
-	const yamlLines: string[] = ['---'];
-	for (const [key, value] of Object.entries(data)) {
-		if (value === undefined || value === null) continue;
-		if (Array.isArray(value)) {
-			yamlLines.push(`${key}:`);
-			for (const item of value) {
-				yamlLines.push(`  - ${escapeYamlValue(String(item))}`);
-			}
-		} else {
-			yamlLines.push(`${key}: ${escapeYamlValue(String(value))}`);
+	if (skill.metadata !== undefined && Object.keys(skill.metadata).length > 0) {
+		yamlLines.push('metadata:');
+		for (const [key, value] of Object.entries(skill.metadata)) {
+			yamlLines.push(`  ${key}: ${escapeYamlValue(value)}`);
 		}
 	}
+
 	yamlLines.push('---');
 
 	return yamlLines.join('\n') + '\n' + skill.body;
@@ -83,33 +75,30 @@ function escapeYamlValue(str: string): string {
  * Converts a SkillDraftState form state object into a Skill object.
  */
 export function draftToSkill(draft: SkillDraftState): Skill {
-	const author = draft.metadata.find((m) => m.key === 'author')?.value || '';
-	const version = draft.metadata.find((m) => m.key === 'version')?.value || undefined;
-	const tagsEntry = draft.metadata.find((m) => m.key === 'tags' || m.key === 'tag');
-	let tags: string[] | undefined = undefined;
-	if (tagsEntry) {
-		tags = tagsEntry.value.split(',').map((t) => t.trim()).filter(Boolean);
-	}
-
 	const skill: Skill = {
 		name: draft.validName,
 		description: draft.description,
-		license: draft.license || 'MIT',
-		author: author,
 		body: draft.body
 	};
 
+	if (draft.license) {
+		skill.license = draft.license;
+	}
 	if (draft.compatibility) {
 		skill.compatibility = draft.compatibility;
 	}
 	if (draft.allowedTools) {
 		skill.allowedTools = draft.allowedTools;
 	}
-	if (version) {
-		skill.version = version;
+
+	const metadata: Record<string, string> = {};
+	for (const m of draft.metadata) {
+		if (m.key && m.value) {
+			metadata[m.key] = m.value;
+		}
 	}
-	if (tags) {
-		skill.tags = tags;
+	if (Object.keys(metadata).length > 0) {
+		skill.metadata = metadata;
 	}
 
 	return skill;

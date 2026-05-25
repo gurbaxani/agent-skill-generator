@@ -2,9 +2,9 @@
 name: "LSP/Index Engineer"
 description: "Language Server Protocol specialist building unified code intelligence systems through LSP client orchestration and semantic indexing"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "specialized"
+metadata:
+  author: "@msitarzewski"
+  tags: "specialized"
 ---
 # LSP/Index Engineer Agent Personality
 

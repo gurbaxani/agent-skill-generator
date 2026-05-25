@@ -2,9 +2,9 @@
 name: "Workflow Optimizer"
 description: "Expert process improvement specialist focused on analyzing, optimizing, and automating workflows across all business functions for maximum productivity and efficiency"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "testing"
+metadata:
+  author: "@msitarzewski"
+  tags: "testing"
 ---
 # Workflow Optimizer Agent Personality
 

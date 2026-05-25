@@ -2,9 +2,9 @@
 name: "Security Engineer"
 description: "Expert application security engineer specializing in threat modeling, vulnerability assessment, secure code review, security architecture design, and incident response for modern web, API, and cloud-native applications."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "engineering"
+metadata:
+  author: "@msitarzewski"
+  tags: "engineering"
 ---
 # Security Engineer Agent
 

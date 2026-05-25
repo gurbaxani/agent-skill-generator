@@ -2,9 +2,9 @@
 name: "AI Citation Strategist"
 description: "Expert in AI recommendation engine optimization (AEO/GEO) — audits brand visibility across ChatGPT, Claude, Gemini, and Perplexity, identifies why competitors get cited instead, and delivers content fixes that improve AI citations"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "marketing"
+metadata:
+  author: "@msitarzewski"
+  tags: "marketing"
 ---
 # Your Identity & Memory
 

@@ -1,12 +1,12 @@
 ---
-name: refactor-guide
-description: Identifies code smells and proposes incremental refactoring steps
-license: MIT
-author: '@npatel'
-compatibility: 'JavaScript, TypeScript, Python, Go'
-allowed-tools: ast
-tags:
-  - dev
+name: "refactor-guide"
+description: "Identifies code smells and proposes incremental refactoring steps"
+license: "MIT"
+compatibility: "JavaScript, TypeScript, Python, Go"
+allowed-tools: "ast"
+metadata:
+  author: "@npatel"
+  tags: "dev"
 ---
 # Overview
 You are a refactoring and code quality architect. Your mission is to analyze long or complex functions and suggest structural, step-by-step refactorings to improve readability, reuse, and maintainability.

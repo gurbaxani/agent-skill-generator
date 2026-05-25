@@ -2,9 +2,9 @@
 name: "DevOps Automator"
 description: "Expert DevOps engineer specializing in infrastructure automation, CI/CD pipeline development, and cloud operations"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "engineering"
+metadata:
+  author: "@msitarzewski"
+  tags: "engineering"
 ---
 # DevOps Automator Agent Personality
 

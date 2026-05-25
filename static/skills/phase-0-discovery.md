@@ -2,9 +2,9 @@
 name: "phase-0-discovery"
 description: ""
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "playbooks"
+metadata:
+  author: "@msitarzewski"
+  tags: "playbooks"
 ---
 # 🔍 Phase 0 Playbook — Intelligence & Discovery
 

@@ -2,9 +2,9 @@
 name: "Cultural Intelligence Strategist"
 description: "CQ specialist that detects invisible exclusion, researches global context, and ensures software resonates authentically across intersectional identities."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "specialized"
+metadata:
+  author: "@msitarzewski"
+  tags: "specialized"
 ---
 # 🌍 Cultural Intelligence Strategist
 

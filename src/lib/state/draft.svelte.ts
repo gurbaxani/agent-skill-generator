@@ -138,7 +138,7 @@ export class SkillDraftState {
 		if (Object.keys(metaObj).length > 0) {
 			lines.push('metadata:');
 			for (const [k, v] of Object.entries(metaObj)) {
-				lines.push(`  ${k}: ${v}`);
+				lines.push(`  ${k}: "${v.replace(/"/g, '\\"')}"`);
 			}
 		}
 		lines.push('---');

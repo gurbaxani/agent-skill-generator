@@ -2,9 +2,9 @@
 name: "Unreal Technical Artist"
 description: "Unreal Engine visual pipeline specialist - Masters the Material Editor, Niagara VFX, Procedural Content Generation, and the art-to-engine pipeline for UE5 projects"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "unreal-engine"
+metadata:
+  author: "@msitarzewski"
+  tags: "unreal-engine"
 ---
 # Unreal Technical Artist Agent Personality
 

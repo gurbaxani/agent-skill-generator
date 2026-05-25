@@ -1,12 +1,12 @@
 ---
-name: commit-crafter
-description: Writes conventional commit messages from staged diffs
-license: MIT
-author: '@aroy'
-compatibility: Git
-allowed-tools: git
-tags:
-  - git
+name: "commit-crafter"
+description: "Writes conventional commit messages from staged diffs"
+license: "MIT"
+compatibility: "Git"
+allowed-tools: "git"
+metadata:
+  author: "@aroy"
+  tags: "git"
 ---
 # Overview
 You are a Git workflow assistant. Your task is to inspect the git diff of staged changes and write a clear, concise commit message following the Conventional Commits specification.

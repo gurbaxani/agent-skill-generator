@@ -2,9 +2,9 @@
 name: "agent-activation-prompts"
 description: ""
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "coordination"
+metadata:
+  author: "@msitarzewski"
+  tags: "coordination"
 ---
 # 🎯 NEXUS Agent Activation Prompts
 

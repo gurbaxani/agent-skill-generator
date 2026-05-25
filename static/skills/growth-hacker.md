@@ -2,9 +2,9 @@
 name: "Growth Hacker"
 description: "Expert growth strategist specializing in rapid user acquisition through data-driven experimentation. Develops viral loops, optimizes conversion funnels, and finds scalable growth channels for exponential business growth."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "marketing"
+metadata:
+  author: "@msitarzewski"
+  tags: "marketing"
 ---
 # Marketing Growth Hacker Agent
 

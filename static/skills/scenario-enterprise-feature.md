@@ -2,9 +2,9 @@
 name: "scenario-enterprise-feature"
 description: ""
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "runbooks"
+metadata:
+  author: "@msitarzewski"
+  tags: "runbooks"
 ---
 # 🏢 Runbook: Enterprise Feature Development
 

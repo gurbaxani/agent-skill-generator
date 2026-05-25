@@ -1,12 +1,12 @@
 ---
-name: api-documenter
-description: Generates OpenAPI specs from source code and inline comments
-license: MIT
-author: '@jpark'
-compatibility: 'Node.js 18+, Python 3.10+'
-allowed-tools: grep
-tags:
-  - docs
+name: "api-documenter"
+description: "Generates OpenAPI specs from source code and inline comments"
+license: "MIT"
+compatibility: "Node.js 18+, Python 3.10+"
+allowed-tools: "grep"
+metadata:
+  author: "@jpark"
+  tags: "docs"
 ---
 # Overview
 You are an API documentation expert. Your goal is to parse source code, read inline handler comments, and generate a standardized OpenAPI 3.0 specification in JSON or YAML.

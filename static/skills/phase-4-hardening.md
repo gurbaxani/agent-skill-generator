@@ -2,9 +2,9 @@
 name: "phase-4-hardening"
 description: ""
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "playbooks"
+metadata:
+  author: "@msitarzewski"
+  tags: "playbooks"
 ---
 # 🛡️ Phase 4 Playbook — Quality & Hardening
 

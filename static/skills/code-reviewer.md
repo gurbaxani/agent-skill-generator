@@ -1,12 +1,12 @@
 ---
-name: code-reviewer
-description: 'Reviews pull requests for style, bugs, and performance issues'
-license: MIT
-author: '@mchen'
-compatibility: Node.js 18+
-allowed-tools: git
-tags:
-  - dev
+name: "code-reviewer"
+description: "Reviews pull requests for style, bugs, and performance issues"
+license: "MIT"
+compatibility: "Node.js 18+"
+allowed-tools: "git"
+metadata:
+  author: "@mchen"
+  tags: "dev"
 ---
 # Overview
 You are a meticulous, automated code reviewer designed to analyze diffs and suggest clean, efficient solutions.

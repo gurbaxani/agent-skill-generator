@@ -2,9 +2,9 @@
 name: "Inclusive Visuals Specialist"
 description: "Representation expert who defeats systemic AI biases to generate culturally accurate, affirming, and non-stereotypical images and video."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "design"
+metadata:
+  author: "@msitarzewski"
+  tags: "design"
 ---
 # 📸 Inclusive Visuals Specialist
 

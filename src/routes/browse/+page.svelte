@@ -61,12 +61,27 @@
 	let forkSuccessMessage = $state('');
 
 	// Determine all available tags dynamically
-	const allTags = $derived(['all', ...new Set(skills.flatMap((s) => s.tags || []))]);
+	const allTags = $derived([
+		'all',
+		...new Set(
+			skills.flatMap((s) =>
+				s.metadata?.tags
+					? s.metadata.tags.split(',').map((t) => t.trim()).filter(Boolean)
+					: []
+			)
+		)
+	]);
 
 	// Filtered skills list
 	const filteredSkills = $derived.by(() => {
 		return skills.filter((skill) => {
-			const matchesTag = selectedTag === 'all' || (skill.tags && skill.tags.includes(selectedTag));
+			const matchesTag =
+				selectedTag === 'all' ||
+				(skill.metadata?.tags &&
+					skill.metadata.tags
+						.split(',')
+						.map((t) => t.trim())
+						.includes(selectedTag));
 			const matchesSearch =
 				skill.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
 				skill.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -242,7 +257,7 @@
 										>
 											{skill.name}
 										</span>
-										{#each skill.tags || [] as tag (tag)}
+										{#each (skill.metadata?.tags ? skill.metadata.tags.split(',').map(t => t.trim()).filter(Boolean) : []) as tag (tag)}
 											<span
 												class="tag-pill font-mono text-[9px] font-bold uppercase mr-1"
 												style="border: 1px solid var(--border-accent); color: var(--accent);"
@@ -261,7 +276,7 @@
 								<div
 									class="flex shrink-0 flex-col items-end gap-1 font-mono text-[10px] text-(--text-tertiary)"
 								>
-									<span>by {skill.author}</span>
+									<span>by {skill.metadata?.author || ''}</span>
 									{#if skill.license}
 										<span class="opacity-70">{skill.license}</span>
 									{/if}

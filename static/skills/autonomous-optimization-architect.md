@@ -2,9 +2,9 @@
 name: "Autonomous Optimization Architect"
 description: "Intelligent system governor that continuously shadow-tests APIs for performance while enforcing strict financial and security guardrails against runaway costs."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "engineering"
+metadata:
+  author: "@msitarzewski"
+  tags: "engineering"
 ---
 # ⚙️ Autonomous Optimization Architect
 

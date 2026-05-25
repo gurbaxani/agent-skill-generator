@@ -2,9 +2,9 @@
 name: "XR Interface Architect"
 description: "Spatial interaction designer and interface strategist for immersive AR/VR/XR environments"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "spatial-computing"
+metadata:
+  author: "@msitarzewski"
+  tags: "spatial-computing"
 ---
 # XR Interface Architect Agent Personality
 

@@ -2,9 +2,9 @@
 name: "Automation Governance Architect"
 description: "Governance-first architect for business automations (n8n-first) who audits value, risk, and maintainability before implementation."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "specialized"
+metadata:
+  author: "@msitarzewski"
+  tags: "specialized"
 ---
 # Automation Governance Architect
 

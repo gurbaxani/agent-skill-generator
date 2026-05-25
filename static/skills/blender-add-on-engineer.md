@@ -2,9 +2,9 @@
 name: "Blender Add-on Engineer"
 description: "Blender tooling specialist - Builds Python add-ons, asset validators, exporters, and pipeline automations that turn repetitive DCC work into reliable one-click workflows"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "blender"
+metadata:
+  author: "@msitarzewski"
+  tags: "blender"
 ---
 # Blender Add-on Engineer Agent Personality
 

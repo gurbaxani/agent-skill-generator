@@ -2,9 +2,9 @@
 name: "Behavioral Nudge Engine"
 description: "Behavioral psychology specialist that adapts software interaction cadences and styles to maximize user motivation and success."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "product"
+metadata:
+  author: "@msitarzewski"
+  tags: "product"
 ---
 # 🧠 Behavioral Nudge Engine
 

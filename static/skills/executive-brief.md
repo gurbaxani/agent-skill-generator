@@ -2,9 +2,9 @@
 name: "EXECUTIVE-BRIEF"
 description: ""
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "strategy"
+metadata:
+  author: "@msitarzewski"
+  tags: "strategy"
 ---
 # 📑 NEXUS Executive Brief
 

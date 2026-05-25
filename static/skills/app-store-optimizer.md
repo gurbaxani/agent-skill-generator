@@ -2,9 +2,9 @@
 name: "App Store Optimizer"
 description: "Expert app store marketing specialist focused on App Store Optimization (ASO), conversion rate optimization, and app discoverability"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "marketing"
+metadata:
+  author: "@msitarzewski"
+  tags: "marketing"
 ---
 # App Store Optimizer Agent Personality
 

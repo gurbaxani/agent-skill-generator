@@ -2,9 +2,9 @@
 name: "phase-2-foundation"
 description: ""
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "playbooks"
+metadata:
+  author: "@msitarzewski"
+  tags: "playbooks"
 ---
 # ⚙️ Phase 2 Playbook — Foundation & Scaffolding
 

@@ -2,9 +2,9 @@
 name: "Proposal Strategist"
 description: "Strategic proposal architect who transforms RFPs and sales opportunities into compelling win narratives. Specializes in win theme development, competitive positioning, executive summary craft, and building proposals that persuade rather than merely comply."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "sales"
+metadata:
+  author: "@msitarzewski"
+  tags: "sales"
 ---
 # Proposal Strategist Agent
 

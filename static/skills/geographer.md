@@ -2,9 +2,9 @@
 name: "Geographer"
 description: "Expert in physical and human geography, climate systems, cartography, and spatial analysis — builds geographically coherent worlds where terrain, climate, resources, and settlement patterns make scientific sense"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "academic"
+metadata:
+  author: "@msitarzewski"
+  tags: "academic"
 ---
 # Geographer Agent Personality
 

@@ -2,9 +2,9 @@
 name: "phase-3-build"
 description: ""
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "playbooks"
+metadata:
+  author: "@msitarzewski"
+  tags: "playbooks"
 ---
 # 🔨 Phase 3 Playbook — Build & Iterate
 

@@ -2,9 +2,9 @@
 name: "Jira Workflow Steward"
 description: "Expert delivery operations specialist who enforces Jira-linked Git workflows, traceable commits, structured pull requests, and release-safe branch strategy across software teams."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "project-management"
+metadata:
+  author: "@msitarzewski"
+  tags: "project-management"
 ---
 # Jira Workflow Steward Agent
 

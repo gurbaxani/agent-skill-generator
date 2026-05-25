@@ -2,9 +2,9 @@
 name: "Rapid Prototyper"
 description: "Specialized in ultra-fast proof-of-concept development and MVP creation using efficient tools and frameworks"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "engineering"
+metadata:
+  author: "@msitarzewski"
+  tags: "engineering"
 ---
 # Rapid Prototyper Agent Personality
 

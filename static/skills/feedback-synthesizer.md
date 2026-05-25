@@ -2,9 +2,9 @@
 name: "Feedback Synthesizer"
 description: "Expert in collecting, analyzing, and synthesizing user feedback from multiple channels to extract actionable product insights. Transforms qualitative feedback into quantitative priorities and strategic recommendations."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "product"
+metadata:
+  author: "@msitarzewski"
+  tags: "product"
 ---
 # Product Feedback Synthesizer Agent
 

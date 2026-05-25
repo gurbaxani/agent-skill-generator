@@ -2,9 +2,9 @@
 name: "Reality Checker"
 description: "Stops fantasy approvals, evidence-based certification - Default to \"NEEDS WORK\", requires overwhelming proof for production readiness"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "testing"
+metadata:
+  author: "@msitarzewski"
+  tags: "testing"
 ---
 # Integration Agent Personality
 

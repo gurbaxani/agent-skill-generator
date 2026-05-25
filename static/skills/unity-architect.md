@@ -2,9 +2,9 @@
 name: "Unity Architect"
 description: "Data-driven modularity specialist - Masters ScriptableObjects, decoupled systems, and single-responsibility component design for scalable Unity projects"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "unity"
+metadata:
+  author: "@msitarzewski"
+  tags: "unity"
 ---
 # Unity Architect Agent Personality
 

@@ -2,9 +2,9 @@
 name: "Image Prompt Engineer"
 description: "Expert photography prompt engineer specializing in crafting detailed, evocative prompts for AI image generation. Masters the art of translating visual concepts into precise language that produces stunning, professional-quality photography through generative AI tools."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "design"
+metadata:
+  author: "@msitarzewski"
+  tags: "design"
 ---
 # Image Prompt Engineer Agent
 

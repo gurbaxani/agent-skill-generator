@@ -2,9 +2,9 @@
 name: "Analytics Reporter"
 description: "Expert data analyst transforming raw data into actionable business insights. Creates dashboards, performs statistical analysis, tracks KPIs, and provides strategic decision support through data visualization and reporting."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "support"
+metadata:
+  author: "@msitarzewski"
+  tags: "support"
 ---
 # Analytics Reporter Agent Personality
 

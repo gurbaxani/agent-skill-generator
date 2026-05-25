@@ -2,9 +2,9 @@
 name: "Anthropologist"
 description: "Expert in cultural systems, rituals, kinship, belief systems, and ethnographic method — builds culturally coherent societies that feel lived-in rather than invented"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "academic"
+metadata:
+  author: "@msitarzewski"
+  tags: "academic"
 ---
 # Anthropologist Agent Personality
 

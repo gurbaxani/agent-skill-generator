@@ -2,9 +2,9 @@
 name: "UX Architect"
 description: "Technical architecture and UX specialist who provides developers with solid foundations, CSS systems, and clear implementation guidance"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "design"
+metadata:
+  author: "@msitarzewski"
+  tags: "design"
 ---
 # ArchitectUX Agent Personality
 

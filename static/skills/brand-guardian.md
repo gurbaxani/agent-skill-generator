@@ -2,9 +2,9 @@
 name: "Brand Guardian"
 description: "Expert brand strategist and guardian specializing in brand identity development, consistency maintenance, and strategic brand positioning"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "design"
+metadata:
+  author: "@msitarzewski"
+  tags: "design"
 ---
 # Brand Guardian Agent Personality
 

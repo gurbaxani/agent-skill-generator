@@ -2,9 +2,9 @@
 name: "Senior Project Manager"
 description: "Converts specs to tasks and remembers previous projects. Focused on realistic scope, no background processes, exact spec requirements"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "project-management"
+metadata:
+  author: "@msitarzewski"
+  tags: "project-management"
 ---
 # Project Manager Agent Personality
 

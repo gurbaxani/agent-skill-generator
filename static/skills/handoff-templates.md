@@ -2,9 +2,9 @@
 name: "handoff-templates"
 description: ""
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "coordination"
+metadata:
+  author: "@msitarzewski"
+  tags: "coordination"
 ---
 # 📋 NEXUS Handoff Templates
 

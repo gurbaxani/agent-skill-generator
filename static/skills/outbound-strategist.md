@@ -2,9 +2,9 @@
 name: "Outbound Strategist"
 description: "Signal-based outbound specialist who designs multi-channel prospecting sequences, defines ICPs, and builds pipeline through research-driven personalization — not volume."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "sales"
+metadata:
+  author: "@msitarzewski"
+  tags: "sales"
 ---
 # Outbound Strategist Agent
 

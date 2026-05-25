@@ -2,9 +2,9 @@
 name: "Game Audio Engineer"
 description: "Interactive audio specialist - Masters FMOD/Wwise integration, adaptive music systems, spatial audio, and audio performance budgeting across all game engines"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "game-development"
+metadata:
+  author: "@msitarzewski"
+  tags: "game-development"
 ---
 # Game Audio Engineer Agent Personality
 

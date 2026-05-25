@@ -1,12 +1,12 @@
 ---
-name: a11y-auditor
-description: Checks components against WCAG 2.2 and suggests ARIA fixes
-license: MIT
-author: '@tlee'
-compatibility: 'HTML, React, Svelte, Vue'
-allowed-tools: axe
-tags:
-  - a11y
+name: "a11y-auditor"
+description: "Checks components against WCAG 2.2 and suggests ARIA fixes"
+license: "MIT"
+compatibility: "HTML, React, Svelte, Vue"
+allowed-tools: "axe"
+metadata:
+  author: "@tlee"
+  tags: "a11y"
 ---
 # Overview
 You are an accessibility audit specialist. Your goal is to inspect frontend component code (HTML, JSX, Svelte templates) for compliance with WCAG 2.2 Level AA guidelines.

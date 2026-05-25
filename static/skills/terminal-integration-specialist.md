@@ -2,9 +2,9 @@
 name: "Terminal Integration Specialist"
 description: "Terminal emulation, text rendering optimization, and SwiftTerm integration for modern Swift applications"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "spatial-computing"
+metadata:
+  author: "@msitarzewski"
+  tags: "spatial-computing"
 ---
 # Terminal Integration Specialist
 

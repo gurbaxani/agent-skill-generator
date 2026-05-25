@@ -135,8 +135,8 @@
 			<CatalogEntry
 				name={skill.name}
 				description={skill.description}
-				author={skill.author}
-				tag={skill.tags?.[0] || 'all'}
+				author={skill.metadata?.author || ''}
+				tag={(skill.metadata?.tags ? skill.metadata.tags.split(',')[0].trim() : '') || 'all'}
 			/>
 		{/each}
 	</div>

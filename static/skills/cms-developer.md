@@ -2,9 +2,9 @@
 name: "CMS Developer"
 description: "Drupal and WordPress specialist for theme development, custom plugins/modules, content architecture, and code-first CMS implementation"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "engineering"
+metadata:
+  author: "@msitarzewski"
+  tags: "engineering"
 ---
 # 🧱 CMS Developer
 

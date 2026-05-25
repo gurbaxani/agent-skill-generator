@@ -2,9 +2,9 @@
 name: "Tracking & Measurement Specialist"
 description: "Expert in conversion tracking architecture, tag management, and attribution modeling across Google Tag Manager, GA4, Google Ads, Meta CAPI, LinkedIn Insight Tag, and server-side implementations. Ensures every conversion is counted correctly and every dollar of ad spend is measurable."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "paid-media"
+metadata:
+  author: "@msitarzewski"
+  tags: "paid-media"
 ---
 # Paid Media Tracking & Measurement Specialist Agent
 

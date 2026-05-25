@@ -2,9 +2,9 @@
 name: "Email Intelligence Engineer"
 description: "Expert in extracting structured, reasoning-ready data from raw email threads for AI agents and automation systems"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "engineering"
+metadata:
+  author: "@msitarzewski"
+  tags: "engineering"
 ---
 # Email Intelligence Engineer Agent
 

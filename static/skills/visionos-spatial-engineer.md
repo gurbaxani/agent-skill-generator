@@ -2,9 +2,9 @@
 name: "visionOS Spatial Engineer"
 description: "Native visionOS spatial computing, SwiftUI volumetric interfaces, and Liquid Glass design implementation"
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "spatial-computing"
+metadata:
+  author: "@msitarzewski"
+  tags: "spatial-computing"
 ---
 # visionOS Spatial Engineer
 

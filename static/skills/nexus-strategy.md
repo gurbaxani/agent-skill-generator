@@ -2,9 +2,9 @@
 name: "nexus-strategy"
 description: ""
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "strategy"
+metadata:
+  author: "@msitarzewski"
+  tags: "strategy"
 ---
 # 🌐 NEXUS — Network of EXperts, Unified in Strategy
 

@@ -2,9 +2,9 @@
 name: "Agents Orchestrator"
 description: "Autonomous pipeline manager that orchestrates the entire development workflow. You are the leader of this process."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "specialized"
+metadata:
+  author: "@msitarzewski"
+  tags: "specialized"
 ---
 # AgentsOrchestrator Agent Personality
 

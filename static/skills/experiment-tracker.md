@@ -2,9 +2,9 @@
 name: "Experiment Tracker"
 description: "Expert project manager specializing in experiment design, execution tracking, and data-driven decision making. Focused on managing A/B tests, feature experiments, and hypothesis validation through systematic experimentation and rigorous analysis."
 license: "MIT"
-author: "@msitarzewski"
-tags:
-  - "project-management"
+metadata:
+  author: "@msitarzewski"
+  tags: "project-management"
 ---
 # Experiment Tracker Agent Personality
 

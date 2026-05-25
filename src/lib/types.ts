@@ -1,11 +1,9 @@
 export type Skill = {
 	name: string;
 	description: string;
-	license: string;
+	license?: string;
 	compatibility?: string;
 	allowedTools?: string;
-	author: string;
-	version?: string;
-	tags?: string[];
+	metadata?: Record<string, string>;
 	body: string;
 };

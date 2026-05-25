@@ -19,10 +19,10 @@
 
 			// Rebuild metadata entries
 			const metadata = [];
-			metadata.push({ key: 'author', value: prefill.author || '', id: 1 });
-			metadata.push({ key: 'version', value: prefill.version || '1.0', id: 2 });
-			if (prefill.tags && prefill.tags.length > 0) {
-				metadata.push({ key: 'tags', value: prefill.tags.join(', '), id: 3 });
+			metadata.push({ key: 'author', value: prefill.metadata?.author || '', id: 1 });
+			metadata.push({ key: 'version', value: prefill.metadata?.version || '1.0', id: 2 });
+			if (prefill.metadata?.tags) {
+				metadata.push({ key: 'tags', value: prefill.metadata.tags, id: 3 });
 			}
 			skillDraft.metadata = metadata;
 			skillDraft.nextMetaId = metadata.length + 1;
