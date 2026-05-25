@@ -43,6 +43,7 @@ export async function publishSkill(skill: Skill, token: string): Promise<string>
 		body: JSON.stringify({
 			message: `Add community skill: ${skill.name} by @${authorClean}`,
 			content: base64Content,
+			branch: 'trunk',
 			...(existingSha ? { sha: existingSha } : {})
 		})
 	});
