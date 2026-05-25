@@ -58,7 +58,25 @@ export function serializeSkill(skill: Skill): string {
 		data.tags = skill.tags;
 	}
 
-	return matter.stringify(skill.body, data);
+	const yamlLines: string[] = ['---'];
+	for (const [key, value] of Object.entries(data)) {
+		if (value === undefined || value === null) continue;
+		if (Array.isArray(value)) {
+			yamlLines.push(`${key}:`);
+			for (const item of value) {
+				yamlLines.push(`  - ${escapeYamlValue(String(item))}`);
+			}
+		} else {
+			yamlLines.push(`${key}: ${escapeYamlValue(String(value))}`);
+		}
+	}
+	yamlLines.push('---');
+
+	return yamlLines.join('\n') + '\n' + skill.body;
+}
+
+function escapeYamlValue(str: string): string {
+	return '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n') + '"';
 }
 
 /**
