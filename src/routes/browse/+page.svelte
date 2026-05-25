@@ -8,9 +8,40 @@
 	import { serializeSkill } from '$lib/parse-skill';
 	import { marked } from 'marked';
 	import type { PageData } from './$types';
+	import { githubAuth } from '$lib/state/github-auth.svelte';
+	import { publishSkill } from '$lib/github-publish';
+	import { env } from '$env/dynamic/public';
 
 	let { data }: { data: PageData } = $props();
 	const skills = $derived(data.skills);
+
+	// ── Publish flow states ───────────────────────────────────────────────
+	let isPublishing = $state(false);
+	let publishUrl = $state('');
+	let publishError = $state('');
+
+	function handleGithubLogin() {
+		const clientId = env.PUBLIC_GITHUB_CLIENT_ID || 'Ov23lizpwtl9Z3J66Q2E';
+		const scope = 'public_repo';
+		const redirectUri = window.location.href;
+		window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=${scope}&redirect_uri=${encodeURIComponent(redirectUri)}`;
+	}
+
+	async function handlePublish(skill: Skill) {
+		if (!githubAuth.token) return;
+		isPublishing = true;
+		publishError = '';
+		publishUrl = '';
+		try {
+			const url = await publishSkill(skill, githubAuth.token);
+			publishUrl = url;
+		} catch (e: unknown) {
+			const message = e instanceof Error ? e.message : String(e);
+			publishError = message;
+		} finally {
+			isPublishing = false;
+		}
+	}
 
 	// ── Filter & Search State ───────────────────────────────────────────────
 	let searchQuery = $state('');
@@ -295,23 +326,66 @@
 					</div>
 
 					<!-- Action CTAs -->
-					<div class="flex flex-col gap-3 sm:flex-row">
-						<button
-							type="button"
-							onclick={() => handleDownload(selectedSkill)}
-							style="border: 1px solid var(--accent); color: var(--accent); font-family: var(--font-display);"
-							class="flex w-full items-center justify-center gap-2 rounded-[2px] py-4 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-glow) focus:outline-none"
-						>
-							<i class="bi bi-download" aria-hidden="true"></i> Download Skill
-						</button>
-						<button
-							type="button"
-							onclick={() => handleFork(selectedSkill)}
-							style="background: var(--accent); color: var(--accent-fg); font-family: var(--font-display);"
-							class="flex w-full items-center justify-center gap-2 rounded-[2px] py-4 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_15px_var(--accent-glow)] focus:outline-none"
-						>
-							<i class="bi bi-git" aria-hidden="true"></i> Fork & Customize
-						</button>
+					<div class="flex flex-col gap-3">
+						<div class="flex flex-col gap-3 sm:flex-row">
+							<button
+								type="button"
+								onclick={() => handleDownload(selectedSkill)}
+								style="border: 1px solid var(--accent); color: var(--accent); font-family: var(--font-display);"
+								class="flex w-full items-center justify-center gap-2 rounded-[2px] py-4 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-glow) focus:outline-none"
+							>
+								<i class="bi bi-download" aria-hidden="true"></i> Download Skill
+							</button>
+							<button
+								type="button"
+								onclick={() => handleFork(selectedSkill)}
+								style="background: var(--accent); color: var(--accent-fg); font-family: var(--font-display);"
+								class="flex w-full items-center justify-center gap-2 rounded-[2px] py-4 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_15px_var(--accent-glow)] focus:outline-none"
+							>
+								<i class="bi bi-git" aria-hidden="true"></i> Fork & Customize
+							</button>
+						</div>
+
+						<!-- GitHub Publish Flow -->
+						<div class="mt-2 border-t border-(--border-default) pt-4">
+							{#if githubAuth.token}
+								{#if publishUrl}
+									<div class="cyber-panel p-4 text-center" style="background: var(--surface-sunken); border-color: var(--accent);">
+										<p class="text-xs text-(--text-primary) font-mono">Skill published successfully!</p>
+										<p class="mt-1 font-mono text-[10px] text-(--text-secondary) break-all">{publishUrl}</p>
+										<a href={publishUrl} target="_blank" rel="noopener noreferrer" class="mt-2 inline-flex items-center gap-1 text-xs text-(--accent) underline hover:text-(--accent-hover)">
+											<i class="bi bi-link-45deg"></i> View on GitHub
+										</a>
+									</div>
+								{:else}
+									<button
+										type="button"
+										onclick={() => handlePublish(selectedSkill)}
+										disabled={isPublishing}
+										style="background: var(--accent); color: var(--accent-fg); font-family: var(--font-display);"
+										class="flex w-full items-center justify-center gap-2 rounded-[2px] py-4 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_15px_var(--accent-glow)] focus:outline-none disabled:opacity-50"
+									>
+										{#if isPublishing}
+											<i class="bi bi-cpu animate-spin"></i> Publishing...
+										{:else}
+											<i class="bi bi-cloud-arrow-up"></i> Publish to Registry
+										{/if}
+									</button>
+								{/if}
+							{:else}
+								<button
+									type="button"
+									onclick={handleGithubLogin}
+									style="border: 1px solid var(--border-strong); color: var(--text-secondary); font-family: var(--font-display);"
+									class="flex w-full items-center justify-center gap-2 rounded-[2px] py-4 text-xs font-bold tracking-widest uppercase transition-all hover:border-(--accent) hover:text-(--accent) focus:outline-none"
+								>
+									<i class="bi bi-github"></i> Login with GitHub to Publish
+								</button>
+							{/if}
+							{#if publishError}
+								<p class="mt-2 text-center text-xs font-mono text-(--secondary)">[Error] {publishError}</p>
+							{/if}
+						</div>
 					</div>
 				</div>
 			{:else}

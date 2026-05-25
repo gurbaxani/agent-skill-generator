@@ -12,8 +12,48 @@
 	import './layout.css';
 	import favicon from '$lib/assets/asg.svg';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
+	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { githubAuth } from '$lib/state/github-auth.svelte';
 
 	let { children } = $props();
+
+	onMount(async () => {
+		const url = new URL(window.location.href);
+		const code = url.searchParams.get('code');
+		if (code) {
+			try {
+				const res = await fetch('/api/auth/token', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ code })
+				});
+				if (res.ok) {
+					const data = await res.json();
+					if (data.access_token) {
+						githubAuth.token = data.access_token;
+						// Fetch user profile
+						const userRes = await fetch('https://api.github.com/user', {
+							headers: {
+								Authorization: `Bearer ${data.access_token}`
+							}
+						});
+						if (userRes.ok) {
+							const userData = await userRes.json();
+							githubAuth.username = userData.login;
+						}
+					}
+				}
+			} catch (e) {
+				console.error('Failed to exchange authorization code:', e);
+			} finally {
+				url.searchParams.delete('code');
+				goto(url.pathname + url.search, { replaceState: true, keepFocus: true });
+			}
+		}
+	});
 </script>
 
 <svelte:head>

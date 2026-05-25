@@ -415,46 +415,36 @@ Output ONLY the JSON, nothing else.`;
 		}
 	}
 
-	// ── GitHub Submission ─────────────────────────────────────────
-	import { serializeSkillToRegistry } from '$lib/utils/github';
+	// ── GitHub Publishing ─────────────────────────────────────────
+	import { githubAuth } from '$lib/state/github-auth.svelte';
+	import { publishSkill } from '$lib/github-publish';
+	import { env } from '$env/dynamic/public';
 
-	let isSubmitModalOpen = $state(false);
-	let githubUsername = $state('');
-	let isSubmitting = $state(false);
-	let submitErrorMsg = $state('');
-	let prSubmitSuccessUrl = $state('');
+	let isPublishing = $state(false);
+	let publishUrl = $state('');
+	let publishErrorMsg = $state('');
 
-	async function handleSubmitToGithub() {
-		if (!githubUsername.trim()) return;
-		isSubmitting = true;
-		submitErrorMsg = '';
+	function handleGithubLogin() {
+		const clientId = env.PUBLIC_GITHUB_CLIENT_ID || 'Ov23lizpwtl9Z3J66Q2E';
+		const scope = 'public_repo';
+		const redirectUri = window.location.origin + window.location.pathname;
+		window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=${scope}&redirect_uri=${encodeURIComponent(redirectUri)}`;
+	}
+
+	async function handlePublish() {
+		if (!githubAuth.token) return;
+		isPublishing = true;
+		publishErrorMsg = '';
+		publishUrl = '';
 		try {
-			const registrySkill = await serializeSkillToRegistry(skillDraft, githubUsername);
-
-			const response = await fetch('/api/submit-pr', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					skill: registrySkill,
-					authorUsername: githubUsername
-				})
-			});
-
-			const result = await response.json();
-
-			if (!response.ok) {
-				throw new Error(result.error || `HTTP error ${response.status}`);
-			}
-
-			prSubmitSuccessUrl = result.prUrl;
-			isSubmitModalOpen = false;
-		} catch (err) {
-			console.error(err);
-			submitErrorMsg = err instanceof Error ? err.message : 'Failed to submit Pull Request.';
+			const skill = draftToSkill(skillDraft);
+			const url = await publishSkill(skill, githubAuth.token);
+			publishUrl = url;
+		} catch (e: unknown) {
+			const message = e instanceof Error ? e.message : String(e);
+			publishErrorMsg = message;
 		} finally {
-			isSubmitting = false;
+			isPublishing = false;
 		}
 	}
 </script>
@@ -1279,15 +1269,45 @@ Output ONLY the JSON, nothing else.`;
 					<i class="bi bi-arrow-left" aria-hidden="true"></i> Back
 				</button>
 				<div class="flex items-center gap-3">
-					<button
-						type="button"
-						id="btn-submit-github"
-						onclick={() => (isSubmitModalOpen = true)}
-						style="border: 1px solid var(--accent); color: var(--accent); font-family: var(--font-display); border-radius: 2px;"
-						class="flex items-center justify-center gap-2 px-6 py-3.5 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-glow) focus:outline-none"
-					>
-						<i class="bi bi-github" aria-hidden="true"></i> Submit to GitHub
-					</button>
+					{#if publishUrl}
+						<div class="cyber-panel p-4 text-center mr-3" style="background: var(--surface-sunken); border-color: var(--accent); max-width: 320px; border-radius: 2px;">
+							<p class="text-xs text-(--text-primary) font-mono">Skill published successfully!</p>
+							<p class="mt-1 font-mono text-[10px] text-(--text-secondary) break-all">{publishUrl}</p>
+							<a href={publishUrl} target="_blank" rel="noopener noreferrer" class="mt-2 inline-flex items-center gap-1 text-xs text-(--accent) underline hover:text-(--accent-hover)">
+								<i class="bi bi-link-45deg"></i> View on GitHub
+							</a>
+						</div>
+					{:else}
+						{#if githubAuth.token}
+							<button
+								type="button"
+								id="btn-submit-github"
+								onclick={handlePublish}
+								disabled={isPublishing}
+								style="background: var(--accent); color: var(--accent-fg); font-family: var(--font-display); border-radius: 2px;"
+								class="flex items-center justify-center gap-2 px-6 py-3.5 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_15px_var(--accent-glow)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
+							>
+								{#if isPublishing}
+									<i class="bi bi-cpu animate-spin" aria-hidden="true"></i> Publishing...
+								{:else}
+									<i class="bi bi-cloud-arrow-up" aria-hidden="true"></i> Publish to Registry
+								{/if}
+							</button>
+						{:else}
+							<button
+								type="button"
+								id="btn-submit-github"
+								onclick={handleGithubLogin}
+								style="border: 1px solid var(--accent); color: var(--accent); font-family: var(--font-display); border-radius: 2px;"
+								class="flex items-center justify-center gap-2 px-6 py-3.5 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-glow) focus:outline-none"
+							>
+								<i class="bi bi-github" aria-hidden="true"></i> Login to Publish
+							</button>
+						{/if}
+					{/if}
+					{#if publishErrorMsg}
+						<span class="text-xs font-mono text-(--secondary)">[Error] {publishErrorMsg}</span>
+					{/if}
 					<button
 						type="button"
 						id="btn-finish"
@@ -1305,163 +1325,6 @@ Output ONLY the JSON, nothing else.`;
 			</div>
 		</div>
 	</div>
-
-	<!-- GitHub Submission Modal Overlay -->
-	{#if isSubmitModalOpen}
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<div class="modal-backdrop" role="presentation" onclick={() => (isSubmitModalOpen = false)}>
-			<!-- svelte-ignore a11y_click_events_have_key_events -->
-			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<div
-				class="modal-container cyber-panel glow-accent"
-				role="dialog"
-				aria-modal="true"
-				aria-labelledby="modal-title"
-				tabindex="-1"
-				onclick={(e) => e.stopPropagation()}
-			>
-				<div
-					class="modal-header flex items-center justify-between border-b border-(--border-default) pb-3"
-				>
-					<h3
-						id="modal-title"
-						class="flex items-center gap-2 font-mono text-sm font-bold tracking-widest text-(--text-primary) uppercase"
-					>
-						<i class="bi bi-github text-base text-(--accent)"></i>
-						Submit to GitHub Registry
-					</h3>
-					<button
-						type="button"
-						onclick={() => (isSubmitModalOpen = false)}
-						class="text-(--text-tertiary) hover:text-(--text-primary) focus:outline-none"
-						aria-label="Close modal"
-					>
-						<i class="bi bi-x-lg"></i>
-					</button>
-				</div>
-
-				<div
-					class="modal-body flex flex-col gap-4 py-4 font-mono text-xs leading-relaxed text-(--text-secondary)"
-				>
-					<p>
-						You are about to submit <span class="font-semibold text-(--accent)"
-							>{skillDraft.validName || 'skill'}.json</span
-						> to the community catalog registry.
-					</p>
-					<div
-						class="flex flex-col gap-2 rounded-[2px] border border-(--border-strong) bg-(--surface-sunken) p-3"
-					>
-						<span class="text-[10px] font-semibold tracking-wider text-(--text-primary) uppercase"
-							>How it works:</span
-						>
-						<ol class="flex list-inside list-decimal flex-col gap-1.5 opacity-90">
-							<li>Enter your GitHub username to receive author attribution.</li>
-							<li>Clicking "Submit to GitHub" will trigger a Cloudflare Worker request.</li>
-							<li>
-								The backend automatically creates a branch, commits the file, and opens a Pull
-								Request on your behalf.
-							</li>
-						</ol>
-					</div>
-
-					<div class="flex flex-col gap-2">
-						<label
-							for="github-username-input"
-							class="text-[10px] font-semibold tracking-wider text-(--text-primary) uppercase"
-						>
-							GitHub Username (for credit)
-						</label>
-						<div class="relative">
-							<span
-								class="absolute top-1/2 left-3 -translate-y-1/2 font-bold text-(--text-tertiary)"
-								>@</span
-							>
-							<input
-								type="text"
-								id="github-username-input"
-								bind:value={githubUsername}
-								placeholder="username"
-								style="background: var(--surface-sunken); border: 1px solid var(--border-strong); border-radius: 2px; color: var(--text-primary); font-family: var(--font-mono);"
-								class="w-full py-2 pr-3 pl-7 text-xs focus:border-(--accent) focus:ring-1 focus:ring-(--accent) focus:outline-none"
-							/>
-						</div>
-					</div>
-
-					{#if submitErrorMsg}
-						<div
-							style="border: 1px solid var(--secondary); background: var(--secondary-subtle); color: var(--secondary); font-family: var(--font-mono); border-radius: 2px;"
-							class="p-3 text-xs leading-relaxed"
-						>
-							[Error] {submitErrorMsg}
-						</div>
-					{/if}
-				</div>
-
-				<div class="modal-footer flex justify-end gap-3 border-t border-(--border-default) pt-4">
-					<button
-						type="button"
-						onclick={() => (isSubmitModalOpen = false)}
-						style="color: var(--text-secondary); border: 1px solid var(--border-default); border-radius: 2px;"
-						class="px-4 py-2 text-[11px] font-bold tracking-wider uppercase transition-colors hover:bg-(--surface-sunken) focus:outline-none"
-					>
-						Cancel
-					</button>
-					<button
-						type="button"
-						onclick={handleSubmitToGithub}
-						disabled={isSubmitting || !githubUsername.trim()}
-						style="background: var(--accent); color: var(--accent-fg); border-radius: 2px;"
-						class="flex items-center gap-1.5 px-4 py-2 text-[11px] font-bold tracking-wider uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_10px_var(--accent-glow)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
-					>
-						{#if isSubmitting}
-							<span class="animate-pulse">Submitting...</span>
-						{:else}
-							<i class="bi bi-github"></i>
-							Submit to GitHub
-						{/if}
-					</button>
-				</div>
-			</div>
-		</div>
-	{/if}
-
-	<!-- Success Toast Overlay -->
-	{#if prSubmitSuccessUrl}
-		<div class="toast-overlay" role="alert">
-			<div
-				class="toast-content cyber-panel glow-accent flex flex-col gap-3 p-4"
-				style="background: var(--surface-raised); border: 1px solid var(--border-accent); border-radius: 2px; max-width: 320px;"
-			>
-				<div class="flex items-center justify-between border-b border-(--border-default) pb-2">
-					<span class="font-mono text-[10px] font-bold tracking-wider text-(--accent) uppercase"
-						>Submission Successful</span
-					>
-					<button
-						type="button"
-						onclick={() => (prSubmitSuccessUrl = '')}
-						class="text-(--text-tertiary) hover:text-(--text-primary) focus:outline-none"
-						aria-label="Close success toast"
-					>
-						<i class="bi bi-x-lg"></i>
-					</button>
-				</div>
-				<p class="font-mono text-xs leading-relaxed text-(--text-secondary)">
-					Your pull request has been automatically created in the registry repository!
-				</p>
-				<a
-					href={prSubmitSuccessUrl}
-					target="_blank"
-					rel="noopener noreferrer"
-					style="background: var(--accent); color: var(--accent-fg); font-family: var(--font-display);"
-					class="flex items-center justify-center gap-1.5 rounded-[2px] py-2 text-xs font-bold tracking-wider uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_10px_var(--accent-glow)]"
-				>
-					<i class="bi bi-box-arrow-up-right"></i>
-					View Pull Request
-				</a>
-			</div>
-		</div>
-	{/if}
 </div>
 
 <style>
