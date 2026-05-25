@@ -25,7 +25,9 @@ export async function downloadSkillZip(draft: SkillDraftState): Promise<void> {
 	if (draft.enableScripts) {
 		const scriptsFolder = skillFolder.folder('scripts');
 		if (scriptsFolder) {
-			const activeFiles = draft.scriptFiles ? draft.scriptFiles.filter((f) => f.name.trim().length > 0) : [];
+			const activeFiles = draft.scriptFiles
+				? draft.scriptFiles.filter((f) => f.name.trim().length > 0)
+				: [];
 			if (activeFiles.length > 0) {
 				for (const file of activeFiles) {
 					const fileName = file.name.trim();
@@ -50,7 +52,10 @@ export async function downloadSkillZip(draft: SkillDraftState): Promise<void> {
 							'run.sh',
 							`#!/bin/bash\n# Bash script for skill: ${draft.name}\n\nset -euo pipefail\n\necho "Running ${draft.name} script..."\n`
 						);
-					} else if (lang === 'javascript' && !activeFiles.some((f) => f.name.trim() === 'index.js')) {
+					} else if (
+						lang === 'javascript' &&
+						!activeFiles.some((f) => f.name.trim() === 'index.js')
+					) {
 						scriptsFolder.file(
 							'index.js',
 							`#!/usr/bin/env node\n/**\n * JavaScript script for skill: ${draft.name}\n */\n\nconsole.log("Running ${draft.name} script...");\n`
@@ -60,7 +65,10 @@ export async function downloadSkillZip(draft: SkillDraftState): Promise<void> {
 					}
 				}
 			}
-			if (activeFiles.length === 0 && (!draft.scriptLanguages || draft.scriptLanguages.length === 0)) {
+			if (
+				activeFiles.length === 0 &&
+				(!draft.scriptLanguages || draft.scriptLanguages.length === 0)
+			) {
 				scriptsFolder.file(
 					'README.md',
 					`# Scripts\n\nPlace your executable scripts in this directory.\n`
@@ -104,7 +112,9 @@ export async function downloadSkillZip(draft: SkillDraftState): Promise<void> {
 	if (draft.enableAssets) {
 		const assetsFolder = skillFolder.folder('assets');
 		if (assetsFolder) {
-			const activeFiles = draft.assetFiles ? draft.assetFiles.filter((f) => f.name.trim().length > 0) : [];
+			const activeFiles = draft.assetFiles
+				? draft.assetFiles.filter((f) => f.name.trim().length > 0)
+				: [];
 			const writtenKinds = new Set<string>();
 
 			if (activeFiles.length > 0) {

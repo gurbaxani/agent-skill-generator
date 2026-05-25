@@ -214,9 +214,7 @@ Output ONLY the JSON, nothing else.`;
 	}
 
 	function handleRefFilesUploaded(files: FileList | File[]) {
-		const mdFiles = Array.from(files).filter((file) =>
-			file.name.toLowerCase().endsWith('.md')
-		);
+		const mdFiles = Array.from(files).filter((file) => file.name.toLowerCase().endsWith('.md'));
 		if (mdFiles.length === 0) {
 			errorMsg = 'Please upload Markdown (.md) files only.';
 			return;
@@ -285,10 +283,7 @@ Output ONLY the JSON, nothing else.`;
 
 	function addScriptFile() {
 		const newId = skillDraft.nextScriptId++;
-		skillDraft.scriptFiles = [
-			...skillDraft.scriptFiles,
-			{ name: '', content: '', id: newId }
-		];
+		skillDraft.scriptFiles = [...skillDraft.scriptFiles, { name: '', content: '', id: newId }];
 		scriptOpenEditorId = newId;
 	}
 
@@ -369,8 +364,10 @@ Output ONLY the JSON, nothing else.`;
 		if (ext === 'md') return 'bi-markdown-fill text-[#4a90e2]';
 		if (ext === 'txt') return 'bi-file-earmark-text text-[#8e8e93]';
 		if (ext === 'pdf') return 'bi-file-pdf-fill text-[#ff3b30]';
-		if (['jpg', 'jpeg', 'png', 'svg', 'gif', 'webp'].includes(ext || '')) return 'bi-file-image-fill text-[#34c759]';
-		if (['py', 'sh', 'js', 'json', 'ts'].includes(ext || '')) return 'bi-file-code-fill text-[#ff9500]';
+		if (['jpg', 'jpeg', 'png', 'svg', 'gif', 'webp'].includes(ext || ''))
+			return 'bi-file-image-fill text-[#34c759]';
+		if (['py', 'sh', 'js', 'json', 'ts'].includes(ext || ''))
+			return 'bi-file-code-fill text-[#ff9500]';
 		return 'bi-file-earmark-fill text-(--text-tertiary)';
 	}
 
@@ -423,7 +420,7 @@ Output ONLY the JSON, nothing else.`;
 		submitErrorMsg = '';
 		try {
 			const registrySkill = await serializeSkillToRegistry(skillDraft, githubUsername);
-			
+
 			const response = await fetch('/api/submit-pr', {
 				method: 'POST',
 				headers: {
@@ -646,10 +643,10 @@ Output ONLY the JSON, nothing else.`;
 							</p>
 						{/if}
 
-						<div class="h-px my-1" style="background: var(--border-default);"></div>
+						<div class="my-1 h-px" style="background: var(--border-default);"></div>
 						<p
 							style="color: var(--text-secondary); font-family: var(--font-body);"
-							class="text-xs font-semibold leading-relaxed mt-1"
+							class="mt-1 text-xs leading-relaxed font-semibold"
 						>
 							Upload script files or write custom scripts:
 						</p>
@@ -657,20 +654,36 @@ Output ONLY the JSON, nothing else.`;
 						<!-- Drag and Drop Dropzone for Scripts -->
 						<div
 							role="presentation"
-							class="dropzone flex flex-col items-center justify-center py-8 px-4 transition-all"
+							class="dropzone flex flex-col items-center justify-center px-4 py-8 transition-all"
 							class:dropzone-active={scriptDragActive}
 							ondragenter={handleScriptDrag}
 							ondragover={handleScriptDrag}
 							ondragleave={handleScriptDrag}
 							ondrop={handleScriptDrop}
-							style="border: 2px dashed {scriptDragActive ? 'var(--accent)' : 'var(--border-strong)'}; border-radius: 2px; background: {scriptDragActive ? 'var(--accent-glow)' : 'var(--surface-base)'}; cursor: pointer;"
+							style="border: 2px dashed {scriptDragActive
+								? 'var(--accent)'
+								: 'var(--border-strong)'}; border-radius: 2px; background: {scriptDragActive
+								? 'var(--accent-glow)'
+								: 'var(--surface-base)'}; cursor: pointer;"
 							onclick={() => document.getElementById('script-file-upload-input')?.click()}
 						>
-							<i class="bi bi-cloud-upload text-3xl mb-2 text-(--text-tertiary) transition-colors" class:text-(--accent)={scriptDragActive}></i>
-							<p style="color: var(--text-secondary); font-family: var(--font-body);" class="text-xs text-center">
-								Drag & drop script files here, or <span style="color: var(--accent);" class="underline font-semibold hover:text-(--accent-hover)">browse</span>
+							<i
+								class="bi bi-cloud-upload mb-2 text-3xl text-(--text-tertiary) transition-colors"
+								class:text-(--accent)={scriptDragActive}
+							></i>
+							<p
+								style="color: var(--text-secondary); font-family: var(--font-body);"
+								class="text-center text-xs"
+							>
+								Drag & drop script files here, or <span
+									style="color: var(--accent);"
+									class="font-semibold underline hover:text-(--accent-hover)">browse</span
+								>
 							</p>
-							<p style="color: var(--text-tertiary); font-family: var(--font-mono);" class="text-[10px] mt-1 opacity-70">
+							<p
+								style="color: var(--text-tertiary); font-family: var(--font-mono);"
+								class="mt-1 text-[10px] opacity-70"
+							>
 								Supports Python, Bash, JavaScript, and custom executables
 							</p>
 							<input
@@ -690,7 +703,10 @@ Output ONLY the JSON, nothing else.`;
 						{#if skillDraft.scriptFiles && skillDraft.scriptFiles.length > 0}
 							<div class="flex flex-col gap-3">
 								{#each skillDraft.scriptFiles as file (file.id)}
-									<div class="flex flex-col gap-2 p-3 border border-(--border-strong) rounded-[2px]" style="background: var(--surface-base);">
+									<div
+										class="flex flex-col gap-2 rounded-[2px] border border-(--border-strong) p-3"
+										style="background: var(--surface-base);"
+									>
 										<div class="flex items-center justify-between gap-3">
 											<div class="flex flex-1 items-center gap-2">
 												<i class="bi {getFileIcon(file.name)} shrink-0 text-sm"></i>
@@ -699,21 +715,29 @@ Output ONLY the JSON, nothing else.`;
 													bind:value={file.name}
 													placeholder="script.py"
 													style="background: transparent; color: var(--text-primary); border: none; border-bottom: 1px solid transparent; font-family: var(--font-mono);"
-													class="flex-1 py-1 text-xs focus:border-(--accent) focus:outline-none placeholder:text-(--text-tertiary)"
+													class="flex-1 py-1 text-xs placeholder:text-(--text-tertiary) focus:border-(--accent) focus:outline-none"
 												/>
 											</div>
 											<div class="flex items-center gap-2">
 												{#if file.file}
-													<span style="color: var(--text-tertiary); font-family: var(--font-mono);" class="text-[11px] whitespace-nowrap">
+													<span
+														style="color: var(--text-tertiary); font-family: var(--font-mono);"
+														class="text-[11px] whitespace-nowrap"
+													>
 														{formatBytes(file.size)}
 													</span>
 												{:else}
-													<span style="border: 1px solid var(--accent); color: var(--accent); font-family: var(--font-mono);" class="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded-[2px]">
+													<span
+														style="border: 1px solid var(--accent); color: var(--accent); font-family: var(--font-mono);"
+														class="rounded-[2px] px-1.5 py-0.5 text-[9px] font-bold uppercase"
+													>
 														Text
 													</span>
 													<button
 														type="button"
-														onclick={() => scriptOpenEditorId = scriptOpenEditorId === file.id ? null : file.id}
+														onclick={() =>
+															(scriptOpenEditorId =
+																scriptOpenEditorId === file.id ? null : file.id)}
 														style="color: var(--text-secondary); border: 1px solid var(--border-strong);"
 														class="flex items-center gap-1 rounded-[2px] px-2 py-1 text-[10px] font-medium tracking-wide uppercase transition-colors hover:border-(--accent) hover:text-(--accent) focus:outline-none"
 													>
@@ -734,7 +758,9 @@ Output ONLY the JSON, nothing else.`;
 
 										<!-- If content editor is open (for non-uploaded script files) -->
 										{#if !file.file && scriptOpenEditorId === file.id}
-											<div class="mt-2 flex flex-col gap-1.5 border-t border-(--border-default) pt-2">
+											<div
+												class="mt-2 flex flex-col gap-1.5 border-t border-(--border-default) pt-2"
+											>
 												<label
 													for="script-editor-{file.id}"
 													style="color: var(--text-secondary); font-family: var(--font-display);"
@@ -748,7 +774,7 @@ Output ONLY the JSON, nothing else.`;
 													placeholder="Write custom script content here..."
 													rows="8"
 													style="background: var(--surface-sunken); border: 1px solid var(--border-strong); border-radius: 2px; color: var(--text-primary); font-family: var(--font-mono); line-height: 1.5;"
-													class="w-full p-2.5 text-xs focus:border-(--accent) focus:outline-none focus:ring-1 focus:ring-(--accent)"
+													class="w-full p-2.5 text-xs focus:border-(--accent) focus:ring-1 focus:ring-(--accent) focus:outline-none"
 												></textarea>
 											</div>
 										{/if}
@@ -811,26 +837,43 @@ Output ONLY the JSON, nothing else.`;
 							style="color: var(--text-secondary); font-family: var(--font-body);"
 							class="text-xs leading-relaxed"
 						>
-							Upload documents referenced in your skill, or write reference pages directly. Keep files focused for context efficiency.
+							Upload documents referenced in your skill, or write reference pages directly. Keep
+							files focused for context efficiency.
 						</p>
 
 						<!-- Drag and Drop Dropzone -->
 						<div
 							role="presentation"
-							class="dropzone flex flex-col items-center justify-center py-8 px-4 transition-all"
+							class="dropzone flex flex-col items-center justify-center px-4 py-8 transition-all"
 							class:dropzone-active={refDragActive}
 							ondragenter={handleRefDrag}
 							ondragover={handleRefDrag}
 							ondragleave={handleRefDrag}
 							ondrop={handleRefDrop}
-							style="border: 2px dashed {refDragActive ? 'var(--accent)' : 'var(--border-strong)'}; border-radius: 2px; background: {refDragActive ? 'var(--accent-glow)' : 'var(--surface-base)'}; cursor: pointer;"
+							style="border: 2px dashed {refDragActive
+								? 'var(--accent)'
+								: 'var(--border-strong)'}; border-radius: 2px; background: {refDragActive
+								? 'var(--accent-glow)'
+								: 'var(--surface-base)'}; cursor: pointer;"
 							onclick={() => document.getElementById('file-upload-input')?.click()}
 						>
-							<i class="bi bi-cloud-upload text-3xl mb-2 text-(--text-tertiary) transition-colors" class:text-(--accent)={refDragActive}></i>
-							<p style="color: var(--text-secondary); font-family: var(--font-body);" class="text-xs text-center">
-								Drag & drop files here, or <span style="color: var(--accent);" class="underline font-semibold hover:text-(--accent-hover)">browse</span>
+							<i
+								class="bi bi-cloud-upload mb-2 text-3xl text-(--text-tertiary) transition-colors"
+								class:text-(--accent)={refDragActive}
+							></i>
+							<p
+								style="color: var(--text-secondary); font-family: var(--font-body);"
+								class="text-center text-xs"
+							>
+								Drag & drop files here, or <span
+									style="color: var(--accent);"
+									class="font-semibold underline hover:text-(--accent-hover)">browse</span
+								>
 							</p>
-							<p style="color: var(--text-tertiary); font-family: var(--font-mono);" class="text-[10px] mt-1 opacity-70">
+							<p
+								style="color: var(--text-tertiary); font-family: var(--font-mono);"
+								class="mt-1 text-[10px] opacity-70"
+							>
 								Supports Markdown (.md) files only
 							</p>
 							<input
@@ -851,7 +894,10 @@ Output ONLY the JSON, nothing else.`;
 						{#if skillDraft.refFiles.length > 0}
 							<div class="flex flex-col gap-3">
 								{#each skillDraft.refFiles as file (file.id)}
-									<div class="flex flex-col gap-2 p-3 border border-(--border-strong) rounded-[2px]" style="background: var(--surface-base);">
+									<div
+										class="flex flex-col gap-2 rounded-[2px] border border-(--border-strong) p-3"
+										style="background: var(--surface-base);"
+									>
 										<div class="flex items-center justify-between gap-3">
 											<div class="flex flex-1 items-center gap-2">
 												<i class="bi {getFileIcon(file.name)} shrink-0 text-sm"></i>
@@ -865,21 +911,28 @@ Output ONLY the JSON, nothing else.`;
 													}}
 													placeholder="filename.md"
 													style="background: transparent; color: var(--text-primary); border: none; border-bottom: 1px solid transparent; font-family: var(--font-mono);"
-													class="flex-1 py-1 text-xs focus:border-(--accent) focus:outline-none placeholder:text-(--text-tertiary)"
+													class="flex-1 py-1 text-xs placeholder:text-(--text-tertiary) focus:border-(--accent) focus:outline-none"
 												/>
 											</div>
 											<div class="flex items-center gap-2">
 												{#if file.file}
-													<span style="color: var(--text-tertiary); font-family: var(--font-mono);" class="text-[11px] whitespace-nowrap">
+													<span
+														style="color: var(--text-tertiary); font-family: var(--font-mono);"
+														class="text-[11px] whitespace-nowrap"
+													>
 														{formatBytes(file.size)}
 													</span>
 												{:else}
-													<span style="border: 1px solid var(--accent); color: var(--accent); font-family: var(--font-mono);" class="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded-[2px]">
+													<span
+														style="border: 1px solid var(--accent); color: var(--accent); font-family: var(--font-mono);"
+														class="rounded-[2px] px-1.5 py-0.5 text-[9px] font-bold uppercase"
+													>
 														Text
 													</span>
 													<button
 														type="button"
-														onclick={() => refOpenEditorId = refOpenEditorId === file.id ? null : file.id}
+														onclick={() =>
+															(refOpenEditorId = refOpenEditorId === file.id ? null : file.id)}
 														style="color: var(--text-secondary); border: 1px solid var(--border-strong);"
 														class="flex items-center gap-1 rounded-[2px] px-2 py-1 text-[10px] font-medium tracking-wide uppercase transition-colors hover:border-(--accent) hover:text-(--accent) focus:outline-none"
 													>
@@ -900,7 +953,9 @@ Output ONLY the JSON, nothing else.`;
 
 										<!-- If content editor is open (for non-uploaded files) -->
 										{#if !file.file && refOpenEditorId === file.id}
-											<div class="mt-2 flex flex-col gap-1.5 border-t border-(--border-default) pt-2">
+											<div
+												class="mt-2 flex flex-col gap-1.5 border-t border-(--border-default) pt-2"
+											>
 												<label
 													for="editor-{file.id}"
 													style="color: var(--text-secondary); font-family: var(--font-display);"
@@ -914,7 +969,7 @@ Output ONLY the JSON, nothing else.`;
 													placeholder="Write Markdown or text content for this reference file..."
 													rows="5"
 													style="background: var(--surface-sunken); border: 1px solid var(--border-strong); border-radius: 2px; color: var(--text-primary); font-family: var(--font-mono); line-height: 1.5;"
-													class="w-full p-2.5 text-xs focus:border-(--accent) focus:outline-none focus:ring-1 focus:ring-(--accent)"
+													class="w-full p-2.5 text-xs focus:border-(--accent) focus:ring-1 focus:ring-(--accent) focus:outline-none"
 												></textarea>
 											</div>
 										{/if}
@@ -1041,10 +1096,10 @@ Output ONLY the JSON, nothing else.`;
 							{/each}
 						</div>
 
-						<div class="h-px my-1" style="background: var(--border-default);"></div>
+						<div class="my-1 h-px" style="background: var(--border-default);"></div>
 						<p
 							style="color: var(--text-secondary); font-family: var(--font-body);"
-							class="text-xs font-semibold leading-relaxed mt-1"
+							class="mt-1 text-xs leading-relaxed font-semibold"
 						>
 							Upload asset files or create blank assets:
 						</p>
@@ -1052,20 +1107,36 @@ Output ONLY the JSON, nothing else.`;
 						<!-- Drag and Drop Dropzone for Assets -->
 						<div
 							role="presentation"
-							class="dropzone flex flex-col items-center justify-center py-8 px-4 transition-all"
+							class="dropzone flex flex-col items-center justify-center px-4 py-8 transition-all"
 							class:dropzone-active={assetDragActive}
 							ondragenter={handleAssetDrag}
 							ondragover={handleAssetDrag}
 							ondragleave={handleAssetDrag}
 							ondrop={handleAssetDrop}
-							style="border: 2px dashed {assetDragActive ? 'var(--accent)' : 'var(--border-strong)'}; border-radius: 2px; background: {assetDragActive ? 'var(--accent-glow)' : 'var(--surface-base)'}; cursor: pointer;"
+							style="border: 2px dashed {assetDragActive
+								? 'var(--accent)'
+								: 'var(--border-strong)'}; border-radius: 2px; background: {assetDragActive
+								? 'var(--accent-glow)'
+								: 'var(--surface-base)'}; cursor: pointer;"
 							onclick={() => document.getElementById('asset-file-upload-input')?.click()}
 						>
-							<i class="bi bi-cloud-upload text-3xl mb-2 text-(--text-tertiary) transition-colors" class:text-(--accent)={assetDragActive}></i>
-							<p style="color: var(--text-secondary); font-family: var(--font-body);" class="text-xs text-center">
-								Drag & drop asset files here, or <span style="color: var(--accent);" class="underline font-semibold hover:text-(--accent-hover)">browse</span>
+							<i
+								class="bi bi-cloud-upload mb-2 text-3xl text-(--text-tertiary) transition-colors"
+								class:text-(--accent)={assetDragActive}
+							></i>
+							<p
+								style="color: var(--text-secondary); font-family: var(--font-body);"
+								class="text-center text-xs"
+							>
+								Drag & drop asset files here, or <span
+									style="color: var(--accent);"
+									class="font-semibold underline hover:text-(--accent-hover)">browse</span
+								>
 							</p>
-							<p style="color: var(--text-tertiary); font-family: var(--font-mono);" class="text-[10px] mt-1 opacity-70">
+							<p
+								style="color: var(--text-tertiary); font-family: var(--font-mono);"
+								class="mt-1 text-[10px] opacity-70"
+							>
 								Automatically categorized by file type (Templates, Images, Data)
 							</p>
 							<input
@@ -1085,7 +1156,10 @@ Output ONLY the JSON, nothing else.`;
 						{#if skillDraft.assetFiles && skillDraft.assetFiles.length > 0}
 							<div class="flex flex-col gap-3">
 								{#each skillDraft.assetFiles as file (file.id)}
-									<div class="flex flex-col gap-2 p-3 border border-(--border-strong) rounded-[2px]" style="background: var(--surface-base);">
+									<div
+										class="flex flex-col gap-2 rounded-[2px] border border-(--border-strong) p-3"
+										style="background: var(--surface-base);"
+									>
 										<div class="flex items-center justify-between gap-3">
 											<div class="flex flex-1 items-center gap-2">
 												<i class="bi {getFileIcon(file.name)} shrink-0 text-sm"></i>
@@ -1094,7 +1168,7 @@ Output ONLY the JSON, nothing else.`;
 													bind:value={file.name}
 													placeholder="data.csv"
 													style="background: transparent; color: var(--text-primary); border: none; border-bottom: 1px solid transparent; font-family: var(--font-mono);"
-													class="flex-1 py-1 text-xs focus:border-(--accent) focus:outline-none placeholder:text-(--text-tertiary)"
+													class="flex-1 py-1 text-xs placeholder:text-(--text-tertiary) focus:border-(--accent) focus:outline-none"
 												/>
 											</div>
 											<div class="flex items-center gap-2">
@@ -1110,16 +1184,23 @@ Output ONLY the JSON, nothing else.`;
 												</select>
 
 												{#if file.file}
-													<span style="color: var(--text-tertiary); font-family: var(--font-mono);" class="text-[11px] whitespace-nowrap">
+													<span
+														style="color: var(--text-tertiary); font-family: var(--font-mono);"
+														class="text-[11px] whitespace-nowrap"
+													>
 														{formatBytes(file.size)}
 													</span>
 												{:else}
-													<span style="border: 1px solid var(--accent); color: var(--accent); font-family: var(--font-mono);" class="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded-[2px]">
+													<span
+														style="border: 1px solid var(--accent); color: var(--accent); font-family: var(--font-mono);"
+														class="rounded-[2px] px-1.5 py-0.5 text-[9px] font-bold uppercase"
+													>
 														Text
 													</span>
 													<button
 														type="button"
-														onclick={() => assetOpenEditorId = assetOpenEditorId === file.id ? null : file.id}
+														onclick={() =>
+															(assetOpenEditorId = assetOpenEditorId === file.id ? null : file.id)}
 														style="color: var(--text-secondary); border: 1px solid var(--border-strong);"
 														class="flex items-center gap-1 rounded-[2px] px-2 py-1 text-[10px] font-medium tracking-wide uppercase transition-colors hover:border-(--accent) hover:text-(--accent) focus:outline-none"
 													>
@@ -1140,7 +1221,9 @@ Output ONLY the JSON, nothing else.`;
 
 										<!-- If content editor is open (for non-uploaded asset files) -->
 										{#if !file.file && assetOpenEditorId === file.id}
-											<div class="mt-2 flex flex-col gap-1.5 border-t border-(--border-default) pt-2">
+											<div
+												class="mt-2 flex flex-col gap-1.5 border-t border-(--border-default) pt-2"
+											>
 												<label
 													for="asset-editor-{file.id}"
 													style="color: var(--text-secondary); font-family: var(--font-display);"
@@ -1154,7 +1237,7 @@ Output ONLY the JSON, nothing else.`;
 													placeholder="Write custom asset template content here..."
 													rows="6"
 													style="background: var(--surface-sunken); border: 1px solid var(--border-strong); border-radius: 2px; color: var(--text-primary); font-family: var(--font-mono); line-height: 1.5;"
-													class="w-full p-2.5 text-xs focus:border-(--accent) focus:outline-none focus:ring-1 focus:ring-(--accent)"
+													class="w-full p-2.5 text-xs focus:border-(--accent) focus:ring-1 focus:ring-(--accent) focus:outline-none"
 												></textarea>
 											</div>
 										{/if}
@@ -1220,9 +1303,21 @@ Output ONLY the JSON, nothing else.`;
 		<div class="modal-backdrop" role="presentation" onclick={() => (isSubmitModalOpen = false)}>
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<div class="modal-container cyber-panel glow-accent" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1" onclick={(e) => e.stopPropagation()}>
-				<div class="modal-header flex items-center justify-between border-b border-(--border-default) pb-3">
-					<h3 id="modal-title" class="flex items-center gap-2 font-mono text-sm font-bold tracking-widest text-(--text-primary) uppercase">
+			<div
+				class="modal-container cyber-panel glow-accent"
+				role="dialog"
+				aria-modal="true"
+				aria-labelledby="modal-title"
+				tabindex="-1"
+				onclick={(e) => e.stopPropagation()}
+			>
+				<div
+					class="modal-header flex items-center justify-between border-b border-(--border-default) pb-3"
+				>
+					<h3
+						id="modal-title"
+						class="flex items-center gap-2 font-mono text-sm font-bold tracking-widest text-(--text-primary) uppercase"
+					>
 						<i class="bi bi-github text-base text-(--accent)"></i>
 						Submit to GitHub Registry
 					</h3>
@@ -1236,25 +1331,42 @@ Output ONLY the JSON, nothing else.`;
 					</button>
 				</div>
 
-				<div class="modal-body py-4 flex flex-col gap-4 font-mono text-xs text-(--text-secondary) leading-relaxed">
+				<div
+					class="modal-body flex flex-col gap-4 py-4 font-mono text-xs leading-relaxed text-(--text-secondary)"
+				>
 					<p>
-						You are about to submit <span class="text-(--accent) font-semibold">{skillDraft.validName || 'skill'}.json</span> to the community catalog registry.
+						You are about to submit <span class="font-semibold text-(--accent)"
+							>{skillDraft.validName || 'skill'}.json</span
+						> to the community catalog registry.
 					</p>
-					<div class="bg-(--surface-sunken) p-3 border border-(--border-strong) rounded-[2px] flex flex-col gap-2">
-						<span class="text-(--text-primary) font-semibold uppercase text-[10px] tracking-wider">How it works:</span>
-						<ol class="list-decimal list-inside flex flex-col gap-1.5 opacity-90">
+					<div
+						class="flex flex-col gap-2 rounded-[2px] border border-(--border-strong) bg-(--surface-sunken) p-3"
+					>
+						<span class="text-[10px] font-semibold tracking-wider text-(--text-primary) uppercase"
+							>How it works:</span
+						>
+						<ol class="flex list-inside list-decimal flex-col gap-1.5 opacity-90">
 							<li>Enter your GitHub username to receive author attribution.</li>
 							<li>Clicking "Submit to GitHub" will trigger a Cloudflare Worker request.</li>
-							<li>The backend automatically creates a branch, commits the file, and opens a Pull Request on your behalf.</li>
+							<li>
+								The backend automatically creates a branch, commits the file, and opens a Pull
+								Request on your behalf.
+							</li>
 						</ol>
 					</div>
 
 					<div class="flex flex-col gap-2">
-						<label for="github-username-input" class="font-semibold text-(--text-primary) uppercase text-[10px] tracking-wider">
+						<label
+							for="github-username-input"
+							class="text-[10px] font-semibold tracking-wider text-(--text-primary) uppercase"
+						>
 							GitHub Username (for credit)
 						</label>
 						<div class="relative">
-							<span class="absolute top-1/2 left-3 -translate-y-1/2 text-(--text-tertiary) font-bold">@</span>
+							<span
+								class="absolute top-1/2 left-3 -translate-y-1/2 font-bold text-(--text-tertiary)"
+								>@</span
+							>
 							<input
 								type="text"
 								id="github-username-input"
@@ -1276,7 +1388,7 @@ Output ONLY the JSON, nothing else.`;
 					{/if}
 				</div>
 
-				<div class="modal-footer border-t border-(--border-default) pt-4 flex justify-end gap-3">
+				<div class="modal-footer flex justify-end gap-3 border-t border-(--border-default) pt-4">
 					<button
 						type="button"
 						onclick={() => (isSubmitModalOpen = false)}
@@ -1307,14 +1419,24 @@ Output ONLY the JSON, nothing else.`;
 	<!-- Success Toast Overlay -->
 	{#if prSubmitSuccessUrl}
 		<div class="toast-overlay" role="alert">
-			<div class="toast-content cyber-panel glow-accent flex flex-col gap-3 p-4" style="background: var(--surface-raised); border: 1px solid var(--border-accent); border-radius: 2px; max-width: 320px;">
+			<div
+				class="toast-content cyber-panel glow-accent flex flex-col gap-3 p-4"
+				style="background: var(--surface-raised); border: 1px solid var(--border-accent); border-radius: 2px; max-width: 320px;"
+			>
 				<div class="flex items-center justify-between border-b border-(--border-default) pb-2">
-					<span class="font-mono text-[10px] font-bold uppercase tracking-wider text-(--accent)">Submission Successful</span>
-					<button type="button" onclick={() => (prSubmitSuccessUrl = '')} class="text-(--text-tertiary) hover:text-(--text-primary) focus:outline-none" aria-label="Close success toast">
+					<span class="font-mono text-[10px] font-bold tracking-wider text-(--accent) uppercase"
+						>Submission Successful</span
+					>
+					<button
+						type="button"
+						onclick={() => (prSubmitSuccessUrl = '')}
+						class="text-(--text-tertiary) hover:text-(--text-primary) focus:outline-none"
+						aria-label="Close success toast"
+					>
 						<i class="bi bi-x-lg"></i>
 					</button>
 				</div>
-				<p class="font-mono text-xs text-(--text-secondary) leading-relaxed">
+				<p class="font-mono text-xs leading-relaxed text-(--text-secondary)">
 					Your pull request has been automatically created in the registry repository!
 				</p>
 				<a

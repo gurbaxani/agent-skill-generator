@@ -1,12 +1,12 @@
 <script lang="ts">
-import { onMount } from "svelte";
-let email = $state("");
+	import { onMount } from 'svelte';
+	let email = $state('');
 
-onMount(() => {
-	const handle = "asg";
-	const domain = "ashwinig.com";
-	email = `${handle}@${domain}`;
-});
+	onMount(() => {
+		const handle = 'asg';
+		const domain = 'ashwinig.com';
+		email = `${handle}@${domain}`;
+	});
 </script>
 
 <div class="contact-container">
@@ -55,7 +55,7 @@ onMount(() => {
 
 	/* Scanline effect */
 	.terminal-card::after {
-		content: "";
+		content: '';
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -149,7 +149,7 @@ onMount(() => {
 	}
 
 	.email-link::after {
-		content: "";
+		content: '';
 		position: absolute;
 		bottom: -2px;
 		left: 0;
@@ -182,12 +182,24 @@ onMount(() => {
 	}
 
 	@keyframes blink {
-		0%, 100% { opacity: 1; }
-		50% { opacity: 0; }
+		0%,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0;
+		}
 	}
 
 	@keyframes pulse {
-		0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--accent); }
-		50% { opacity: 0.5; box-shadow: 0 0 2px var(--accent); }
+		0%,
+		100% {
+			opacity: 1;
+			box-shadow: 0 0 8px var(--accent);
+		}
+		50% {
+			opacity: 0.5;
+			box-shadow: 0 0 2px var(--accent);
+		}
 	}
 </style>

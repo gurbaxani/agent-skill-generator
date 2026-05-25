@@ -1,16 +1,28 @@
 <script lang="ts">
+	import { page } from '$app/state';
+	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { userState } from '$lib/state/user.svelte';
 	import { skillDraft, type ScriptLanguage, type AssetKind } from '$lib/state/draft.svelte';
 	import { getRegistrySkills, type RegistrySkill } from '$lib/registry';
 	import { marked } from 'marked';
+	import { downloadSkillZip } from '$lib/utils/zip';
 
 	const skills = getRegistrySkills();
 
 	// ── Filter & Search State ───────────────────────────────────────────────
 	let searchQuery = $state('');
 	let selectedTag = $state('all');
-	let selectedSkillName = $state('');
+	let selectedSkillName = $state(browser ? page.url.searchParams.get('skill') || '' : '');
+
+	function selectSkill(skillName: string) {
+		selectedSkillName = skillName;
+		if (browser) {
+			const url = new URL(page.url);
+			url.searchParams.set('skill', skillName);
+			goto(url, { replaceState: true, keepFocus: true });
+		}
+	}
 
 	// ── Notification state ───────────────────────────────────────────────────
 	let forkSuccessMessage = $state('');
@@ -82,8 +94,7 @@
 			: ''
 	);
 
-	// Fork and load into draft
-	function handleFork(skill: RegistrySkill) {
+	function populateDraftFromSkill(skill: RegistrySkill) {
 		skillDraft.reset();
 		skillDraft.name = skill.name;
 		skillDraft.description = skill.description;
@@ -94,8 +105,8 @@
 
 		skillDraft.enableScripts = skill.enableScripts || false;
 		if (skill.scriptLanguages) {
-			skillDraft.scriptLanguages = skill.scriptLanguages.filter(
-				(l): l is ScriptLanguage => ['python', 'bash', 'javascript', 'other'].includes(l)
+			skillDraft.scriptLanguages = skill.scriptLanguages.filter((l): l is ScriptLanguage =>
+				['python', 'bash', 'javascript', 'other'].includes(l)
 			);
 		}
 		if (skill.scriptFiles) {
@@ -120,8 +131,8 @@
 
 		skillDraft.enableAssets = skill.enableAssets || false;
 		if (skill.assetKinds) {
-			skillDraft.assetKinds = skill.assetKinds.filter(
-				(k): k is AssetKind => ['templates', 'images', 'data'].includes(k)
+			skillDraft.assetKinds = skill.assetKinds.filter((k): k is AssetKind =>
+				['templates', 'images', 'data'].includes(k)
 			);
 		}
 		if (skill.assetFiles) {
@@ -140,7 +151,11 @@
 				{ key: 'version', value: '1.0', id: 2 }
 			];
 		}
+	}
 
+	// Fork and load into draft
+	function handleFork(skill: RegistrySkill) {
+		populateDraftFromSkill(skill);
 		forkSuccessMessage = `Remixing skill: "${skill.name}". Loading workspace...`;
 
 		setTimeout(() => {
@@ -151,6 +166,15 @@
 				goto('/create/required');
 			}
 		}, 1500);
+	}
+
+	async function handleDownload(skill: RegistrySkill) {
+		populateDraftFromSkill(skill);
+		try {
+			await downloadSkillZip(skillDraft);
+		} catch (error) {
+			console.error('Failed to download skill:', error);
+		}
 	}
 </script>
 
@@ -214,7 +238,9 @@
 						Search Registry
 					</label>
 					<div class="relative">
-						<i class="bi bi-search absolute top-1/2 left-3.5 -translate-y-1/2 text-(--text-tertiary) text-xs"></i>
+						<i
+							class="bi bi-search absolute top-1/2 left-3.5 -translate-y-1/2 text-xs text-(--text-tertiary)"
+						></i>
 						<input
 							type="text"
 							id="search-skills"
@@ -228,7 +254,9 @@
 
 				<!-- Tag Chips -->
 				<div class="flex flex-col gap-2">
-					<span class="font-mono text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase">
+					<span
+						class="font-mono text-[10px] font-bold tracking-wider text-(--text-secondary) uppercase"
+					>
 						Filter by Tag
 					</span>
 					<div class="flex flex-wrap gap-2">
@@ -252,10 +280,13 @@
 					{#each filteredSkills as skill (skill.name)}
 						<button
 							type="button"
-							onclick={() => (selectedSkillName = skill.name)}
+							onclick={() => selectSkill(skill.name)}
 							class="skill-card text-left"
 							class:skill-card-active={selectedSkill?.name === skill.name}
-							style="background: var(--surface-raised); border: 1px solid {selectedSkill?.name === skill.name ? 'var(--accent)' : 'var(--border-strong)'};"
+							style="background: var(--surface-raised); border: 1px solid {selectedSkill?.name ===
+							skill.name
+								? 'var(--accent)'
+								: 'var(--border-strong)'};"
 						>
 							<div class="flex items-start justify-between gap-4">
 								<div class="flex-1">
@@ -279,7 +310,9 @@
 										{skill.description}
 									</p>
 								</div>
-								<div class="flex flex-col items-end gap-1 shrink-0 font-mono text-[10px] text-(--text-tertiary)">
+								<div
+									class="flex shrink-0 flex-col items-end gap-1 font-mono text-[10px] text-(--text-tertiary)"
+								>
 									<span>by {skill.author}</span>
 									{#if skill.license}
 										<span class="opacity-70">{skill.license}</span>
@@ -306,7 +339,9 @@
 						<div class="flex items-center justify-between border-b border-(--border-default) pb-3">
 							<div class="flex items-center gap-2">
 								<i class="bi bi-file-earmark-medical text-sm text-(--accent)"></i>
-								<h2 class="font-mono text-xs font-bold tracking-widest text-(--text-primary) uppercase">
+								<h2
+									class="font-mono text-xs font-bold tracking-widest text-(--text-primary) uppercase"
+								>
 									Preview: {selectedSkill.name}/SKILL.md
 								</h2>
 							</div>
@@ -342,15 +377,25 @@
 						</div>
 					</div>
 
-					<!-- Fork Action CTA -->
-					<button
-						type="button"
-						onclick={() => handleFork(selectedSkill)}
-						style="background: var(--accent); color: var(--accent-fg); font-family: var(--font-display);"
-						class="flex w-full items-center justify-center gap-2 rounded-[2px] py-4 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_15px_var(--accent-glow)] focus:outline-none"
-					>
-						<i class="bi bi-git" aria-hidden="true"></i> Fork & Customize Skill
-					</button>
+					<!-- Action CTAs -->
+					<div class="flex flex-col gap-3 sm:flex-row">
+						<button
+							type="button"
+							onclick={() => handleDownload(selectedSkill)}
+							style="border: 1px solid var(--accent); color: var(--accent); font-family: var(--font-display);"
+							class="flex w-full items-center justify-center gap-2 rounded-[2px] py-4 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-glow) focus:outline-none"
+						>
+							<i class="bi bi-download" aria-hidden="true"></i> Download Skill
+						</button>
+						<button
+							type="button"
+							onclick={() => handleFork(selectedSkill)}
+							style="background: var(--accent); color: var(--accent-fg); font-family: var(--font-display);"
+							class="flex w-full items-center justify-center gap-2 rounded-[2px] py-4 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_15px_var(--accent-glow)] focus:outline-none"
+						>
+							<i class="bi bi-git" aria-hidden="true"></i> Fork & Customize
+						</button>
+					</div>
 				</div>
 			{:else}
 				<div class="cyber-panel p-8 text-center" style="background: var(--surface-sunken);">

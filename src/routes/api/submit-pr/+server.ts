@@ -21,7 +21,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		if (!token) {
 			return json(
 				{
-					error: 'GitHub Integration is not configured. Please define GITHUB_PAT on Cloudflare Pages.'
+					error:
+						'GitHub Integration is not configured. Please define GITHUB_PAT on Cloudflare Pages.'
 				},
 				{ status: 501 }
 			);
@@ -56,22 +57,19 @@ export const POST: RequestHandler = async ({ request }) => {
 		const mainBranchSha = refData.object.sha;
 
 		// 2. Create a new branch pointing to that SHA
-		const branchRes = await fetch(
-			`https://api.github.com/repos/${OWNER}/${REPO}/git/refs`,
-			{
-				method: 'POST',
-				headers: {
-					Authorization: `Bearer ${token}`,
-					Accept: 'application/vnd.github.v3+json',
-					'Content-Type': 'application/json',
-					'User-Agent': 'ASG-App'
-				},
-				body: JSON.stringify({
-					ref: `refs/heads/${branchName}`,
-					sha: mainBranchSha
-				})
-			}
-		);
+		const branchRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/git/refs`, {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${token}`,
+				Accept: 'application/vnd.github.v3+json',
+				'Content-Type': 'application/json',
+				'User-Agent': 'ASG-App'
+			},
+			body: JSON.stringify({
+				ref: `refs/heads/${branchName}`,
+				sha: mainBranchSha
+			})
+		});
 
 		if (!branchRes.ok) {
 			const text = await branchRes.text();
@@ -132,24 +130,21 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		// 4. Open a Pull Request from our branch to main
-		const prRes = await fetch(
-			`https://api.github.com/repos/${OWNER}/${REPO}/pulls`,
-			{
-				method: 'POST',
-				headers: {
-					Authorization: `Bearer ${token}`,
-					Accept: 'application/vnd.github.v3+json',
-					'Content-Type': 'application/json',
-					'User-Agent': 'ASG-App'
-				},
-				body: JSON.stringify({
-					title: `Add community skill: ${skill.name} by @${cleanUsername}`,
-					head: branchName,
-					base: 'trunk',
-					body: `### New Skill Submission\n\n- **Skill Name**: ${skill.name}\n- **Author**: @${cleanUsername}\n- **Description**: ${skill.description || 'No description provided.'}\n\n*Created automatically via the Agent Skill Generator web dashboard.*`
-				})
-			}
-		);
+		const prRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/pulls`, {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${token}`,
+				Accept: 'application/vnd.github.v3+json',
+				'Content-Type': 'application/json',
+				'User-Agent': 'ASG-App'
+			},
+			body: JSON.stringify({
+				title: `Add community skill: ${skill.name} by @${cleanUsername}`,
+				head: branchName,
+				base: 'trunk',
+				body: `### New Skill Submission\n\n- **Skill Name**: ${skill.name}\n- **Author**: @${cleanUsername}\n- **Description**: ${skill.description || 'No description provided.'}\n\n*Created automatically via the Agent Skill Generator web dashboard.*`
+			})
+		});
 
 		if (!prRes.ok) {
 			const text = await prRes.text();

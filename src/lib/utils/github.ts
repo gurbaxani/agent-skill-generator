@@ -26,7 +26,9 @@ export async function serializeSkillToRegistry(
 
 	const scriptFiles = [];
 	if (draft.enableScripts) {
-		const activeFiles = draft.scriptFiles ? draft.scriptFiles.filter((f) => f.name.trim().length > 0) : [];
+		const activeFiles = draft.scriptFiles
+			? draft.scriptFiles.filter((f) => f.name.trim().length > 0)
+			: [];
 		for (const f of activeFiles) {
 			scriptFiles.push({
 				name: f.name.trim(),
@@ -37,7 +39,9 @@ export async function serializeSkillToRegistry(
 
 	const refFiles = [];
 	if (draft.enableReferences) {
-		const activeFiles = draft.refFiles ? draft.refFiles.filter((f) => f.name.trim().length > 0) : [];
+		const activeFiles = draft.refFiles
+			? draft.refFiles.filter((f) => f.name.trim().length > 0)
+			: [];
 		for (const f of activeFiles) {
 			refFiles.push({
 				name: f.name.trim(),
@@ -49,7 +53,9 @@ export async function serializeSkillToRegistry(
 
 	const assetFiles = [];
 	if (draft.enableAssets) {
-		const activeFiles = draft.assetFiles ? draft.assetFiles.filter((f) => f.name.trim().length > 0) : [];
+		const activeFiles = draft.assetFiles
+			? draft.assetFiles.filter((f) => f.name.trim().length > 0)
+			: [];
 		for (const f of activeFiles) {
 			assetFiles.push({
 				name: f.name.trim(),
