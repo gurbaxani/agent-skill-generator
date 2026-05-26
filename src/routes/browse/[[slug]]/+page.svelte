@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
 	import { userState } from '$lib/state/user.svelte';
 	import { skillDraft, type ScriptLanguage, type AssetKind } from '$lib/state/draft.svelte';
 	import type { Skill } from '$lib/types';
@@ -15,6 +16,21 @@
 
 	let { data }: { data: PageData } = $props();
 	const skills = $derived(data.skills);
+
+	// Legacy ?skill= redirect (client-side only, can't use searchParams in prerendered load)
+	onMount(() => {
+		const legacySkillName = new URL(window.location.href).searchParams.get('skill');
+		if (legacySkillName && !page.params.slug) {
+			const match = skills.find(
+				(s) =>
+					s.name.toLowerCase() === legacySkillName.toLowerCase() ||
+					(s.slug && s.slug.toLowerCase() === legacySkillName.toLowerCase())
+			);
+			if (match?.slug) {
+				goto(`/browse/${match.slug}`, { replaceState: true });
+			}
+		}
+	});
 
 	// ── Publish flow states ───────────────────────────────────────────────
 	let isPublishing = $state(false);
