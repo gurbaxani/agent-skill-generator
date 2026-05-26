@@ -133,6 +133,7 @@
 	<div class="catalog-list">
 		{#each CATALOG_SKILLS as skill (skill.name)}
 			<CatalogEntry
+				slug={skill.slug || ''}
 				name={skill.name}
 				description={skill.description}
 				author={skill.metadata?.author || ''}

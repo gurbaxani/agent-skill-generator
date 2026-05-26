@@ -47,16 +47,6 @@
 	// ── Filter & Search State ───────────────────────────────────────────────
 	let searchQuery = $state('');
 	let selectedTag = $state('all');
-	let selectedSkillName = $state(browser ? page.url.searchParams.get('skill') || '' : '');
-
-	function selectSkill(skillName: string) {
-		selectedSkillName = skillName;
-		if (browser) {
-			const url = new URL(page.url);
-			url.searchParams.set('skill', skillName);
-			goto(url, { replaceState: true, keepFocus: true });
-		}
-	}
 
 	// ── Notification state ───────────────────────────────────────────────────
 	let forkSuccessMessage = $state('');
@@ -95,8 +85,11 @@
 
 	// Select current skill based on active selection or first item in filtered list
 	const selectedSkill = $derived.by(() => {
-		const match = filteredSkills.find((s) => s.name === selectedSkillName);
-		if (match) return match;
+		const slug = page.params.slug;
+		if (slug) {
+			const match = filteredSkills.find((s) => s.slug === slug);
+			if (match) return match;
+		}
 		return filteredSkills[0] || null;
 	});
 
@@ -231,13 +224,14 @@
 			<div class="flex flex-col gap-3">
 				{#if filteredSkills.length > 0}
 					{#each filteredSkills as skill (skill.name)}
-						<button
-							type="button"
-							onclick={() => selectSkill(skill.name)}
+						<a
+							href="/browse/{skill.slug}"
+							data-sveltekit-noscroll
+							data-sveltekit-replacestate
 							class="skill-card text-left"
-							class:skill-card-active={selectedSkill?.name === skill.name}
-							style="background: var(--surface-raised); border: 1px solid {selectedSkill?.name ===
-							skill.name
+							class:skill-card-active={selectedSkill?.slug === skill.slug}
+							style="background: var(--surface-raised); border: 1px solid {selectedSkill?.slug ===
+							skill.slug
 								? 'var(--accent)'
 								: 'var(--border-strong)'};"
 						>
@@ -277,7 +271,7 @@
 									{/if}
 								</div>
 							</div>
-						</button>
+						</a>
 					{/each}
 				{:else}
 					<div class="cyber-panel p-8 text-center" style="background: var(--surface-sunken);">
@@ -451,6 +445,8 @@
 
 	/* Skill card list rows */
 	.skill-card {
+		display: block;
+		text-decoration: none;
 		width: 100%;
 		padding: 18px 20px;
 		border-radius: 2px;
@@ -550,6 +546,7 @@
 		line-height: 1.75;
 		word-break: break-word;
 		overflow-wrap: break-word;
+		overflow-x: auto;
 	}
 
 	.preview-prose :global(h1),

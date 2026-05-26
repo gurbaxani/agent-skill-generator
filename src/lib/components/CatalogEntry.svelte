@@ -1,15 +1,16 @@
 <script lang="ts">
 	interface Props {
+		slug: string;
 		name: string;
 		description: string;
 		author: string;
 		tag: string;
 	}
 
-	let { name, description, author, tag }: Props = $props();
+	let { slug, name, description, author, tag }: Props = $props();
 </script>
 
-<a href="/browse" class="catalog-entry" id="catalog-entry-{name}">
+<a href="/browse/{slug}" class="catalog-entry" id="catalog-entry-{slug}">
 	<span class="entry-index" aria-hidden="true">›</span>
 	<span class="entry-name">{name}</span>
 	<span class="entry-desc">{description}</span>

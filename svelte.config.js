@@ -10,7 +10,8 @@ const config = {
 	kit: {
 		adapter: adapter(),
 		prerender: {
-			handleHttpError: 'warn'
+			handleHttpError: 'warn',
+			handleMissingId: 'warn'
 		}
 	},
 	preprocess: [mdsvex({ extensions: ['.svx', '.md'] })],
