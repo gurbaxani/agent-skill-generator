@@ -109,6 +109,8 @@
 		return filteredSkills[0] || null;
 	});
 
+	const hasDirectSlug = $derived(!!page.params.slug);
+
 	const selectedSkillMarkdown = $derived(selectedSkill ? serializeSkill(selectedSkill) : '');
 
 	const frontmatterLines = $derived.by(() => {
@@ -186,9 +188,9 @@
 	</div>
 
 	<!-- Workspace Grid -->
-	<div class="grid items-start gap-8 lg:grid-cols-[1.2fr_1fr]">
+	<div class="browse-grid" class:browse-grid-detail={hasDirectSlug}>
 		<!-- Left: Filters + List -->
-		<div class="flex flex-col gap-6">
+		<div class="browse-list flex flex-col gap-6">
 			<!-- Search and Tags Filter Pane -->
 			<div class="cyber-panel flex flex-col gap-4 p-5">
 				<!-- Search -->
@@ -299,7 +301,15 @@
 		</div>
 
 		<!-- Right: Details / Live preview -->
-		<div class="sticky-column">
+		<div class="browse-detail sticky-column">
+			{#if hasDirectSlug}
+				<a
+					href="/browse"
+					class="back-link"
+				>
+					<i class="bi bi-arrow-left" aria-hidden="true"></i> Browse all skills
+				</a>
+			{/if}
 			{#if selectedSkill}
 				<div class="flex flex-col gap-4">
 					<!-- Preview box -->
@@ -485,10 +495,58 @@
 		letter-spacing: 0.04em;
 	}
 
+	/* Browse Grid Layout */
+	.browse-grid {
+		display: grid;
+		align-items: start;
+		gap: 2rem;
+		grid-template-columns: 1fr;
+	}
+
+	@media (min-width: 1024px) {
+		.browse-grid {
+			grid-template-columns: 1.2fr 1fr;
+		}
+	}
+
+	/* On mobile, when a slug is present, show detail first */
+	@media (max-width: 1023px) {
+		.browse-grid-detail .browse-detail {
+			order: -1;
+		}
+	}
+
+	.back-link {
+		display: none;
+		align-items: center;
+		gap: 6px;
+		margin-bottom: var(--space-md);
+		font-family: var(--font-display);
+		font-size: var(--text-xs);
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		text-decoration: none;
+		color: var(--text-secondary);
+		transition: color var(--duration-fast) var(--ease-out-quart);
+	}
+
+	.back-link:hover {
+		color: var(--accent);
+	}
+
+	@media (max-width: 1023px) {
+		.back-link {
+			display: inline-flex;
+		}
+	}
+
 	/* Sidebar Preview Layout */
-	.sticky-column {
-		position: sticky;
-		top: var(--space-md);
+	@media (min-width: 1024px) {
+		.sticky-column {
+			position: sticky;
+			top: var(--space-md);
+		}
 	}
 
 	.preview-scroll-container {
