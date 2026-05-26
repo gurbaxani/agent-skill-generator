@@ -1,6 +1,7 @@
 <script lang="ts">
 	import SkillPreview from '$lib/components/SkillPreview.svelte';
 	import CatalogEntry from '$lib/components/CatalogEntry.svelte';
+	import ProductHuntBadge from '$lib/components/ProductHuntBadge.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -65,6 +66,9 @@
 					Start Building
 				</a>
 				<a href="/browse" class="btn btn-outline" id="cta-browse"> Explore Skills </a>
+			</div>
+			<div class="hero-ph-container">
+				<ProductHuntBadge />
 			</div>
 		</div>
 		<div class="hero-terminal">
@@ -150,6 +154,9 @@
 			<span class="footer-text">&copy; {new Date().getFullYear()} KH Systems Private Limited</span>
 			<span class="footer-sep" aria-hidden="true">·</span>
 			<span class="footer-text">MIT License</span>
+		</div>
+		<div class="footer-badge">
+			<ProductHuntBadge />
 		</div>
 		<div class="footer-links">
 			<a
@@ -531,6 +538,19 @@
 	.site-footer {
 		padding: var(--space-xl) var(--space-xl);
 		border-top: 1px solid var(--border-default);
+	}
+
+	.footer-badge {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.hero-ph-container {
+		margin-top: var(--space-xl);
+		display: flex;
+		align-items: center;
+		animation: fade-in-up var(--duration-entrance) var(--ease-out-expo) 150ms both;
 	}
 
 	.footer-inner {
