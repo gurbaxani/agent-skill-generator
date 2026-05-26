@@ -3,11 +3,7 @@ import type { SkillDraftState } from '$lib/state/draft.svelte';
 
 function unescapeYamlValue(val: string): string {
 	if (val.startsWith('"') && val.endsWith('"')) {
-		return val
-			.slice(1, -1)
-			.replace(/\\"/g, '"')
-			.replace(/\\n/g, '\n')
-			.replace(/\\\\/g, '\\');
+		return val.slice(1, -1).replace(/\\"/g, '"').replace(/\\n/g, '\n').replace(/\\\\/g, '\\');
 	}
 	if (val.startsWith("'") && val.endsWith("'")) {
 		return val.slice(1, -1);
@@ -93,7 +89,10 @@ export function parseSkill(raw: string): Skill {
 			}
 		}
 		if (lastHeaderLine !== -1) {
-			cleanedBody = lines.slice(lastHeaderLine + 1).join('\n').trim();
+			cleanedBody = lines
+				.slice(lastHeaderLine + 1)
+				.join('\n')
+				.trim();
 		}
 	}
 
@@ -166,7 +165,10 @@ export function serializeSkill(skill: Skill): string {
 			}
 		}
 		if (lastHeaderLine !== -1) {
-			cleanedBody = lines.slice(lastHeaderLine + 1).join('\n').trim();
+			cleanedBody = lines
+				.slice(lastHeaderLine + 1)
+				.join('\n')
+				.trim();
 		}
 	}
 

@@ -72,8 +72,16 @@ export async function publishSkill(skill: Skill, token: string): Promise<string>
 		}
 	}
 
-	const authorClean = author.toLowerCase().trim().replace(/[^a-z0-9_-]/g, '') || 'anonymous';
-	const nameClean = skill.name.toLowerCase().trim().replace(/[^a-z0-9_-]/g, '') || 'untitled-skill';
+	const authorClean =
+		author
+			.toLowerCase()
+			.trim()
+			.replace(/[^a-z0-9_-]/g, '') || 'anonymous';
+	const nameClean =
+		skill.name
+			.toLowerCase()
+			.trim()
+			.replace(/[^a-z0-9_-]/g, '') || 'untitled-skill';
 	const timestamp = Date.now();
 	const branchName = `registry/submit-${nameClean}-${timestamp}`;
 	const filepath = `community/${authorClean}/${nameClean}.md`;

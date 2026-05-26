@@ -67,7 +67,10 @@
 		...new Set(
 			skills.flatMap((s) =>
 				s.metadata?.tags
-					? s.metadata.tags.split(',').map((t) => t.trim()).filter(Boolean)
+					? s.metadata.tags
+							.split(',')
+							.map((t) => t.trim())
+							.filter(Boolean)
 					: []
 			)
 		)
@@ -97,9 +100,7 @@
 		return filteredSkills[0] || null;
 	});
 
-	const selectedSkillMarkdown = $derived(
-		selectedSkill ? serializeSkill(selectedSkill) : ''
-	);
+	const selectedSkillMarkdown = $derived(selectedSkill ? serializeSkill(selectedSkill) : '');
 
 	const frontmatterLines = $derived.by(() => {
 		if (!selectedSkillMarkdown) return [];
@@ -129,7 +130,6 @@
 		}
 	}
 </script>
-
 
 <svelte:head>
 	<title>Browse Skills — ASG</title>
@@ -249,9 +249,12 @@
 										>
 											{skill.name}
 										</span>
-										{#each (skill.metadata?.tags ? skill.metadata.tags.split(',').map(t => t.trim()).filter(Boolean) : []) as tag (tag)}
+										{#each skill.metadata?.tags ? skill.metadata.tags
+													.split(',')
+													.map((t) => t.trim())
+													.filter(Boolean) : [] as tag (tag)}
 											<span
-												class="tag-pill font-mono text-[9px] font-bold uppercase mr-1"
+												class="tag-pill mr-1 font-mono text-[9px] font-bold uppercase"
 												style="border: 1px solid var(--border-accent); color: var(--accent);"
 											>
 												{tag}
@@ -357,10 +360,22 @@
 						<div class="mt-2 border-t border-(--border-default) pt-4">
 							{#if githubAuth.token}
 								{#if publishUrl}
-									<div class="cyber-panel p-4 text-center" style="background: var(--surface-sunken); border-color: var(--accent);">
-										<p class="text-xs text-(--text-primary) font-mono">Skill published successfully!</p>
-										<p class="mt-1 font-mono text-[10px] text-(--text-secondary) break-all">{publishUrl}</p>
-										<a href={publishUrl} target="_blank" rel="noopener noreferrer" class="mt-2 inline-flex items-center gap-1 text-xs text-(--accent) underline hover:text-(--accent-hover)">
+									<div
+										class="cyber-panel p-4 text-center"
+										style="background: var(--surface-sunken); border-color: var(--accent);"
+									>
+										<p class="font-mono text-xs text-(--text-primary)">
+											Skill published successfully!
+										</p>
+										<p class="mt-1 font-mono text-[10px] break-all text-(--text-secondary)">
+											{publishUrl}
+										</p>
+										<a
+											href={publishUrl}
+											target="_blank"
+											rel="noopener noreferrer"
+											class="mt-2 inline-flex items-center gap-1 text-xs text-(--accent) underline hover:text-(--accent-hover)"
+										>
 											<i class="bi bi-link-45deg"></i> View on GitHub
 										</a>
 									</div>
@@ -390,7 +405,9 @@
 								</button>
 							{/if}
 							{#if publishError}
-								<p class="mt-2 text-center text-xs font-mono text-(--secondary)">[Error] {publishError}</p>
+								<p class="mt-2 text-center font-mono text-xs text-(--secondary)">
+									[Error] {publishError}
+								</p>
 							{/if}
 						</div>
 					</div>

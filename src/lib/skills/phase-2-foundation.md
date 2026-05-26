@@ -1,11 +1,12 @@
 ---
-name: "phase-2-foundation"
-description: ""
-license: "MIT"
+name: 'phase-2-foundation'
+description: ''
+license: 'MIT'
 metadata:
-  author: "@msitarzewski"
-  tags: "playbooks"
+  author: '@msitarzewski'
+  tags: 'playbooks'
 ---
+
 # ⚙️ Phase 2 Playbook — Foundation & Scaffolding
 
 > **Duration**: 3-5 days | **Agents**: 6 | **Gate Keepers**: DevOps Automator + Evidence Collector
@@ -27,6 +28,7 @@ Build the technical and operational foundation that all subsequent work depends 
 ### Workstream A: Infrastructure (Day 1-3, Parallel)
 
 #### 🚀 DevOps Automator — CI/CD Pipeline + Infrastructure
+
 ```
 Activate DevOps Automator for infrastructure setup on [PROJECT].
 
@@ -58,6 +60,7 @@ Timeline: 3 days
 ```
 
 #### 🏗️ Infrastructure Maintainer — Cloud Infrastructure + Monitoring
+
 ```
 Activate Infrastructure Maintainer for monitoring setup on [PROJECT].
 
@@ -85,6 +88,7 @@ Timeline: 3 days
 ```
 
 #### ⚙️ Studio Operations — Process Setup
+
 ```
 Activate Studio Operations for process setup on [PROJECT].
 
@@ -113,6 +117,7 @@ Timeline: 2 days
 ### Workstream B: Application Foundation (Day 1-4, Parallel)
 
 #### 🎨 Frontend Developer — Project Scaffolding + Component Library
+
 ```
 Activate Frontend Developer for project scaffolding on [PROJECT].
 
@@ -145,6 +150,7 @@ Timeline: 3 days
 ```
 
 #### 🏗️ Backend Architect — Database + API Foundation
+
 ```
 Activate Backend Architect for API foundation on [PROJECT].
 
@@ -179,6 +185,7 @@ Timeline: 4 days
 ```
 
 #### 🏛️ UX Architect — CSS System Implementation
+
 ```
 Activate UX Architect for CSS system implementation on [PROJECT].
 
@@ -212,6 +219,7 @@ Timeline: 2 days
 ## Verification Checkpoint (Day 4-5)
 
 ### Evidence Collector Verification
+
 ```
 Activate Evidence Collector for Phase 2 foundation verification.
 
@@ -231,16 +239,16 @@ Verdict: PASS / FAIL with specific issues
 
 ## Quality Gate Checklist
 
-| # | Criterion | Evidence Source | Status |
-|---|-----------|----------------|--------|
-| 1 | CI/CD pipeline builds, tests, and deploys | Pipeline execution logs | ☐ |
-| 2 | Database schema deployed with all tables/indexes | Migration success output | ☐ |
-| 3 | API scaffold responding on health check | curl response evidence | ☐ |
-| 4 | Frontend skeleton renders in browser | Evidence Collector screenshots | ☐ |
-| 5 | Monitoring dashboards showing metrics | Dashboard screenshots | ☐ |
-| 6 | Design system tokens implemented | Component library demo | ☐ |
-| 7 | Theme toggle functional (light/dark/system) | Before/after screenshots | ☐ |
-| 8 | Git workflow and processes documented | Studio Operations playbook | ☐ |
+| #   | Criterion                                        | Evidence Source                | Status |
+| --- | ------------------------------------------------ | ------------------------------ | ------ |
+| 1   | CI/CD pipeline builds, tests, and deploys        | Pipeline execution logs        | ☐      |
+| 2   | Database schema deployed with all tables/indexes | Migration success output       | ☐      |
+| 3   | API scaffold responding on health check          | curl response evidence         | ☐      |
+| 4   | Frontend skeleton renders in browser             | Evidence Collector screenshots | ☐      |
+| 5   | Monitoring dashboards showing metrics            | Dashboard screenshots          | ☐      |
+| 6   | Design system tokens implemented                 | Component library demo         | ☐      |
+| 7   | Theme toggle functional (light/dark/system)      | Before/after screenshots       | ☐      |
+| 8   | Git workflow and processes documented            | Studio Operations playbook     | ☐      |
 
 ## Gate Decision
 
@@ -255,6 +263,7 @@ Verdict: PASS / FAIL with specific issues
 ## Phase 2 → Phase 3 Handoff Package
 
 ### For all Developer Agents:
+
 - Working CI/CD pipeline (auto-deploys on merge)
 - Design system tokens and component library
 - API scaffold with auth and health checks
@@ -262,18 +271,21 @@ Verdict: PASS / FAIL with specific issues
 - Git workflow and PR process
 
 ### For Evidence Collector (ongoing QA):
+
 - Application URLs (dev, staging)
 - Screenshot capture methodology
 - Component library reference
 - Brand guidelines for visual verification
 
 ### For Agents Orchestrator (Dev↔QA loop management):
+
 - Sprint Prioritizer backlog (from Phase 1)
 - Task list with acceptance criteria (from Phase 1)
 - Agent assignment matrix (from NEXUS strategy)
 - Quality thresholds for each task type
 
 ### Environment Access:
+
 - Dev environment: [URL]
 - Staging environment: [URL]
 - Monitoring dashboard: [URL]
@@ -283,4 +295,4 @@ Verdict: PASS / FAIL with specific issues
 
 ---
 
-*Phase 2 is complete when the skeleton application is running, the CI/CD pipeline is operational, and the Evidence Collector has verified all foundation elements with screenshots.*
+_Phase 2 is complete when the skeleton application is running, the CI/CD pipeline is operational, and the Evidence Collector has verified all foundation elements with screenshots._

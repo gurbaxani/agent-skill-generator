@@ -33,5 +33,3 @@ export interface RegistrySkill {
 	assetKinds?: string[];
 	assetFiles?: RegistryAssetFile[];
 }
-
-

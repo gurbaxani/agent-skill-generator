@@ -188,4 +188,3 @@ export async function downloadSkillAsZip(skill: Skill): Promise<void> {
 	a.click();
 	URL.revokeObjectURL(url);
 }
-

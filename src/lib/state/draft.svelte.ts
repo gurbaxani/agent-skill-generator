@@ -158,7 +158,10 @@ export class SkillDraftState {
 				}
 			}
 			if (lastHeaderLine !== -1) {
-				cleanedBody = bodyLines.slice(lastHeaderLine + 1).join('\n').trim();
+				cleanedBody = bodyLines
+					.slice(lastHeaderLine + 1)
+					.join('\n')
+					.trim();
 			}
 		}
 

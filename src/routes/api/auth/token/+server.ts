@@ -37,10 +37,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		};
 
 		if (data.error) {
-			return json(
-				{ error: data.error_description || data.error },
-				{ status: 400 }
-			);
+			return json({ error: data.error_description || data.error }, { status: 400 });
 		}
 
 		return json({ access_token: data.access_token });
