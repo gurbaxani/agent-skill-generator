@@ -1513,7 +1513,7 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 							{#if downloaded}
 								<i class="bi bi-check-lg"></i> Downloaded!
 							{:else}
-								<i class="bi bi-download" aria-hidden="true"></i> Download Markdown
+								<i class="bi bi-download" aria-hidden="true"></i> Download Skill
 							{/if}
 						</button>
 					</div>

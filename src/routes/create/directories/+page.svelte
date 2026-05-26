@@ -1347,7 +1347,7 @@ Output ONLY the JSON, nothing else.`;
 						{#if downloaded}
 							<i class="bi bi-check-lg" aria-hidden="true"></i> Downloaded!
 						{:else}
-							<i class="bi bi-download" aria-hidden="true"></i> Download Markdown
+							<i class="bi bi-download" aria-hidden="true"></i> Download Skill
 						{/if}
 					</button>
 				</div>
