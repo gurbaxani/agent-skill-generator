@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { userState } from '$lib/state/user.svelte';
 	import { skillDraft, type MetaEntry } from '$lib/state/draft.svelte';
+	import { extractAndParseJson } from '$lib/utils/llm';
 
 	let showExperimentalMsg = $state(false);
 
@@ -66,6 +67,17 @@ Output ONLY the JSON, nothing else.`;
 						body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
 					}
 				);
+				if (!res.ok) {
+					const text = await res.text();
+					let message = `Gemini API returned status ${res.status}`;
+					try {
+						const parsed = JSON.parse(text);
+						message = parsed.error?.message || parsed.message || message;
+					} catch {
+						if (text) message = text.length > 200 ? text.slice(0, 200) + '...' : text;
+					}
+					throw new Error(message);
+				}
 				const data = await res.json();
 				if (data.error) throw new Error(data.error.message);
 				responseText = data.candidates[0].content.parts[0].text.trim();
@@ -84,6 +96,17 @@ Output ONLY the JSON, nothing else.`;
 						messages: [{ role: 'user', content: prompt }]
 					})
 				});
+				if (!res.ok) {
+					const text = await res.text();
+					let message = `Anthropic API returned status ${res.status}`;
+					try {
+						const parsed = JSON.parse(text);
+						message = parsed.error?.message || parsed.message || message;
+					} catch {
+						if (text) message = text.length > 200 ? text.slice(0, 200) + '...' : text;
+					}
+					throw new Error(message);
+				}
 				const data = await res.json();
 				if (data.error) throw new Error(data.error.message);
 				responseText = data.content[0].text.trim();
@@ -107,16 +130,28 @@ Output ONLY the JSON, nothing else.`;
 						messages: [{ role: 'user', content: prompt }]
 					})
 				});
+				if (!res.ok) {
+					const text = await res.text();
+					let message = `API returned status ${res.status}`;
+					try {
+						const parsed = JSON.parse(text);
+						message = parsed.error?.message || parsed.message || message;
+					} catch {
+						if (text) message = text.length > 200 ? text.slice(0, 200) + '...' : text;
+					}
+					throw new Error(message);
+				}
 				const data = await res.json();
 				if (data.error) throw new Error(data.error.message);
 				responseText = data.choices[0].message.content.trim();
 			}
 
-			const cleaned = responseText
-				.replace(/^```json\s*/i, '')
-				.replace(/```$/, '')
-				.trim();
-			const parsed = JSON.parse(cleaned);
+			const parsed = extractAndParseJson<{
+				license?: string;
+				compatibility?: string;
+				metadata?: Record<string, string | number | boolean>;
+				'allowed-tools'?: string;
+			}>(responseText);
 
 			if (parsed.license) skillDraft.license = parsed.license;
 			if (parsed.compatibility) skillDraft.compatibility = parsed.compatibility.slice(0, 500);

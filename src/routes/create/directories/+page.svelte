@@ -4,6 +4,7 @@
 	import { userState } from '$lib/state/user.svelte';
 	import { skillDraft, type ScriptLanguage, type AssetKind } from '$lib/state/draft.svelte';
 	import { serializeSkill, draftToSkill } from '$lib/parse-skill';
+	import { extractAndParseJson } from '$lib/utils/llm';
 	import { downloadSkillZip } from '$lib/utils/zip';
 
 	let isGenerating = $state(false);
@@ -68,6 +69,17 @@ Output ONLY the JSON, nothing else.`;
 						body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
 					}
 				);
+				if (!res.ok) {
+					const text = await res.text();
+					let message = `Gemini API returned status ${res.status}`;
+					try {
+						const parsed = JSON.parse(text);
+						message = parsed.error?.message || parsed.message || message;
+					} catch {
+						if (text) message = text.length > 200 ? text.slice(0, 200) + '...' : text;
+					}
+					throw new Error(message);
+				}
 				const data = await res.json();
 				if (data.error) throw new Error(data.error.message);
 				responseText = data.candidates[0].content.parts[0].text.trim();
@@ -86,6 +98,17 @@ Output ONLY the JSON, nothing else.`;
 						messages: [{ role: 'user', content: prompt }]
 					})
 				});
+				if (!res.ok) {
+					const text = await res.text();
+					let message = `Anthropic API returned status ${res.status}`;
+					try {
+						const parsed = JSON.parse(text);
+						message = parsed.error?.message || parsed.message || message;
+					} catch {
+						if (text) message = text.length > 200 ? text.slice(0, 200) + '...' : text;
+					}
+					throw new Error(message);
+				}
 				const data = await res.json();
 				if (data.error) throw new Error(data.error.message);
 				responseText = data.content[0].text.trim();
@@ -108,16 +131,23 @@ Output ONLY the JSON, nothing else.`;
 						messages: [{ role: 'user', content: prompt }]
 					})
 				});
+				if (!res.ok) {
+					const text = await res.text();
+					let message = `API returned status ${res.status}`;
+					try {
+						const parsed = JSON.parse(text);
+						message = parsed.error?.message || parsed.message || message;
+					} catch {
+						if (text) message = text.length > 200 ? text.slice(0, 200) + '...' : text;
+					}
+					throw new Error(message);
+				}
 				const data = await res.json();
 				if (data.error) throw new Error(data.error.message);
 				responseText = data.choices[0].message.content.trim();
 			}
 
-			const cleaned = responseText
-				.replace(/^```json\s*/i, '')
-				.replace(/```$/, '')
-				.trim();
-			const parsed: GenerateResult = JSON.parse(cleaned);
+			const parsed = extractAndParseJson<GenerateResult>(responseText);
 
 			if (parsed.scripts?.enabled) {
 				skillDraft.enableScripts = true;
@@ -1261,43 +1291,51 @@ Output ONLY the JSON, nothing else.`;
 				</button>
 				<div class="flex items-center gap-3">
 					{#if publishUrl}
-						<div class="cyber-panel p-4 text-center mr-3" style="background: var(--surface-sunken); border-color: var(--accent); max-width: 320px; border-radius: 2px;">
-							<p class="text-xs text-(--text-primary) font-mono">Skill published successfully!</p>
-							<p class="mt-1 font-mono text-[10px] text-(--text-secondary) break-all">{publishUrl}</p>
-							<a href={publishUrl} target="_blank" rel="noopener noreferrer" class="mt-2 inline-flex items-center gap-1 text-xs text-(--accent) underline hover:text-(--accent-hover)">
+						<div
+							class="cyber-panel mr-3 p-4 text-center"
+							style="background: var(--surface-sunken); border-color: var(--accent); max-width: 320px; border-radius: 2px;"
+						>
+							<p class="font-mono text-xs text-(--text-primary)">Skill published successfully!</p>
+							<p class="mt-1 font-mono text-[10px] break-all text-(--text-secondary)">
+								{publishUrl}
+							</p>
+							<a
+								href={publishUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="mt-2 inline-flex items-center gap-1 text-xs text-(--accent) underline hover:text-(--accent-hover)"
+							>
 								<i class="bi bi-link-45deg"></i> View on GitHub
 							</a>
 						</div>
+					{:else if githubAuth.token}
+						<button
+							type="button"
+							id="btn-submit-github"
+							onclick={handlePublish}
+							disabled={isPublishing}
+							style="background: var(--accent); color: var(--accent-fg); font-family: var(--font-display); border-radius: 2px;"
+							class="flex items-center justify-center gap-2 px-6 py-3.5 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_15px_var(--accent-glow)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
+						>
+							{#if isPublishing}
+								<i class="bi bi-cpu animate-spin" aria-hidden="true"></i> Publishing...
+							{:else}
+								<i class="bi bi-cloud-arrow-up" aria-hidden="true"></i> Publish to Registry
+							{/if}
+						</button>
 					{:else}
-						{#if githubAuth.token}
-							<button
-								type="button"
-								id="btn-submit-github"
-								onclick={handlePublish}
-								disabled={isPublishing}
-								style="background: var(--accent); color: var(--accent-fg); font-family: var(--font-display); border-radius: 2px;"
-								class="flex items-center justify-center gap-2 px-6 py-3.5 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_15px_var(--accent-glow)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
-							>
-								{#if isPublishing}
-									<i class="bi bi-cpu animate-spin" aria-hidden="true"></i> Publishing...
-								{:else}
-									<i class="bi bi-cloud-arrow-up" aria-hidden="true"></i> Publish to Registry
-								{/if}
-							</button>
-						{:else}
-							<button
-								type="button"
-								id="btn-submit-github"
-								onclick={handleGithubLogin}
-								style="border: 1px solid var(--accent); color: var(--accent); font-family: var(--font-display); border-radius: 2px;"
-								class="flex items-center justify-center gap-2 px-6 py-3.5 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-glow) focus:outline-none"
-							>
-								<i class="bi bi-github" aria-hidden="true"></i> Login to Publish
-							</button>
-						{/if}
+						<button
+							type="button"
+							id="btn-submit-github"
+							onclick={handleGithubLogin}
+							style="border: 1px solid var(--accent); color: var(--accent); font-family: var(--font-display); border-radius: 2px;"
+							class="flex items-center justify-center gap-2 px-6 py-3.5 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-glow) focus:outline-none"
+						>
+							<i class="bi bi-github" aria-hidden="true"></i> Login to Publish
+						</button>
 					{/if}
 					{#if publishErrorMsg}
-						<span class="text-xs font-mono text-(--secondary)">[Error] {publishErrorMsg}</span>
+						<span class="font-mono text-xs text-(--secondary)">[Error] {publishErrorMsg}</span>
 					{/if}
 					<button
 						type="button"

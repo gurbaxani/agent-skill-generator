@@ -12,6 +12,7 @@
 	import { marked } from 'marked';
 	import { serializeSkill, draftToSkill } from '$lib/parse-skill';
 	import { downloadSkillZip } from '$lib/utils/zip';
+	import { extractAndParseJson } from '$lib/utils/llm';
 
 	// ── Page States ──────────────────────────────────────────────────────────
 	let isGenerating = $state(false);
@@ -120,6 +121,17 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 						body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
 					}
 				);
+				if (!res.ok) {
+					const text = await res.text();
+					let message = `Gemini API returned status ${res.status}`;
+					try {
+						const parsed = JSON.parse(text);
+						message = parsed.error?.message || parsed.message || message;
+					} catch {
+						if (text) message = text.length > 200 ? text.slice(0, 200) + '...' : text;
+					}
+					throw new Error(message);
+				}
 				const data = await res.json();
 				if (data.error) throw new Error(data.error.message);
 				responseText = data.candidates[0].content.parts[0].text.trim();
@@ -138,6 +150,17 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 						messages: [{ role: 'user', content: prompt }]
 					})
 				});
+				if (!res.ok) {
+					const text = await res.text();
+					let message = `Anthropic API returned status ${res.status}`;
+					try {
+						const parsed = JSON.parse(text);
+						message = parsed.error?.message || parsed.message || message;
+					} catch {
+						if (text) message = text.length > 200 ? text.slice(0, 200) + '...' : text;
+					}
+					throw new Error(message);
+				}
 				const data = await res.json();
 				if (data.error) throw new Error(data.error.message);
 				responseText = data.content[0].text.trim();
@@ -160,16 +183,23 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 						messages: [{ role: 'user', content: prompt }]
 					})
 				});
+				if (!res.ok) {
+					const text = await res.text();
+					let message = `API returned status ${res.status}`;
+					try {
+						const parsed = JSON.parse(text);
+						message = parsed.error?.message || parsed.message || message;
+					} catch {
+						if (text) message = text.length > 200 ? text.slice(0, 200) + '...' : text;
+					}
+					throw new Error(message);
+				}
 				const data = await res.json();
 				if (data.error) throw new Error(data.error.message);
 				responseText = data.choices[0].message.content.trim();
 			}
 
-			const cleaned = responseText
-				.replace(/^```json\s*/i, '')
-				.replace(/```$/, '')
-				.trim();
-			const parsed: AIGeneratedSkill = JSON.parse(cleaned);
+			const parsed = extractAndParseJson<AIGeneratedSkill>(responseText);
 
 			if (parsed.name) skillDraft.name = parsed.name;
 			if (parsed.description) skillDraft.description = parsed.description;
@@ -1489,44 +1519,54 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 					</div>
 
 					{#if publishUrl}
-						<div class="cyber-panel p-4 text-center mt-3" style="background: var(--surface-sunken); border-color: var(--accent); width: 100%;">
-							<p class="text-xs text-(--text-primary) font-mono">Skill published successfully!</p>
-							<p class="mt-1 font-mono text-[10px] text-(--text-secondary) break-all">{publishUrl}</p>
-							<a href={publishUrl} target="_blank" rel="noopener noreferrer" class="mt-2 inline-flex items-center gap-1 text-xs text-(--accent) underline hover:text-(--accent-hover)">
+						<div
+							class="cyber-panel mt-3 p-4 text-center"
+							style="background: var(--surface-sunken); border-color: var(--accent); width: 100%;"
+						>
+							<p class="font-mono text-xs text-(--text-primary)">Skill published successfully!</p>
+							<p class="mt-1 font-mono text-[10px] break-all text-(--text-secondary)">
+								{publishUrl}
+							</p>
+							<a
+								href={publishUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="mt-2 inline-flex items-center gap-1 text-xs text-(--accent) underline hover:text-(--accent-hover)"
+							>
 								<i class="bi bi-link-45deg"></i> View on GitHub
 							</a>
 						</div>
+					{:else if githubAuth.token}
+						<button
+							type="button"
+							id="expert-btn-submit"
+							onclick={handlePublish}
+							disabled={!isValid || isPublishing}
+							style="background: var(--accent); color: var(--accent-fg);"
+							class="flex w-full items-center justify-center gap-2 rounded-[2px] py-3.5 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_15px_var(--accent-glow)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
+						>
+							{#if isPublishing}
+								<i class="bi bi-cpu animate-spin" aria-hidden="true"></i> Publishing...
+							{:else}
+								<i class="bi bi-cloud-arrow-up" aria-hidden="true"></i> Publish to Registry
+							{/if}
+						</button>
 					{:else}
-						{#if githubAuth.token}
-							<button
-								type="button"
-								id="expert-btn-submit"
-								onclick={handlePublish}
-								disabled={!isValid || isPublishing}
-								style="background: var(--accent); color: var(--accent-fg);"
-								class="flex w-full items-center justify-center gap-2 rounded-[2px] py-3.5 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-hover) hover:shadow-[0_0_15px_var(--accent-glow)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
-							>
-								{#if isPublishing}
-									<i class="bi bi-cpu animate-spin" aria-hidden="true"></i> Publishing...
-								{:else}
-									<i class="bi bi-cloud-arrow-up" aria-hidden="true"></i> Publish to Registry
-								{/if}
-							</button>
-						{:else}
-							<button
-								type="button"
-								id="expert-btn-submit"
-								onclick={handleGithubLogin}
-								disabled={!isValid}
-								style="border: 1px solid var(--accent); color: var(--accent);"
-								class="flex w-full items-center justify-center gap-2 rounded-[2px] py-3.5 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-glow) focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
-							>
-								<i class="bi bi-github" aria-hidden="true"></i> Login with GitHub to Publish
-							</button>
-						{/if}
+						<button
+							type="button"
+							id="expert-btn-submit"
+							onclick={handleGithubLogin}
+							disabled={!isValid}
+							style="border: 1px solid var(--accent); color: var(--accent);"
+							class="flex w-full items-center justify-center gap-2 rounded-[2px] py-3.5 text-xs font-bold tracking-widest uppercase transition-all hover:bg-(--accent-glow) focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
+						>
+							<i class="bi bi-github" aria-hidden="true"></i> Login with GitHub to Publish
+						</button>
 					{/if}
 					{#if publishErrorMsg}
-						<p class="mt-2 text-center text-xs font-mono text-(--secondary)">[Error] {publishErrorMsg}</p>
+						<p class="mt-2 text-center font-mono text-xs text-(--secondary)">
+							[Error] {publishErrorMsg}
+						</p>
 					{/if}
 				</div>
 			</div>

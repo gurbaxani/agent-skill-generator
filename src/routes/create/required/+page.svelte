@@ -49,6 +49,17 @@ Output ONLY the text of the description, nothing else.`;
 						body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
 					}
 				);
+				if (!res.ok) {
+					const text = await res.text();
+					let message = `Gemini API returned status ${res.status}`;
+					try {
+						const parsed = JSON.parse(text);
+						message = parsed.error?.message || parsed.message || message;
+					} catch {
+						if (text) message = text.length > 200 ? text.slice(0, 200) + '...' : text;
+					}
+					throw new Error(message);
+				}
 				const data = await res.json();
 				if (data.error) throw new Error(data.error.message);
 				responseText = data.candidates[0].content.parts[0].text.trim();
@@ -67,6 +78,17 @@ Output ONLY the text of the description, nothing else.`;
 						messages: [{ role: 'user', content: prompt }]
 					})
 				});
+				if (!res.ok) {
+					const text = await res.text();
+					let message = `Anthropic API returned status ${res.status}`;
+					try {
+						const parsed = JSON.parse(text);
+						message = parsed.error?.message || parsed.message || message;
+					} catch {
+						if (text) message = text.length > 200 ? text.slice(0, 200) + '...' : text;
+					}
+					throw new Error(message);
+				}
 				const data = await res.json();
 				if (data.error) throw new Error(data.error.message);
 				responseText = data.content[0].text.trim();
@@ -89,6 +111,17 @@ Output ONLY the text of the description, nothing else.`;
 						messages: [{ role: 'user', content: prompt }]
 					})
 				});
+				if (!res.ok) {
+					const text = await res.text();
+					let message = `API returned status ${res.status}`;
+					try {
+						const parsed = JSON.parse(text);
+						message = parsed.error?.message || parsed.message || message;
+					} catch {
+						if (text) message = text.length > 200 ? text.slice(0, 200) + '...' : text;
+					}
+					throw new Error(message);
+				}
 				const data = await res.json();
 				if (data.error) throw new Error(data.error.message);
 				responseText = data.choices[0].message.content.trim();
