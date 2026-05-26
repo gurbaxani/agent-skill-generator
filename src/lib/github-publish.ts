@@ -53,8 +53,27 @@ export async function publishSkill(skill: Skill, token: string): Promise<string>
 	const forkRepo = forkData.name;
 
 	// Define branch and path names
-	const authorClean = (skill.metadata?.author || '').trim().replace(/^@/, '');
-	const nameClean = skill.name.toLowerCase().trim().replace(/[^a-z0-9_-]/g, '');
+	let author = (skill.metadata?.author || '').trim().replace(/^@/, '');
+	if (!author) {
+		try {
+			const userRes = await fetch('https://api.github.com/user', {
+				headers: {
+					Authorization: `Bearer ${token}`,
+					Accept: 'application/vnd.github.v3+json',
+					'User-Agent': 'ASG-App'
+				}
+			});
+			if (userRes.ok) {
+				const userData = (await userRes.json()) as { login: string };
+				author = userData.login.trim();
+			}
+		} catch (e) {
+			console.warn('Failed to fetch authenticated user details:', e);
+		}
+	}
+
+	const authorClean = author.toLowerCase().trim().replace(/[^a-z0-9_-]/g, '') || 'anonymous';
+	const nameClean = skill.name.toLowerCase().trim().replace(/[^a-z0-9_-]/g, '') || 'untitled-skill';
 	const timestamp = Date.now();
 	const branchName = `registry/submit-${nameClean}-${timestamp}`;
 	const filepath = `community/${authorClean}/${nameClean}.md`;
