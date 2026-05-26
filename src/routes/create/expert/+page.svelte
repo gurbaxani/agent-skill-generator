@@ -11,6 +11,7 @@
 	} from '$lib/state/draft.svelte';
 	import { marked } from 'marked';
 	import { serializeSkill, draftToSkill } from '$lib/parse-skill';
+	import { downloadSkillZip } from '$lib/utils/zip';
 
 	// ── Page States ──────────────────────────────────────────────────────────
 	let isGenerating = $state(false);
@@ -471,24 +472,14 @@ Do NOT include any markdown formatting around the JSON except standard \`\`\`jso
 		setTimeout(() => (copied = false), 2000);
 	}
 
-	function handleDownload() {
+	async function handleDownload() {
 		try {
-			const skill = draftToSkill(skillDraft);
-			const serialized = serializeSkill(skill);
-			const blob = new Blob([serialized], { type: 'text/markdown;charset=utf-8;' });
-			const url = URL.createObjectURL(blob);
-			const link = document.createElement('a');
-			link.href = url;
-			link.setAttribute('download', `${skill.name || 'skill'}.md`);
-			document.body.appendChild(link);
-			link.click();
-			document.body.removeChild(link);
-			URL.revokeObjectURL(url);
+			await downloadSkillZip(skillDraft);
 			downloaded = true;
 			setTimeout(() => (downloaded = false), 2000);
 		} catch (err) {
 			console.error(err);
-			errorMsg = err instanceof Error ? err.message : 'Failed to generate Markdown download.';
+			errorMsg = err instanceof Error ? err.message : 'Failed to generate ZIP download.';
 		}
 	}
 

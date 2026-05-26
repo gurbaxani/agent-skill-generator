@@ -77,15 +77,30 @@ export function parseFrontmatter(raw: string): { data: Record<string, any>; cont
 
 /**
  * Parses raw SKILL.md contents into a Skill object.
- * Maps 'allowed-tools' in YAML frontmatter to allowedTools, and trims the body.
+ * Supports both the traditional YAML frontmatter format and the new layout format.
  */
 export function parseSkill(raw: string): Skill {
 	const { data, content } = parseFrontmatter(raw);
 
+	let cleanedBody = content.trim();
+	if (cleanedBody.startsWith('> ## Documentation Index')) {
+		const lines = cleanedBody.split('\n');
+		let lastHeaderLine = -1;
+		for (let i = 0; i < lines.length; i++) {
+			if (lines[i].includes('discover all available pages before exploring further.')) {
+				lastHeaderLine = i;
+				break;
+			}
+		}
+		if (lastHeaderLine !== -1) {
+			cleanedBody = lines.slice(lastHeaderLine + 1).join('\n').trim();
+		}
+	}
+
 	const skill: Skill = {
 		name: data.name !== undefined ? String(data.name) : '',
 		description: data.description !== undefined ? String(data.description) : '',
-		body: content.trim()
+		body: cleanedBody
 	};
 
 	if (data.license !== undefined) {
@@ -109,8 +124,7 @@ export function parseSkill(raw: string): Skill {
 }
 
 /**
- * Serializes a Skill object back to SKILL.md format with YAML frontmatter.
- * Maps allowedTools back to 'allowed-tools', and omits undefined optional fields.
+ * Serializes a Skill object back to SKILL.md format with YAML frontmatter and Documentation Index blockquote.
  */
 export function serializeSkill(skill: Skill): string {
 	const yamlLines: string[] = ['---'];
@@ -137,7 +151,26 @@ export function serializeSkill(skill: Skill): string {
 
 	yamlLines.push('---');
 
-	return yamlLines.join('\n') + '\n' + skill.body;
+	const docIndexHeader = `> ## Documentation Index
+> Fetch the complete documentation index at: https://agentskills.io/llms.txt
+> Use this file to discover all available pages before exploring further.`;
+
+	let cleanedBody = skill.body.trim();
+	if (cleanedBody.startsWith('> ## Documentation Index')) {
+		const lines = cleanedBody.split('\n');
+		let lastHeaderLine = -1;
+		for (let i = 0; i < lines.length; i++) {
+			if (lines[i].includes('discover all available pages before exploring further.')) {
+				lastHeaderLine = i;
+				break;
+			}
+		}
+		if (lastHeaderLine !== -1) {
+			cleanedBody = lines.slice(lastHeaderLine + 1).join('\n').trim();
+		}
+	}
+
+	return yamlLines.join('\n') + '\n' + docIndexHeader + '\n\n' + cleanedBody;
 }
 
 function escapeYamlValue(str: string): string {

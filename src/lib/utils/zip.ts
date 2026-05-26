@@ -1,5 +1,7 @@
 import JSZip from 'jszip';
 import type { SkillDraftState } from '$lib/state/draft.svelte';
+import type { Skill } from '$lib/types';
+import { serializeSkill } from '$lib/parse-skill';
 
 /**
  * Generates a structured .zip file for the skill draft and triggers a browser download.
@@ -158,3 +160,32 @@ export async function downloadSkillZip(draft: SkillDraftState): Promise<void> {
 	a.click();
 	URL.revokeObjectURL(url);
 }
+
+export async function downloadSkillAsZip(skill: Skill): Promise<void> {
+	const zip = new JSZip();
+	const folderName =
+		skill.name
+			.toLowerCase()
+			.replace(/[^a-z0-9\s-]/g, '')
+			.replace(/\s+/g, '-')
+			.replace(/-+/g, '-')
+			.replace(/^-+/, '')
+			.slice(0, 63) || 'skill';
+
+	const skillFolder = zip.folder(folderName);
+	if (!skillFolder) {
+		throw new Error('Failed to create skill folder in ZIP archive.');
+	}
+
+	const serialized = serializeSkill(skill);
+	skillFolder.file('SKILL.md', serialized);
+
+	const content = await zip.generateAsync({ type: 'blob' });
+	const url = URL.createObjectURL(content);
+	const a = document.createElement('a');
+	a.href = url;
+	a.download = `${folderName}.zip`;
+	a.click();
+	URL.revokeObjectURL(url);
+}
+

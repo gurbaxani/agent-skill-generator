@@ -133,7 +133,7 @@ export class SkillDraftState {
 		}
 		const metaObj: Record<string, string> = {};
 		for (const m of this.metadata) {
-			if (m.key) metaObj[m.key] = m.value;
+			if (m.key && m.value) metaObj[m.key] = m.value;
 		}
 		if (Object.keys(metaObj).length > 0) {
 			lines.push('metadata:');
@@ -142,9 +142,30 @@ export class SkillDraftState {
 			}
 		}
 		lines.push('---');
-		if (this.body.trim()) {
+
+		const docIndexHeader = `> ## Documentation Index
+> Fetch the complete documentation index at: https://agentskills.io/llms.txt
+> Use this file to discover all available pages before exploring further.`;
+
+		let cleanedBody = this.body.trim();
+		if (cleanedBody.startsWith('> ## Documentation Index')) {
+			const bodyLines = cleanedBody.split('\n');
+			let lastHeaderLine = -1;
+			for (let i = 0; i < bodyLines.length; i++) {
+				if (bodyLines[i].includes('discover all available pages before exploring further.')) {
+					lastHeaderLine = i;
+					break;
+				}
+			}
+			if (lastHeaderLine !== -1) {
+				cleanedBody = bodyLines.slice(lastHeaderLine + 1).join('\n').trim();
+			}
+		}
+
+		lines.push(docIndexHeader);
+		if (cleanedBody) {
 			lines.push('');
-			lines.push(this.body.trim());
+			lines.push(cleanedBody);
 		}
 		return lines.join('\n');
 	}

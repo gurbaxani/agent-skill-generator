@@ -6,6 +6,7 @@
 	import { skillDraft, type ScriptLanguage, type AssetKind } from '$lib/state/draft.svelte';
 	import type { Skill } from '$lib/types';
 	import { serializeSkill } from '$lib/parse-skill';
+	import { downloadSkillAsZip } from '$lib/utils/zip';
 	import { marked } from 'marked';
 	import type { PageData } from './$types';
 	import { githubAuth } from '$lib/state/github-auth.svelte';
@@ -120,18 +121,9 @@
 		goto('/create', { state: { prefill: skill } });
 	}
 
-	function handleDownload(skill: Skill) {
+	async function handleDownload(skill: Skill) {
 		try {
-			const serialized = serializeSkill(skill);
-			const blob = new Blob([serialized], { type: 'text/markdown;charset=utf-8;' });
-			const url = URL.createObjectURL(blob);
-			const link = document.createElement('a');
-			link.href = url;
-			link.setAttribute('download', `${skill.name}.md`);
-			document.body.appendChild(link);
-			link.click();
-			document.body.removeChild(link);
-			URL.revokeObjectURL(url);
+			await downloadSkillAsZip(skill);
 		} catch (error) {
 			console.error('Failed to download skill:', error);
 		}
