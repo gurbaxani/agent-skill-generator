@@ -58,6 +58,7 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+	<script defer data-domain="agent-skill-generator.pages.dev" src="https://plausible.ashwinig.com/js/script.js"></script>
 </svelte:head>
 
 <div class="app-shell">
